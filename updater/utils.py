@@ -47,14 +47,14 @@ def delete_deprecated_files() -> None:
 
 
 def display_release_notes(program_version: str, release_notes: str) -> None:
-    """Displays the release notes of a Fansly Downloader version.
+    """Displays the release notes of a Fansly Downloader NG version.
     
-    :param str program_version: The Fansly Downloader version.
+    :param str program_version: The Fansly Downloader NG version.
     :param str release_notes: The corresponding release notes.
     """
     print_update(f"Successfully updated to version {program_version}!\n\n► Release Notes:\n{release_notes}")
     print()
-    input('Press <ENTER> to start Fansly Downloader ...')
+    input('Press <ENTER> to start Fansly Downloader NG ...')
 
     clear_terminal()
 
@@ -100,11 +100,11 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     :return: True if successful or False otherwise.
     :rtype: bool
     """
-    print_warning(f"A new version of fansly downloader has been found on GitHub - update required!")
+    print_warning(f"A new version of Fansly Downloader NG has been found on GitHub - update required!")
     
     print_info(f"Latest Build:\n{18*' '}Version: {release_info['release_version']}\n{18*' '}Published: {release_info['created_at']}\n{18*' '}Download count: {release_info['download_count']}\n\n{17*' '}Your version: {program_version} is outdated!")
     
-    # if current environment is pure python, prompt user to update fansly downloader himself
+    # If current environment is pure Python prompt user to update Fansly Downloader NG themselves
     if not getattr(sys, 'frozen', False):
         print_warning(f"To update Fansly Downloader, please download the latest version from the GitHub repository.\n{20*' '}Only executable versions of the downloader receive & apply updates automatically.\n")
         # but we don't care if user updates or just wants to see this prompt on every execution further on
@@ -118,7 +118,7 @@ def perform_update(program_version: str, release_info: dict) -> bool:
         release_info['download_url'],
         allow_redirects=True,
         headers = {
-            'user-agent': f'Fansly Downloader {program_version}',
+            'user-agent': f'Fansly Downloader NG {program_version}',
             'accept-language': 'en-US,en;q=0.9'
         }
     )
@@ -170,8 +170,8 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     # start executable from just downloaded latest platform compatible release, with a start argument
     # which instructs it to delete old executable & display release notes for newest version
     current_platform = platform.system()
-    # from now on executable will be called Fansly Downloader
-    filename = 'Fansly Downloader'
+    # from now on executable will be called Fansly Downloader NG
+    filename = 'Fansly Downloader NG'
 
     if current_platform == 'Windows':
         filename = filename + '.exe'

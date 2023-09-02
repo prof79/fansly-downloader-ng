@@ -253,7 +253,7 @@ def load_config(config: FanslyConfig) -> None:
 
         if 'a boolean' in error_string:
             if config.interactive:
-                open_url('https://github.com/Avnsx/fansly-downloader/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+                open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
             raise ConfigError(
                 f"'{error_string.rsplit('boolean: ')[1]}' is malformed in the configuration file! This value can only be True or False"
@@ -262,7 +262,7 @@ def load_config(config: FanslyConfig) -> None:
 
         else:
             if config.interactive:
-                open_url('https://github.com/Avnsx/fansly-downloader/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+                open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
             raise ConfigError(
                 f"You have entered a wrong value in the config.ini file -> '{error_string}'"
@@ -271,7 +271,7 @@ def load_config(config: FanslyConfig) -> None:
 
     except (KeyError, NameError) as key:
         if config.interactive:
-            open_url('https://github.com/Avnsx/fansly-downloader/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+            open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
         raise ConfigError(
             f"'{key}' is missing or malformed in the configuration file!"

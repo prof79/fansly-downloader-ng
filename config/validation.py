@@ -130,7 +130,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
             except ImportError:
                 print_warning(
-                    f"Fansly Downloader's automatic configuration for the authorization_token in the config.ini file will be skipped."
+                    f"Fansly Downloader NG's automatic configuration for the authorization_token in the config.ini file will be skipped."
                     f"\n{20*' '}Your system is missing required plyvel (python module) builds by Siyao Chen (@liviaerxin)."
                     f"\n{20*' '}Installable with 'pip3 install plyvel-ci' or from github.com/liviaerxin/plyvel/releases/latest"
                 )
@@ -187,7 +187,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
                 browser_name = parse_browser_from_string(browser_path)
 
                 if config.interactive:
-                    # let user pick a account, to connect to fansly downloader
+                    # Save token to configuration?
                     print_config(f"Do you want to link the account '{fansly_account}' to Fansly Downloader? (found in: {browser_name})")
 
                     while True:
@@ -262,7 +262,7 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
             print_config(
                 f"Adjusting it with an educated guess, hardcoded for Chrome browser."
                 f"\n{19*' '}If you're not using Chrome you might want to replace it in the config.ini file later on."
-                f"\n{19*' '}More information regarding this topic is on the Fansly Downloader Wiki."
+                f"\n{19*' '}More information regarding this topic is on the Fansly Downloader NG Wiki."
             )
 
         try:
@@ -270,7 +270,7 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
             user_agent_response = config.http_session.get(
                 'https://jnrbsn.github.io/user-agents/user-agents.json',
                 headers = {
-                    'User-Agent': f"Avnsx/Fansly Downloader {config.program_version}",
+                    'User-Agent': ua_if_failed,
                     'accept-language': 'en-US,en;q=0.9'
                 }
             )

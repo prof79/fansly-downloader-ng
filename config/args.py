@@ -18,7 +18,7 @@ from utils.common import is_valid_post_id, save_config_or_raise
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Fansly Downloader scrapes media content from one or more Fansly creators. "
+        description="Fansly Downloader NG scrapes media content from one or more Fansly creators. "
             "Settings will be taken from config.ini or internal defaults and "
             "can be overriden with the following parameters.\n"
             "Using the command-line will not overwrite config.ini.",
@@ -251,7 +251,7 @@ def check_attributes(
 
     :param args: The arguments parsed.
     :type args: argparse.Namespace
-    :param config: The Fansly Downloader configuration.
+    :param config: The Fansly Downloader NG configuration.
     :type config: FanslyConfig
     :param arg_attribute: The argument destination variable name.
     :type arg_attribute: str
