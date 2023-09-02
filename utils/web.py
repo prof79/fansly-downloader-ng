@@ -29,7 +29,7 @@ def open_url(url_to_open: str) -> None:
 
 
 def open_get_started_url() -> None:
-    open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Get-Started')
+    open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Getting-Started')
 
 
 def get_fansly_account_for_token(auth_token: str) -> str | None:
