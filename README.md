@@ -35,7 +35,7 @@
   </a>
 </div>
 
-![Fansly Downloader NG UI Banner](https://i.imgur.com/9VaUh2v.gif)
+![Fansly Downloader NG Screenshot](resources/fansly_ng_screenshot.png)
 
 This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [Fansly Downloader](https://github.com/Avnsx/fansly-downloader). **Fansly Downloader NG** supports new features:
 
