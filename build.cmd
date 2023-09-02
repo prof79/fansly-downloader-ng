@@ -7,4 +7,4 @@ pyinstaller ^
     --console ^
     --noupx ^
     --icon=resources\fansly_ng.ico ^
-    fansly_downloader_ng.py
+    "%~dp0fansly_downloader_ng.py"
