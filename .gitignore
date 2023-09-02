@@ -162,3 +162,4 @@ cython_debug/
 # User-specific
 *_fansly/
 config_args.ini
+config.ini
