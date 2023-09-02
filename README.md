@@ -49,6 +49,8 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 * Easier-to-extend, modern, modular and robust codebase
 * It doesn't care about starring the repository
 
+*There are still pieces missing like compiled releases and an appropriate wiki update.*
+
 **Fansly Downloader NG** is the go-to app for all your bulk media downloading needs. Download photos, videos, audio or any other media from Fansly. This powerful tool has got you covered! Say goodbye to the hassle of individually downloading each piece of media – now you can download them all or just some in one go.
 
 ## ✨ Features
