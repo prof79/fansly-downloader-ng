@@ -215,9 +215,9 @@ class FanslyConfig(object):
 
         headers = {
             'Accept': 'application/json, text/plain, */*',
-            'Referer': 'https://fansly.com/',
-            'accept-language': 'en-US,en;q=0.9',
+            'Accept-Language': 'en-US,en;q=0.9',
             'authorization': token,
+            'Referer': 'https://fansly.com/',
             'User-Agent': self.user_agent,
         }
 
