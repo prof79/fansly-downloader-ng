@@ -12,7 +12,7 @@ from loguru import logger
 from pathlib import Path
 
 
-LOG_FILE_NAME: str = 'fansly_downloader.log'
+LOG_FILE_NAME: str = 'fansly_downloader_ng.log'
 
 
 # most of the time, we utilize this to display colored output rather than logging or prints
