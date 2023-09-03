@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.5.15'
-__date__ = '2023-09-03T16:52:00+02'
+__version__ = '0.5.16'
+__date__ = '2023-09-03T17:34:00+02'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2021-2023 by {__maintainer__}'
 __authors__ = [
@@ -65,8 +65,10 @@ def print_logo() -> None:
 def print_statistics(config: FanslyConfig, state: DownloadState) -> None:
 
     print_info(
-        f"\n╔═\n  Finished {config.download_mode_str()} type download of {state.pic_count} pictures & {state.vid_count} videos "
-        f"from @{state.creator_name}!\n  Declined duplicates: {state.duplicate_count}"
+        f"\n╔═\n  Finished {config.download_mode_str()} type download for @{state.creator_name}!"
+        f"\n  Total timeline media: {state.total_timeline_pictures} pictures & {state.total_timeline_videos} videos"
+        f"\n  Downloaded media: {state.pic_count} pictures & {state.vid_count} videos"
+        f"\n  Duplicates skipped: {state.duplicate_count}"
         f"\n  Saved content in directory: '{state.base_path}'"
         f"\n{74*' '}═╝"
     )
