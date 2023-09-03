@@ -11,18 +11,6 @@ from config.fanslyconfig import FanslyConfig
 from errors import ConfigError
 
 
-def exit(status: int=0) -> None:
-    """Exits the program.
-
-    This function overwrites the default exit() function with a
-    pyinstaller compatible one.
-
-    :param status: The exit code of the program.
-    :type status: int
-    """
-    os._exit(status)
-
-
 def save_config_or_raise(config: FanslyConfig) -> bool:
     """Tries to save the configuration to `config.ini` or
     raises a `ConfigError` otherwise.

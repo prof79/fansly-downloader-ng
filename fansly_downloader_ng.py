@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.5.13'
-__date__ = '2023-09-03T15:39:00+02'
+__version__ = '0.5.14'
+__date__ = '2023-09-03T15:48:00+02'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2021-2023 by {__maintainer__}'
 __authors__ = [
@@ -42,7 +42,7 @@ from textio import (
     set_window_title,
 )
 from updater import self_update
-from utils.common import exit, open_location
+from utils.common import open_location
 
 
 # tell PIL to be tolerant of files that are truncated
