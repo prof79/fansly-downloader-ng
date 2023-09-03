@@ -106,7 +106,8 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
             print_error(f"Unexpected error during Timeline download: \n{traceback.format_exc()}", 36)
             input_enter_continue(config.interactive)
 
-    # Check if atleast 20% of timeline was scraped; exluding the case when all the media was declined as duplicates
+    # Check if at least 20 % of timeline was scraped;
+    # excluding the case when all the media was declined as duplicates
     low_yield = False
 
     if state.pic_count <= state.total_timeline_pictures * 0.2 and state.duplicate_count <= state.total_timeline_pictures * 0.2:
