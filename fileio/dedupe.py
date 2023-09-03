@@ -106,7 +106,7 @@ def dedupe_media_content(state: DownloadState, content: bytearray, mimetype: str
 
     # Deduplication - part 2.1: decide if this media is even worth further processing; by hashing
     if file_hash in hashlist:
-        print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename}' → declined")
+        print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename}' → skipped")
         state.duplicate_count += 1
         return None
 

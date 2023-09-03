@@ -55,7 +55,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
         # deduplication - part 1: decide if this media is even worth further processing; by media id
         if any([media_item.media_id in state.recent_photo_media_ids, media_item.media_id in state.recent_video_media_ids]):
-            print_info(f"Deduplication [Media ID]: {media_item.mimetype.split('/')[-2]} '{filename}' → declined")
+            print_info(f"Deduplication [Media ID]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
             state.duplicate_count += 1
             continue
 

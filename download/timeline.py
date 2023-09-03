@@ -107,7 +107,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
             input_enter_continue(config.interactive)
 
     # Check if at least 20 % of timeline was scraped;
-    # excluding the case when all the media was declined as duplicates
+    # excluding the case when all the media was duplicate and skipped
     low_yield = False
 
     if state.pic_count <= state.total_timeline_pictures * 0.2 and state.duplicate_count <= state.total_timeline_pictures * 0.2:
