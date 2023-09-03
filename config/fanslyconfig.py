@@ -223,4 +223,24 @@ class FanslyConfig(object):
 
         return headers
 
+
+    def cors_options_request(self, url: str) -> None:
+        """Performs an OPTIONS CORS request to Fansly servers."""
+
+        headers = {
+            'Accept': '*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Access-Control-Request-Headers':
+                'authorization,fansly-client-check,fansly-client-id,fansly-client-ts,fansly-session-id',
+            'Access-Control-Request-Method': 'GET',
+            'Origin': 'https://fansly.com',
+            'Referer': 'https://fansly.com/',
+            'User-Agent': self.user_agent,
+        }
+
+        self.http_session.options(
+            url=url,
+            headers=headers,
+        )
+
     #endregion

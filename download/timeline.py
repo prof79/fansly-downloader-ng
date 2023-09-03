@@ -25,20 +25,27 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
     state.download_type = DownloadType.TIMELINE
 
     # this has to be up here so it doesn't get looped
+    MAX_ATTEMPTS = 3
     timeline_cursor = 0
+    attempts = 0
 
-    while True:
+    while True and attempts < MAX_ATTEMPTS:
         if timeline_cursor == 0:
-            print_info("Inspecting most recent Timeline cursor ...")
+            print_info(f"Inspecting most recent Timeline cursor ... [CID: {state.creator_id}]")
 
         else:
-            print_info(f"Inspecting Timeline cursor: {timeline_cursor}")
+            print_info(f"Inspecting Timeline cursor: {timeline_cursor} [CID: {state.creator_id}]")
     
         timeline_response = Response()
     
         try:
+            timeline_url = \
+                f"https://apiv3.fansly.com/api/v1/timelinenew/{state.creator_id}?before={timeline_cursor}&after=0&wallId=&contentSearch=&ngsw-bypass=true"
+
+            config.cors_options_request(timeline_url)
+
             timeline_response = config.http_session.get(
-                f"https://apiv3.fansly.com/api/v1/timeline/{state.creator_id}?before={timeline_cursor}&after=0&wallId=&contentSearch=&ngsw-bypass=true",
+                timeline_url,
                 headers=config.http_headers(),
             )
 
@@ -51,6 +58,18 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                 if config.debug:
                     print_debug(f'Post object: {post_object}')
 
+                if len(post_object['accountMedia']) == 0:
+                    # We might be a rate-limit victim, slow extremely down
+                    delay_seconds = 60
+                    print_info(f"Slowing down for {delay_seconds} s ...")
+                    attempts += 1
+                    sleep(delay_seconds)
+                    # Try again
+                    continue
+                else:
+                    # Reset attempts eg. new timeline
+                    attempts = 0
+
                 if not process_download_accessible_media(config, state, post_object['accountMedia']):
                     # Break on deduplication error - already downloaded
                     break
@@ -61,6 +80,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                 try:
                     # Slow down to avoid the Fansly rate-limit which was introduced in late August 2023
                     sleep(random.uniform(2, 4))
+
                     timeline_cursor = post_object['posts'][-1]['id']
 
                 except IndexError:

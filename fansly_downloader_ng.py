@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.5.6'
-__date__ = '2023-09-02T22:29:00+02'
+__version__ = '0.5.13'
+__date__ = '2023-09-03T15:39:00+02'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2021-2023 by {__maintainer__}'
 __authors__ = [
@@ -17,6 +17,8 @@ __credits__ = [
 ]
 
 # TODO: Fix in future: audio needs to be properly transcoded from mp4 to mp3, instead of just saved as
+# TODO: Rate-limiting fix works but is terribly slow - would be nice to know how to interface with Fansly API properly
+# TODO: Check whether messages are rate-limited too or not
 
 
 import base64
@@ -62,7 +64,7 @@ def print_logo() -> None:
 
 def print_statistics(config: FanslyConfig, state: DownloadState) -> None:
 
-    print(
+    print_info(
         f"\n╔═\n  Finished {config.download_mode_str()} type download of {state.pic_count} pictures & {state.vid_count} videos "
         f"from @{state.creator_name}!\n  Declined duplicates: {state.duplicate_count}"
         f"\n  Saved content in directory: '{state.base_path}'"

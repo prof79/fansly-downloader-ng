@@ -1,10 +1,13 @@
 """Fansly Download Functionality"""
 
 
+import random
+
 from pathlib import Path
 from PIL import Image, ImageFile
 from rich.progress import Progress, BarColumn, TextColumn
 from rich.table import Column
+from time import sleep
 
 from .downloadstate import DownloadState
 from .m3u8 import download_m3u8
@@ -166,3 +169,6 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
                     f"network error --> status_code: {response.status_code} "
                     f"| content: \n{response.content} [13]"
                 )
+
+        # Slow down a bit to be sure
+        sleep(random.uniform(0.4, 0.75))
