@@ -25,11 +25,11 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
     state.download_type = DownloadType.TIMELINE
 
     # this has to be up here so it doesn't get looped
-    MAX_ATTEMPTS = 3
     timeline_cursor = 0
     attempts = 0
 
-    while True and attempts < MAX_ATTEMPTS:
+    # Careful - "retry" means (1 + retries) runs
+    while True and attempts <= config.timeline_retries:
         if timeline_cursor == 0:
             print_info(f"Inspecting most recent Timeline cursor ... [CID: {state.creator_id}]")
 
@@ -59,12 +59,13 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                     print_debug(f'Post object: {post_object}')
 
                 if len(post_object['accountMedia']) == 0:
-                    # We might be a rate-limit victim, slow extremely down
-                    delay_seconds = 60
-                    print_info(f"Slowing down for {delay_seconds} s ...")
-                    attempts += 1
-                    sleep(delay_seconds)
+                    # We might be a rate-limit victim, slow extremely down -
+                    # but only if there are retries left
+                    if attempts < config.timeline_retries:
+                        print_info(f"Slowing down for {config.timeline_delay_seconds} s ...")
+                        sleep(config.timeline_delay_seconds)
                     # Try again
+                    attempts += 1
                     continue
                 else:
                     # Reset attempts eg. new timeline

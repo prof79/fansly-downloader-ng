@@ -72,6 +72,11 @@ class FanslyConfig(object):
     # to the computer and wanting to see what happened in the console window.
     prompt_on_exit: bool = True
 
+    # Number of retries to get a timeline
+    timeline_retries: int = 1
+    # Anti-rate-limiting delay in seconds
+    timeline_delay_seconds: int = 60
+
     #endregion
 
     #endregion
@@ -133,6 +138,10 @@ class FanslyConfig(object):
         self._parser.set('Options', 'use_folder_suffix', str(self.use_folder_suffix))
         self._parser.set('Options', 'interactive', str(self.interactive))
         self._parser.set('Options', 'prompt_on_exit', str(self.prompt_on_exit))
+
+        # Unsigned ints
+        self._parser.set('Options', 'timeline_retries', str(self.timeline_retries))
+        self._parser.set('Options', 'timeline_delay_seconds', str(self.timeline_delay_seconds))
 
 
     def _load_raw_config(self) -> list[str]:

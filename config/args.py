@@ -215,6 +215,36 @@ def parse_args() -> argparse.Namespace:
         help="How to handle media EXIF metadata. "
             "Supported strategies: Advanced (Default), Simple",
     )
+    parser.add_argument(
+        '-tr', '--timeline-retries',
+        required=False,
+        default=1,
+        type=int,
+        dest='timeline_retries',
+        help="Number of retries on empty timelines. Defaults to 1. "
+            "Part of anti-rate-limiting measures - try bumping up to eg. 2 "
+            "if nothing gets downloaded. Also see the explanation of "
+            "--timeline-delay-seconds.",
+    )
+    parser.add_argument(
+        '-td', '--timeline-delay-seconds',
+        required=False,
+        default=60,
+        type=int,
+        dest='timeline_delay_seconds',
+        help="Number of seconds to wait before retrying empty timelines. "
+            "Defaults to 60. "
+            "Part of anti-rate-limiting measures - 1 retry/60 seconds works "
+            "all the time but also unnecessarily delays at the proper end of "
+            "a creator's timeline - since reaching the end and being "
+            "rate-limited is indistinguishable as of now. "
+            "You may try to lower this or set to 0 in order to speed things "
+            "up - but if nothing gets downloaded the Fansly server firewalls "
+            "rate-limited you. "
+            "You can calculate yourself how long a download session "
+            "(without download time and extra retries) will last at minimum: "
+            "NUMBER_OF_CREATORS * TIMELINE_RETRIES * TIMELINE_DELAY_SECONDS",
+    )
 
     #endregion
 
@@ -349,7 +379,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
 
     # The code following avoids code duplication of checking an
     # argument and setting the override flag for each argument.
-    # On the other hand, this certainly not refactoring/renaming friendly.
+    # On the other hand, this certainly is not refactoring/renaming friendly.
     # But arguments following similar patterns can be changed or
     # added more easily.
 
@@ -417,6 +447,36 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
 
         if arg_attribute == True:
             setattr(config, config_name, not arg_attribute)
+
+    # Unsigned integers to map
+    unsigned_ints = [
+        'timeline_retries',
+        'timeline_delay_seconds',
+    ]
+
+    # Sets config to int(argument) if argument is a number >= 0
+    # or to 0 otherwise
+    for attr_name in unsigned_ints:
+        check_attr(attr_name, attr_name)
+        arg_attribute = getattr(args, attr_name)
+
+        int_value = 0
+
+        try:
+            int_value = int(arg_attribute)
+
+            if int_value < 0:
+                int_value = 0
+
+        except ValueError:
+            pass
+
+        config_attribute = getattr(config, attr_name)
+
+        # Does it differ from the defaults?
+        if int_value != int(config_attribute):
+            setattr(config, attr_name, int_value)
+            config_overridden = True
 
     if config_overridden:
         print_warning(
