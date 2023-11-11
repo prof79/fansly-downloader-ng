@@ -1,0 +1,59 @@
+# This workflow will install Python dependencies and build a PyInstaller package
+
+name: Python PyInstaller - Windows
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ARCHIVE_NAME: Fansly_Downloader_NG.zip
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if (Test-Path requirements.txt -PathType Leaf) { pip install -r requirements.txt }
+        if (Test-Path requirements-dev.txt -PathType Leaf) { pip install -r requirements-dev.txt }
+
+    - name: Run PyInstaller
+      run: |
+        .\build.cmd
+
+    - name: Zip EXE
+      run: |
+        cd dist
+        7z a "${Env:ARCHIVE_NAME}.zip" "Fansly Downloader NG.exe"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.ARCHIVE_NAME }}
+        path: |
+          dist/*
+
+    - name: Publish release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Automatic Build"
+        files: |
+          ${{ env.ARCHIVE_NAME }}.zip
