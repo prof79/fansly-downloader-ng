@@ -1,6 +1,7 @@
-# This workflow will install Python dependencies and build a PyInstaller package
+# This workflow will install Python dependencies and
+# build a PyInstaller package for Windows on demand.
 
-name: Python PyInstaller - Windows
+name: Python PyInstaller - Windows - On Demand
 
 on:
   workflow_dispatch:
@@ -9,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  ARCHIVE_NAME: Fansly_Downloader_NG
+  ARCHIVE_NAME: Fansly_Downloader_NG-Windows
 
 jobs:
   build:
