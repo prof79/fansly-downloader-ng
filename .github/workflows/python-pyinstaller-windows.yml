@@ -16,6 +16,9 @@ jobs:
 
     runs-on: windows-latest
 
+    env:
+      SHORT_SHA:
+
     steps:
 
     - uses: actions/checkout@v3
@@ -45,7 +48,8 @@ jobs:
 
     - name: Set short commit hash variable
       run: |
-        Write-Host "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> $Env:GITHUB_STATE
+        [Environment]::SetEnvironmentVariable('SHORT_SHA', ${Env:GITHUB_SHA}.Substring(0, 7))
+        #Write-Host "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${{ env.GITHUB_ENV }}"
 
     - name: Show commit hash variable
       run: |
