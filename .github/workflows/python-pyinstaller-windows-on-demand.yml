@@ -71,6 +71,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Automatic Build ${{ env.SHORT_SHA }}"
+        title: "Development Release ${{ env.SHORT_SHA }}"
         files: |
           dist/${{ env.ARCHIVE_NAME }}-${{ env.SHORT_SHA }}.zip
