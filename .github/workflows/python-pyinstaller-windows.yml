@@ -43,17 +43,25 @@ jobs:
           Get-Content 'build\Fansly Downloader NG\warn-Fansly Downloader NG.txt'
         }
 
+    - name: Set short commit hash variable
+      run: |
+        Write-Host "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> $Env:GITHUB_ENV
+
+    - name: Show commit hash variable
+      run: |
+        Write-Host $Env:SHORT_SHA
+
     - name: Zip EXE
       run: |
         cd dist
-        7z a "${Env:ARCHIVE_NAME}.zip" "Fansly Downloader NG.exe"
+        7z a "${Env:ARCHIVE_NAME}-${Env:SHORT_SHA}.zip" "Fansly Downloader NG.exe"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARCHIVE_NAME }}
+        name: ${{ env.ARCHIVE_NAME }}-${{ env.SHORT_SHA }}
         path: |
-          dist/${{ env.ARCHIVE_NAME }}.zip
+          dist/${{ env.ARCHIVE_NAME }}-${{ env.SHORT_SHA }}.zip
 
     - name: Publish release
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -61,6 +69,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Automatic Build"
+        title: "Automatic Build ${{ env.SHORT_SHA }}"
         files: |
-          dist/${{ env.ARCHIVE_NAME }}.zip
+          dist/${{ env.ARCHIVE_NAME }}-${{ env.SHORT_SHA }}.zip
