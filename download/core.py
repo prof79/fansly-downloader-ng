@@ -9,6 +9,7 @@ from .account import get_creator_account_info
 from .collections import download_collections
 from .common import print_download_info
 from .downloadstate import DownloadState
+from .globalstate import GlobalState
 from .messages import download_messages
 from .single import download_single_post
 from .timeline import download_timeline
@@ -21,5 +22,6 @@ __all__ = [
     'download_single_post',
     'download_timeline',
     'DownloadState',
+    'GlobalState',
     'get_creator_account_info',
 ]

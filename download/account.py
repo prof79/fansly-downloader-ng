@@ -17,7 +17,11 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
     print_info('Getting account information ...')
 
     if config.download_mode == DownloadMode.NOTSET:
-        message = 'Internal error getting account info - config download mode is not set.'
+        message = 'Internal error getting account info - config download mode not set.'
+        raise RuntimeError(message)
+
+    if state.creator_name is None:
+        message = 'Internal error getting account info - creator name not set.'
         raise RuntimeError(message)
 
     # Collections are independent of creators and

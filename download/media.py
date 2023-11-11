@@ -167,7 +167,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
                 raise DownloadError(
                     f"Download failed on filename: {filename} - due to a "
                     f"network error --> status_code: {response.status_code} "
-                    f"| content: \n{response.content} [13]"
+                    f"| content: \n{response.content.decode('utf-8')} [13]"
                 )
 
         # Slow down a bit to be sure

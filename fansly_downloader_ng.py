@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.6.0'
-__date__ = '2023-11-04T13:42:00+01'
+__version__ = '0.7.0'
+__date__ = '2023-11-10T22:56:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023 by {__maintainer__}'
 __authors__ = [
@@ -24,8 +24,6 @@ __credits__ = [
 import base64
 import traceback
 
-from time import sleep
-
 from config import FanslyConfig, load_config, validate_adjust_config
 from config.args import parse_args, map_args_to_config
 from config.modes import DownloadMode
@@ -43,6 +41,8 @@ from textio import (
 )
 from updater import self_update
 from utils.common import open_location
+from utils.statistics import *
+from utils.timer import Timer
 
 
 # tell PIL to be tolerant of files that are truncated
@@ -62,20 +62,6 @@ def print_logo() -> None:
     )
 
 
-def print_statistics(config: FanslyConfig, state: DownloadState) -> None:
-
-    print_info(
-        f"\n╔═\n  Finished {config.download_mode_str()} type download for @{state.creator_name}!"
-        f"\n  Total timeline media: {state.total_timeline_pictures} pictures & {state.total_timeline_videos} videos"
-        f"\n  Downloaded media: {state.pic_count} pictures & {state.vid_count} videos"
-        f"\n  Duplicates skipped: {state.duplicate_count}"
-        f"\n  Saved content in directory: '{state.base_path}'"
-        f"\n{74*' '}═╝"
-    )
-
-    sleep(10)
-
-
 def main(config: FanslyConfig) -> int:
     """The main logic of the downloader program.
     
@@ -86,6 +72,10 @@ def main(config: FanslyConfig) -> int:
     :rtype: int
     """
     exit_code = EXIT_SUCCESS
+
+    timer = Timer('Total')
+
+    timer.start()
 
     # Update window title with specific downloader version
     set_window_title(f"Fansly Downloader NG v{config.program_version}")
@@ -110,52 +100,62 @@ def main(config: FanslyConfig) -> int:
             or config.download_mode == DownloadMode.NOTSET:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
 
+    global_download_state = GlobalState()
+
     for creator_name in sorted(config.user_names):
-        try:
-            state = DownloadState(creator_name)
+        with Timer(creator_name):
+            try:
+                state = DownloadState(creator_name=creator_name)
 
-            # Special treatment for deviating folder names later
-            if not config.download_mode == DownloadMode.SINGLE:
-                dedupe_init(config, state)
+                # Special treatment for deviating folder names later
+                if not config.download_mode == DownloadMode.SINGLE:
+                    dedupe_init(config, state)
 
-            print_download_info(config)
+                print_download_info(config)
 
-            get_creator_account_info(config, state)
+                get_creator_account_info(config, state)
 
-            # Download mode:
-            # Normal: Downloads Timeline + Messages one after another.
-            # Timeline: Scrapes only the creator's timeline content.
-            # Messages: Scrapes only the creator's messages content.
-            # Single: Fetch a single post by the post's ID. Click on a post to see its ID in the url bar e.g. ../post/1283493240234
-            # Collection: Download all content listed within the "Purchased Media Collection"
+                # Download mode:
+                # Normal: Downloads Timeline + Messages one after another.
+                # Timeline: Scrapes only the creator's timeline content.
+                # Messages: Scrapes only the creator's messages content.
+                # Single: Fetch a single post by the post's ID. Click on a post to see its ID in the url bar e.g. ../post/1283493240234
+                # Collection: Download all content listed within the "Purchased Media Collection"
 
-            print_info(f'Download mode is: {config.download_mode_str()}')
-            print()
+                print_info(f'Download mode is: {config.download_mode_str()}')
+                print()
 
-            if config.download_mode == DownloadMode.SINGLE:
-                download_single_post(config, state)
+                if config.download_mode == DownloadMode.SINGLE:
+                    download_single_post(config, state)
 
-            elif config.download_mode == DownloadMode.COLLECTION:
-                download_collections(config, state)
+                elif config.download_mode == DownloadMode.COLLECTION:
+                    download_collections(config, state)
 
-            else:
-                if any([config.download_mode == DownloadMode.MESSAGES, config.download_mode == DownloadMode.NORMAL]):
-                    download_messages(config, state)
+                else:
+                    if any([config.download_mode == DownloadMode.MESSAGES, config.download_mode == DownloadMode.NORMAL]):
+                        download_messages(config, state)
 
-                if any([config.download_mode == DownloadMode.TIMELINE, config.download_mode == DownloadMode.NORMAL]):
-                    download_timeline(config, state)
+                    if any([config.download_mode == DownloadMode.TIMELINE, config.download_mode == DownloadMode.NORMAL]):
+                        download_timeline(config, state)
 
-            print_statistics(config, state)
+                update_global_statistics(global_download_state, download_state=state)
+                print_statistics(config, state)
 
-            # open download folder
-            if state.base_path is not None:
-                open_location(state.base_path, config.open_folder_when_finished, config.interactive)
+                # open download folder
+                if state.base_path is not None:
+                    open_location(state.base_path, config.open_folder_when_finished, config.interactive)
 
-        # Still continue if one creator failed
-        except ApiAccountInfoError as e:
-            print_error(str(e))
-            input_enter_continue(config.interactive)
-            exit_code = SOME_USERS_FAILED
+            # Still continue if one creator failed
+            except ApiAccountInfoError as e:
+                print_error(str(e))
+                input_enter_continue(config.interactive)
+                exit_code = SOME_USERS_FAILED
+
+    timer.stop()
+
+    print_timing_statistics()
+
+    print_global_statistics(config, global_download_state)
 
     return exit_code
 

@@ -73,14 +73,14 @@ def process_download_accessible_media(
     original_duplicate_threshold = config.DUPLICATE_THRESHOLD
 
     if state.download_type == DownloadType.MESSAGES:
-        total_accessible_message_content = len(accessible_media)
+        state.total_message_items = len(accessible_media)
 
         # Overwrite base dup threshold with 20% of total accessible content in messages.
         # Don't forget to save/reset afterwards.
-        config.DUPLICATE_THRESHOLD = int(0.2 * total_accessible_message_content)
+        config.DUPLICATE_THRESHOLD = int(0.2 * state.total_message_items)
 
     # at this point we have already parsed the whole post object and determined what is scrapable with the code above
-    print_info(f"{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
+    print_info(f"@{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
 
     set_create_directory_for_download(config, state)
 

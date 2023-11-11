@@ -106,27 +106,3 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
         except Exception:
             print_error(f"Unexpected error during Timeline download: \n{traceback.format_exc()}", 36)
             input_enter_continue(config.interactive)
-
-    # Check if at least 20 % of timeline was scraped;
-    # excluding the case when all the media was duplicate and skipped
-    low_yield = False
-
-    if state.pic_count <= state.total_timeline_pictures * 0.2 and state.duplicate_count <= state.total_timeline_pictures * 0.2:
-        print_warning(f"Low amount of Pictures scraped. Creators total Pictures: {state.total_timeline_pictures} | Downloaded: {state.pic_count}")
-        low_yield = True
-    
-    if state.vid_count <= state.total_timeline_videos * 0.2 and state.duplicate_count <= state.total_timeline_videos * 0.2:
-        print_warning(f"Low amount of Videos scraped. Creators total Videos: {state.total_timeline_videos} | Downloaded: {state.vid_count}")
-        low_yield = True
-    
-    if low_yield:
-        if not state.following:
-            print(f"{20*' '}Follow the creator to be able to scrape media!")
-        
-        if not state.subscribed:
-            print(f"{20*' '}Subscribe to the creator if you would like to get the entire content.")
-        
-        if not config.download_media_previews:
-            print(f"{20*' '}Try setting download_media_previews to True in the config.ini file. Doing so, will help if the creator has marked all his content as previews.")
-
-        print()

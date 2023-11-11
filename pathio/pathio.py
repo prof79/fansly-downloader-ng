@@ -46,6 +46,10 @@ def set_create_directory_for_download(config: FanslyConfig, state: DownloadState
         message = 'Internal error during directory creation - download directory not set.'
         raise RuntimeError(message)
 
+    if state.creator_name is None:
+        message = 'Internal error during directory creation - creator name not set.'
+        raise RuntimeError(message)
+
     else:
 
         suffix = ''

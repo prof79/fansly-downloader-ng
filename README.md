@@ -115,6 +115,16 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ## 🗒️ Release Notes
 
+### 0.7.0
+
+* Vast improvements regarding statistics output
+  * list total counts of items
+  * include message item counts
+  * show the number of missing items, potentially indicating a problem (timeline + messages - downloads - skipped)
+  * show a grand total of all creators' downloads at the end of the program
+  * show session duration info per creator and total
+  * implemeinting this I found the "low-yield" calculations to be faulty - this is now handled differently based on missing items during the statistics output
+
 ### 0.6.0
 
 * Make anti-rate-limiting measures for timeline downloads configurable:
