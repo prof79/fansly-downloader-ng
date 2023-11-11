@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
-  ARCHIVE_NAME: Fansly_Downloader_NG.zip
+  ARCHIVE_NAME: Fansly_Downloader_NG
 
 jobs:
   build:
@@ -36,6 +36,13 @@ jobs:
       run: |
         .\build.cmd
 
+    - name: Show PyInstaller warnings
+      run: |
+        if (Test-Path 'build\Fansly Downloader NG\warn-Fansly Downloader NG.txt' -PathType Leaf)
+        {
+          Get-Content 'build\Fansly Downloader NG\warn-Fansly Downloader NG.txt'
+        }
+
     - name: Zip EXE
       run: |
         cd dist
@@ -46,7 +53,7 @@ jobs:
       with:
         name: ${{ env.ARCHIVE_NAME }}
         path: |
-          dist/*
+          dist/*.zip
 
     - name: Publish release
       uses: "marvinpinto/action-automatic-releases@latest"
