@@ -20,6 +20,14 @@ jobs:
 
     - uses: actions/checkout@v3
 
+    - name: Set short commit hash variable
+      run: |
+        Write-Output "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${Env:GITHUB_ENV}"
+
+    - name: Show commit hash variable
+      run: |
+        Write-Host $Env:SHORT_SHA
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
@@ -42,14 +50,6 @@ jobs:
         {
           Get-Content 'build\Fansly Downloader NG\warn-Fansly Downloader NG.txt'
         }
-
-    - name: Set short commit hash variable
-      run: |
-        Write-Output "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${Env:GITHUB_ENV}"
-
-    - name: Show commit hash variable
-      run: |
-        Write-Host $Env:SHORT_SHA
 
     - name: Zip EXE
       run: |
