@@ -9,7 +9,7 @@
   <a href="https://github.com/prof79/fansly-downloader-ng/releases/latest">
     <img src="https://img.shields.io/github/v/release/prof79/fansly-downloader-ng?color=%23b02d4a&display_name=tag&label=%F0%9F%9A%80%20Latest%20Compiled%20Release&style=flat-square" alt="Latest Release" />
   </a>
-  <a href="https://github.com/prof79/fansly-downloader-ng/commits/master">
+  <a href="https://github.com/prof79/fansly-downloader-ng/commits/main">
     <img src="https://img.shields.io/github/commits-since/prof79/fansly-downloader-ng/latest?color=orange&label=%F0%9F%92%81%20Uncompiled%20Commits&style=flat-square" alt="Commits since latest release" />
   </a>
   <a href="https://github.com/prof79/fansly-downloader-ng/issues?q=is%3Aissue+is%3Aopen+label%3Abug">
