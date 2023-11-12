@@ -1,0 +1,29 @@
+# This *experimental* workflow will try to build a PyInstaller binary
+# using a Docker container.
+
+name: Python - Run PyInstaller - Docker experimental
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Run PyInstaller via Docker
+      uses: docker://fydeinc/pyinstaller
+      with:
+        args: -v "$(pwd):/src" --name fansly_downloader_ng.py --onefile --console --noupx --icon:/src/resources/fansly_ng.ico
+
+    - name: Show dist contents
+      run: ls -lhR
+      working-directory: dist
