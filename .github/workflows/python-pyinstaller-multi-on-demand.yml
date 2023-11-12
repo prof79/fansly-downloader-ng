@@ -112,25 +112,18 @@ jobs:
 
     - uses: actions/checkout@v4
 
+    - name: Create dist directory
+      run: mkdir dist
+
     - name: Download artifact
       uses: actions/download-artifact@v3
       with:
         name: ${{ env.PRODUCT_NAME }}
-  
-    - name: Unpack artifact files
-      shell: pwsh
-      run: |
-        New-Item -Type Dir 'dist'
-
-        Get-ChildItem -Filter *.zip | ForEach-Object {
-
-          $fullName = $_.FullName
-
-          7z x -o'dist' "$fullName"
-        }
-  
+        path: dist
+ 
     - name: Display structure of downloaded files
-      run: ls -R      
+      run: ls -R
+      working-directory: dist
   
     - name: Publish release
       uses: "marvinpinto/action-automatic-releases@latest"
