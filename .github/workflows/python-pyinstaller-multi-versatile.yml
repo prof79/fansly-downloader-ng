@@ -2,7 +2,7 @@
 # build a PyInstaller package for multiple platforms
 # on demand or version tag push.
 
-name: Python PyInstaller - Multi-Platform - Versatile
+name: Python - Run PyInstaller - Multi-Platform - Versatile
 
 on:
   push:
@@ -30,14 +30,21 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    outputs:
+      short-sha: ${{ steps.short-hash.outputs.short-sha }}
+
     steps:
 
     - uses: actions/checkout@v4
 
     - name: Set short commit hash variable
+      id: short-hash
       shell: pwsh
       run: |
-        Write-Output "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${Env:GITHUB_ENV}"
+        $shortHash = ${Env:GITHUB_SHA}.Substring(0, 7)
+
+        Write-Output "SHORT_SHA=$shortHash" >> "${Env:GITHUB_ENV}"
+        Write-Output "short-sha=$shortHash" >> "${Env:GITHUB_OUTPUT}"
 
     - name: Set version name variable
       shell: pwsh
@@ -152,7 +159,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "ondemand"
         prerelease: true
-        title: "Development Release ${{ env.SHORT_SHA }}"
+        title: "Development Release ${{ needs.build.outputs.short-sha }}"
         files: |
           dist/*.zip
 
