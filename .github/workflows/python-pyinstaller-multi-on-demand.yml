@@ -53,6 +53,7 @@ jobs:
     - name: Show build variables
       shell: pwsh
       run: |
+        Write-Host "GitHub ref: ${{ github.ref }}"
         Write-Host "GitHub ref name: ${{ github.ref_name }}"
         Write-Host "Commit short SHA: ${Env:SHORT_SHA}"
         Write-Host "Base name: ${Env:BASE_NAME}"
