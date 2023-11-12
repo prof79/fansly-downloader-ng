@@ -1,0 +1,170 @@
+# This workflow will install Python dependencies and
+# build a PyInstaller package for multiple platforms
+# on demand or version tag push.
+
+name: Python PyInstaller - Multi-Platform - Versatile
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PRODUCT_NAME: Fansly Downloader NG
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        os:
+          - macos-11
+          - ubuntu-20.04
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Set short commit hash variable
+      shell: pwsh
+      run: |
+        Write-Output "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${Env:GITHUB_ENV}"
+
+    - name: Set version name variable
+      shell: pwsh
+      run: |
+        $versionName = ${Env:SHORT_SHA}
+        
+        if (${Env:GITHUB_REF} -match '^ref/tags/v')
+        {
+          $versionName = ${Env:GITHUB_REF_NAME}
+        }
+
+        Write-Output "VERSION_NAME=$versionName" >> "${Env:GITHUB_ENV}"
+
+    - name: Set Windows file name environment variables
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: |
+        Write-Output 'BASE_NAME=Fansly Downloader NG' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME=Fansly Downloader NG.exe' >> "${Env:GITHUB_ENV}"
+        Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:VERSION_NAME}.zip" >> "${Env:GITHUB_ENV}"
+
+    - name: Set macOS & Linux file name environment variables
+      if: ${{ runner.os != 'Windows' }}
+      shell: pwsh
+      run: |
+        Write-Output 'BASE_NAME=fansly-downloader-ng' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME=fansly-downloader-ng' >> "${Env:GITHUB_ENV}"
+        Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:VERSION_NAME}.zip" >> "${Env:GITHUB_ENV}"
+
+    - name: Show build variables
+      shell: pwsh
+      run: |
+        Write-Host "GitHub ref: ${{ github.ref }}"
+        Write-Host "GitHub ref name: ${{ github.ref_name }}"
+        Write-Host "Commit short SHA: ${Env:SHORT_SHA}"
+        Write-Host "Version name: ${Env:VERSION_NAME}"
+        Write-Host "Base name: ${Env:BASE_NAME}"
+        Write-Host "Binary name: ${Env:BINARY_NAME}"
+        Write-Host "Archive name: ${Env:ARCHIVE_NAME}"
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      shell: pwsh
+      run: |
+        python -m pip install --upgrade pip
+
+        if (Test-Path requirements.txt -PathType Leaf) { pip install -r requirements.txt }
+
+        if (Test-Path requirements-dev.txt -PathType Leaf) { pip install -r requirements-dev.txt }
+
+    - name: Run PyInstaller
+      shell: pwsh
+      run: |
+        .\build.ps1 -BaseName "${Env:BASE_NAME}"
+
+    - name: Show PyInstaller warnings
+      shell: pwsh
+      run: |
+        $warningFileName = Join-Path build ${Env:BASE_NAME}
+        $warningFileName = Join-Path $warningFileName "warn-${Env:BASE_NAME}.txt"
+
+        if (Test-Path "$warningFileName" -PathType Leaf)
+        {
+          Get-Content "$warningFileName"
+        }
+
+    - name: Zip executable
+      shell: pwsh
+      run: |
+        cd dist
+        7z a "${Env:ARCHIVE_NAME}" "${Env:BINARY_NAME}"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.PRODUCT_NAME }}
+        path: |
+          dist/${{ env.ARCHIVE_NAME }}
+
+
+  publish:
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Create dist directory
+      run: mkdir dist
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.PRODUCT_NAME }}
+        path: dist
+ 
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: dist
+  
+    - name: Publish on-demand release
+      if: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "ondemand"
+        prerelease: true
+        title: "Development Release ${{ env.SHORT_SHA }}"
+        files: |
+          dist/*.zip
+
+    - name: Publish version release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: ${{ github.ref_name }}
+        prerelease: false
+        title: "Fansly Downloader NG ${{ github.ref_name }}"
+        files: |
+          dist/*.zip
