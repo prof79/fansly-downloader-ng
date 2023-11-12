@@ -51,7 +51,7 @@ jobs:
       run: |
         $versionName = ${Env:SHORT_SHA}
         
-        if (${Env:GITHUB_REF} -match '^ref/tags/v')
+        if (${Env:GITHUB_REF} -match '^refs/tags/v')
         {
           $versionName = ${Env:GITHUB_REF_NAME}
         }
