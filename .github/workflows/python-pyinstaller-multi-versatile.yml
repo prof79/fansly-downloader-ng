@@ -11,9 +11,6 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 env:
   PRODUCT_NAME: Fansly Downloader NG
 
@@ -134,6 +131,9 @@ jobs:
     needs: build
 
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
 
