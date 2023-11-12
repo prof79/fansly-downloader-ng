@@ -1,0 +1,106 @@
+# This workflow will install Python dependencies and
+# build a PyInstaller package for multiple platforms on demand.
+
+name: Python PyInstaller - Multi-Platform - On Demand
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Set short commit hash variable
+      shell: pwsh
+      run: |
+        Write-Output "SHORT_SHA=$(${Env:GITHUB_SHA}.Substring(0, 7))" >> "${Env:GITHUB_ENV}"
+
+    - name: Set Windows file name environment variables
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      run: |
+        Write-Output 'BASE_NAME="Fansly Downloader NG"' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME="Fansly Downloader NG.exe"' >> "${Env:GITHUB_ENV}"
+        Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:SHORT_SHA}.zip" >> "${Env:GITHUB_ENV}"
+
+    - name: Set macOS & Linux file name environment variables
+      if: ${{ runner.os != 'Windows' }}
+      shell: pwsh
+      run: |
+        Write-Output 'BASE_NAME="fansly-downloader-ng"' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME="fansly-downloader-ng"' >> "${Env:GITHUB_ENV}"
+        Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:SHORT_SHA}.zip" >> "${Env:GITHUB_ENV}"
+
+    - name: Show build variables
+      shell: pwsh
+      run: |
+        Write-Host "Commit short SHA: ${Env:SHORT_SHA}"
+        Write-Host "Base name: ${Env:BASE_NAME}"
+        Write-Host "Binary name: ${Env:BINARY_NAME}"
+        Write-Host "Archive name: ${Env:ARCHIVE_NAME}"
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      shell: pwsh
+      run: |
+        python -m pip install --upgrade pip
+
+        if (Test-Path requirements.txt -PathType Leaf) { pip install -r requirements.txt }
+
+        if (Test-Path requirements-dev.txt -PathType Leaf) { pip install -r requirements-dev.txt }
+
+    - name: Run PyInstaller
+      shell: pwsh
+      run: |
+        .\build.ps1 -BaseName "${Env:BASE_NAME}"
+
+    - name: Show PyInstaller warnings
+      shell: pwsh
+      run: |
+        if (Test-Path "build\${Env:BASE_NAME}\warn-${Env:BASE_NAME}.txt" -PathType Leaf)
+        {
+          Get-Content 'build\${Env:BASE_NAME}\warn-${Env:BASE_NAME}.txt'
+        }
+
+    - name: Zip EXE
+      shell: pwsh
+      run: |
+        cd dist
+        7z a "${Env:ARCHIVE_NAME}" "${Env:BINARY_NAME}"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.ARCHIVE_NAME }}
+        path: |
+          dist/${{ env.ARCHIVE_NAME }}
+
+    - name: Publish release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "ondemand"
+        prerelease: true
+        title: "Development Release ${{ env.SHORT_SHA }}"
+        files: |
+          dist/${{ env.ARCHIVE_NAME }}
