@@ -20,7 +20,7 @@ jobs:
       matrix:
         os:
           - macos-latest
-          - ubuntu-latest
+          - ubuntu-20.04
           - windows-latest
 
     runs-on: ${{ matrix.os }}
@@ -53,13 +53,14 @@ jobs:
     - name: Show build variables
       shell: pwsh
       run: |
+        Write-Host "GitHub ref name: ${{ github.ref_name }}"
         Write-Host "Commit short SHA: ${Env:SHORT_SHA}"
         Write-Host "Base name: ${Env:BASE_NAME}"
         Write-Host "Binary name: ${Env:BINARY_NAME}"
         Write-Host "Archive name: ${Env:ARCHIVE_NAME}"
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: "3.11"
 
