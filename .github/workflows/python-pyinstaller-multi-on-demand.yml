@@ -77,9 +77,12 @@ jobs:
     - name: Show PyInstaller warnings
       shell: pwsh
       run: |
-        if (Test-Path "build/${Env:BASE_NAME}/warn-${Env:BASE_NAME}.txt" -PathType Leaf)
+        $warningFileName = Join-Path build ${Env:BASE_NAME}
+        $warningFileName = Join-Path $warningFileName "warn-${Env:BASE_NAME}.txt"
+
+        if (Test-Path "$warningFileName" -PathType Leaf)
         {
-          Get-Content 'build/${Env:BASE_NAME}/warn-${Env:BASE_NAME}.txt'
+          Get-Content "$warningFileName"
         }
 
     - name: Zip executable
