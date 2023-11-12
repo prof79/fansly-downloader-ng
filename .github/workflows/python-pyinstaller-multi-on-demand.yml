@@ -9,6 +9,9 @@ on:
 permissions:
   contents: write
 
+env:
+  PRODUCT_NAME: Fansly Downloader NG
+
 jobs:
 
   build:
@@ -24,7 +27,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set short commit hash variable
       shell: pwsh
@@ -94,10 +97,41 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARCHIVE_NAME }}
+        name: ${{ env.PRODUCT_NAME }}
         path: |
           dist/${{ env.ARCHIVE_NAME }}
 
+
+  publish:
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.PRODUCT_NAME }}
+  
+    - name: Unpack artifact files
+      shell: pwsh
+      run: |
+        New-Item -Type Dir 'dist'
+
+        Get-ChildItem -Filter *.zip | ForEach-Object {
+
+          $fullName = $_.FullName
+
+          7z x -o'dist' "$fullName"
+        }
+  
+    - name: Display structure of downloaded files
+      run: ls -R      
+  
     - name: Publish release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -106,4 +140,4 @@ jobs:
         prerelease: true
         title: "Development Release ${{ env.SHORT_SHA }}"
         files: |
-          dist/${{ env.ARCHIVE_NAME }}
+          dist/*.zip
