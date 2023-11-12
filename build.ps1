@@ -30,11 +30,14 @@ else
     $name = 'fansly-downloader-ng'
 }
 
+$iconPath = Join-Path 'resources' 'fansly_ng.ico'
+$fullScriptPath = Join-Path $PSScriptRoot 'fansly_downloader_ng.py'
+
 # Build
 pyinstaller `
-    -n $name `
+    -n "$name" `
     --onefile `
     --console `
     --noupx `
-    --icon=resources\fansly_ng.ico `
-    "$PSScriptRoot\fansly_downloader_ng.py"
+    --icon="$iconPath" `
+    "$fullScriptPath"

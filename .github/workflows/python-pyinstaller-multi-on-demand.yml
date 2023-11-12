@@ -35,16 +35,16 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       shell: pwsh
       run: |
-        Write-Output 'BASE_NAME="Fansly Downloader NG"' >> "${Env:GITHUB_ENV}"
-        Write-Output 'BINARY_NAME="Fansly Downloader NG.exe"' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BASE_NAME=Fansly Downloader NG' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME=Fansly Downloader NG.exe' >> "${Env:GITHUB_ENV}"
         Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:SHORT_SHA}.zip" >> "${Env:GITHUB_ENV}"
 
     - name: Set macOS & Linux file name environment variables
       if: ${{ runner.os != 'Windows' }}
       shell: pwsh
       run: |
-        Write-Output 'BASE_NAME="fansly-downloader-ng"' >> "${Env:GITHUB_ENV}"
-        Write-Output 'BINARY_NAME="fansly-downloader-ng"' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BASE_NAME=fansly-downloader-ng' >> "${Env:GITHUB_ENV}"
+        Write-Output 'BINARY_NAME=fansly-downloader-ng' >> "${Env:GITHUB_ENV}"
         Write-Output "ARCHIVE_NAME=Fansly_Downloader_NG-${Env:RUNNER_OS}-${Env:SHORT_SHA}.zip" >> "${Env:GITHUB_ENV}"
 
     - name: Show build variables
