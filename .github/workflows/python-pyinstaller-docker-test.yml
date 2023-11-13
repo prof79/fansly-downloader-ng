@@ -23,6 +23,7 @@ jobs:
       uses: docker://fydeinc/pyinstaller
       env:
         SRCDIR: /github/workspace
+        PLATFORMS: linux,alpine
       with:
         args: --name fansly-downloader-ng --console -i "${{ env.SRCDIR }}/resources/fansly_ng.ico" "${{ env.SRCDIR }}/fansly_downloader_ng.py"
 
