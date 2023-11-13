@@ -161,8 +161,9 @@ cython_debug/
 
 # User-specific
 *_fansly/
+temp/
 config_args.ini
 config.ini
 *.bak
 logo*.txt
-dummy.py
+dummy.*
