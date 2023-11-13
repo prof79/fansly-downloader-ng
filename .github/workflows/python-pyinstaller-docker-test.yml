@@ -19,6 +19,9 @@ jobs:
 
     - uses: actions/checkout@v4
 
+    - name: Create dist directory
+      run: mkdir dist
+
     - name: Run PyInstaller via Docker
       uses: docker://fydeinc/pyinstaller
       with:
