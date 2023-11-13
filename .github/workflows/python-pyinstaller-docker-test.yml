@@ -24,7 +24,7 @@ jobs:
       env:
         SRCDIR: /github/workspace
       with:
-        args: --name fansly-downloader-ng --console --icon:"${{ env.SRCDIR }}/resources/fansly_ng.ico" fansly_downloader_ng.py
+        args: --name fansly-downloader-ng --console -i "${{ env.SRCDIR }}/resources/fansly_ng.ico" "${{ env.SRCDIR }}/fansly_downloader_ng.py"
 
     - name: Show dist contents
       run: ls -lhR
