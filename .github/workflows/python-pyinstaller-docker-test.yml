@@ -21,8 +21,10 @@ jobs:
 
     - name: Run PyInstaller via Docker
       uses: docker://fydeinc/pyinstaller
+      env:
+        SRCDIR: /github/workspace
       with:
-        args: -v "${{ github.workspace }}:/src" --name fansly_downloader_ng.py --onefile --console --noupx --icon:/src/resources/fansly_ng.ico
+        args: --name fansly_downloader_ng.py --onefile --console --noupx --icon:/src/resources/fansly_ng.ico
 
     - name: Show dist contents
       run: ls -lhR
