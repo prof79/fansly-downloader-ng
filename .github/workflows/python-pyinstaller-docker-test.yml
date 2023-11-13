@@ -9,9 +9,12 @@ on:
 permissions:
   contents: read
 
+env:
+  PRODUCT_NAME: Fansly Downloader NG
+
 jobs:
 
-  build:
+  build-linux-generic:
 
     runs-on: ubuntu-latest
 
@@ -30,3 +33,10 @@ jobs:
     - name: Show dist contents
       run: ls -lhR
       working-directory: dist
+
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: ${{ env.PRODUCT_NAME }}
+    #     path: |
+    #       dist/${{ env.ARCHIVE_NAME }}
