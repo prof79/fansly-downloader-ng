@@ -98,6 +98,14 @@ class MediaError(RuntimeError):
     def __init__(self, *args):
         super().__init__(*args)
 
+class M3U8Error(MediaError):
+    """This error is raised when M3U8 data is invalid eg.
+    both no audio and no video.
+    """
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
 #endregion
 
 
@@ -120,4 +128,5 @@ __all__ = [
     'DownloadError',
     'DuplicateCountError',
     'MediaError',
+    'M3U8Error',
 ]

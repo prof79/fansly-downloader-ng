@@ -14,7 +14,7 @@ from .m3u8 import download_m3u8
 from .types import DownloadType
 
 from config import FanslyConfig
-from errors import DownloadError, DuplicateCountError, MediaError
+from errors import DownloadError, DuplicateCountError, M3U8Error, MediaError
 from fileio.dedupe import dedupe_media_content
 from media import MediaItem
 from pathio import set_create_directory_for_download
@@ -110,11 +110,15 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
         if media_item.file_extension == 'm3u8':
             # handle the download of a m3u8 file
-            file_downloaded = download_m3u8(config, m3u8_url=media_item.download_url, save_path=file_save_path)
+            try:
+                file_downloaded = download_m3u8(config, m3u8_url=media_item.download_url, save_path=file_save_path)
 
-            if file_downloaded:
-                state.pic_count += 1 if 'image' in media_item.mimetype else 0
-                state.vid_count += 1 if 'video' in media_item.mimetype else 0
+                if file_downloaded:
+                    state.pic_count += 1 if 'image' in media_item.mimetype else 0
+                    state.vid_count += 1 if 'video' in media_item.mimetype else 0
+
+            except M3U8Error as ex:
+                print_warning(f'Skipping invalid item: {ex}')
 
         else:
             # handle the download of a normal media file

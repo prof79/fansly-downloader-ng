@@ -6,12 +6,16 @@ import concurrent.futures
 import io
 import m3u8
 
+from av.audio.stream import AudioStream
+from av.video.stream import VideoStream
 from m3u8 import M3U8
 from pathlib import Path
 from rich.table import Column
 from rich.progress import BarColumn, TextColumn, Progress
+from typing import Optional
 
 from config.fanslyconfig import FanslyConfig
+from errors import M3U8Error
 from textio import print_error
 
 
@@ -97,18 +101,39 @@ def download_m3u8(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
     
     input_container = av.open(io.BytesIO(segment), format='mpegts')
 
-    video_stream = input_container.streams.video[0]
-    audio_stream = input_container.streams.audio[0]
+    first_video_stream: Optional[VideoStream] = None
+    first_audio_stream: Optional[AudioStream] = None
+
+    for stream in input_container.streams.video:
+        first_video_stream = stream
+        break
+
+    for stream in input_container.streams.audio:
+        first_audio_stream = stream
+        break
+
+    has_video = first_video_stream is not None
+    has_audio = first_audio_stream is not None
+
+    if not has_video and not has_audio:
+        raise M3U8Error(f'Neiter audio nor video in M3U8 file: {m3u8_url}')
 
     # define output container and streams
     output_container = av.open(f"{save_path}.mp4", 'w') # add .mp4 file extension
 
-    video_stream = output_container.add_stream(template=video_stream)
-    audio_stream = output_container.add_stream(template=audio_stream)
+    video_stream: Optional[VideoStream] = None
+    audio_stream: Optional[AudioStream] = None
+
+    if has_video:
+        video_stream = output_container.add_stream(template=first_video_stream)
+
+    if has_audio:
+        audio_stream = output_container.add_stream(template=first_audio_stream)
 
     start_pts = None
 
     for packet in input_container.demux():
+
         if packet.dts is None:
             continue
 
@@ -118,10 +143,10 @@ def download_m3u8(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
         packet.pts -= start_pts
         packet.dts -= start_pts
 
-        if packet.stream == input_container.streams.video[0]:
+        if packet.stream == first_video_stream:
             packet.stream = video_stream
 
-        elif packet.stream == input_container.streams.audio[0]:
+        elif packet.stream == first_audio_stream:
             packet.stream = audio_stream
 
         output_container.mux(packet)
