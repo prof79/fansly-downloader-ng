@@ -2,19 +2,19 @@
 
 ## 🗒️ Release Notes
 
-### 0.7.4 2023-11-18
+### v0.7.4 2023-11-18
 
 This should fix the [download problem of M3U8 files](#2) when there is no audio stream for example. The code is now more robust and can detect/skip/warn when there are lists with neither audio nor video.
 
 Please note that there are still issues with the macOS and Ubuntu builds though Ubuntu *should* work now (generic Linux being a totally different story). Actually I wanted to make a separate announcement about multi-OS releases but I'll do that in the future after more testing. 🙂
 
-### 0.7.3
+### v0.7.3 2023-11-11
 
 This is a huge step - **Fansly Downloader NG** now has a binary download release for Windows and can be built automatically! 😁🎉
 
 As a minor change, now also prints the program version number below the logo.
 
-### 0.7.0
+### v0.7.0 2023-11-11
 
 * Vast improvements regarding statistics output
   * list total counts of items
@@ -24,14 +24,14 @@ As a minor change, now also prints the program version number below the logo.
   * show session duration info per creator and total
   * implemeinting this I found the "low-yield" calculations to be faulty - this is now handled differently based on missing items during the statistics output
 
-### 0.6.0
+### v0.6.0 2023-11-10
 
 * Make anti-rate-limiting measures for timeline downloads configurable:
   * Configure number of timeline retries (`--timeline-retries` or `timeline_retries` in `config.ini`)
   * Configure delay in seconds between retries (`--timeline-delay-seconds` or `timeline_delay_seconds` in `config.ini`)
   * Thus you can experiment and try to lower your download session duration. The defaults of `1` retry with a delay of `60` seconds should work all the time but also delay unnecessarily at the proper end of a creator's timeline. You can calculate the minimum duration of a download session (without download time and rate-limiting retries) yourself: `NUMBER_OF_CREATORS * TIMELINE_RETRIES * TIMELINE_DELAY_SECONDS`
 
-### 0.5.*
+### v0.5.* 2023-09
 
 The major rewrite from a single Python script to a more functional, modular, maintanable codebase!
 

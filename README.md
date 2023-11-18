@@ -115,7 +115,7 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ## 📰 What's New (Release Notes)
 
-### 0.7.4 2023-11-18
+### v0.7.4 2023-11-18
 
 This should fix the [download problem of M3U8 files](#2) when there is no audio stream for example. The code is now more robust and can detect/skip/warn when there are lists with neither audio nor video.
 
