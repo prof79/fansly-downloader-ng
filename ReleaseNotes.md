@@ -4,7 +4,7 @@
 
 ### v0.7.4 2023-11-18
 
-This should fix the [download problem of M3U8 files](issues/2) when there is no audio stream for example. The code is now more robust and can detect/skip/warn when there are lists with neither audio nor video.
+This should fix the [download problem of M3U8 files](/issues/2) when there is no audio stream for example. The code is now more robust and can detect/skip/warn when there are lists with neither audio nor video.
 
 Please note that there are still issues with the macOS and Ubuntu builds though Ubuntu *should* work now (generic Linux being a totally different story). Actually I wanted to make a separate announcement about multi-OS releases but I'll do that in the future after more testing. 🙂
 
