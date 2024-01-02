@@ -1,26 +1,13 @@
 """Download Fansly Collections"""
 
 
-from typing import Any, Iterable
-
 from .common import process_download_accessible_media
 from .downloadstate import DownloadState
 from .types import DownloadType
 
 from config import FanslyConfig
 from textio import input_enter_continue, print_error, print_info
-
-
-def batch_list(input_list: list[Any], batch_size: int) -> Iterable[list[Any]]:
-    """Yield successive n-sized batches from input_list.
-    
-    batch_size must be >= 1.
-    """
-    if batch_size < 1:
-        raise ValueError(f'batch_list(): Invalid batch size of {batch_size} is less than 1.')
-
-    for i in range(0, len(input_list), batch_size):
-        yield input_list[i:i + batch_size]
+from utils.common import batch_list
 
 
 def download_collections(config: FanslyConfig, state: DownloadState):

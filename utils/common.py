@@ -6,9 +6,22 @@ import platform
 import subprocess
 
 from pathlib import Path
+from typing import Any, Iterable
 
 from config.fanslyconfig import FanslyConfig
 from errors import ConfigError
+
+
+def batch_list(input_list: list[Any], batch_size: int) -> Iterable[list[Any]]:
+    """Yield successive n-sized batches from input_list.
+    
+    batch_size must be >= 1.
+    """
+    if batch_size < 1:
+        raise ValueError(f'batch_list(): Invalid batch size of {batch_size} is less than 1.')
+
+    for i in range(0, len(input_list), batch_size):
+        yield input_list[i:i + batch_size]
 
 
 def save_config_or_raise(config: FanslyConfig) -> bool:
