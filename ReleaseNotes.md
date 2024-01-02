@@ -2,6 +2,11 @@
 
 ## 🗒️ Release Notes
 
+### v0.7.5 2024-01-02
+
+Thanks to [@icewinterberry12](https://github.com/icewinterberry12) a Fansly API size limitation was uncovered and fixed by them. Kudos!
+Further research required whether this also fixes issues other people are having or not.
+
 ### v0.7.4 2023-11-18
 
 This should fix the [download problem of M3U8 files](../../issues/2) when there is no audio stream for example. The code is now more robust and can detect/skip/warn when there are lists with neither audio nor video.
