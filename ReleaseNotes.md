@@ -2,6 +2,13 @@
 
 ## 🗒️ Release Notes
 
+### v0.7.6 2024-01-02
+
+Thanks to [@icewinterberry12](https://github.com/icewinterberry12) a Fansly API size limitation was uncovered and fixed by them. Kudos!
+Further research required whether this also fixes issues other people are having or not.
+
+Compared to v0.7.5 I added some error handling for batching and did minor restructuring myself.
+
 ### v0.7.5 2024-01-02
 
 Thanks to [@icewinterberry12](https://github.com/icewinterberry12) a Fansly API size limitation was uncovered and fixed by them. Kudos!
