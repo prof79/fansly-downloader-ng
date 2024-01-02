@@ -47,10 +47,26 @@ def download_collections(config: FanslyConfig, state: DownloadState):
                 f"https://apiv3.fansly.com/api/v1/account/media?ids={batched_ids}",
                 headers=config.http_headers())
 
-            post_object = post_object_response.json()
-  
-            process_download_accessible_media(config, state, post_object['response'])
+            if post_object_response.status_code == 200:
+                post_object = post_object_response.json()
+    
+                process_download_accessible_media(config, state, post_object['response'])
+            
+            else:
+                print_error(
+                    f"Media batch download failed. Response code: "
+                    f"{post_object_response.status_code}"
+                    f"\n{post_object_response.text}"
+                    f"\n\nAffected media IDs: {batched_ids}",
+                    23
+                )
+                input_enter_continue(config.interactive)
+
 
     else:
-        print_error(f"Failed Collections download. Response code: {collections_response.status_code}\n{collections_response.text}", 23)
+        print_error(
+            f"Collections download failed. Response code: "
+            f"{collections_response.status_code}\n{collections_response.text}",
+            23
+        )
         input_enter_continue(config.interactive)
