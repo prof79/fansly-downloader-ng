@@ -9,6 +9,12 @@ from config import FanslyConfig
 from textio import input_enter_continue, print_error, print_info
 
 
+def batch_list(input_list, batch_size):
+    """Yield successive n-sized batches from input_list."""
+    for i in range(0, len(input_list), batch_size):
+        yield input_list[i:i + batch_size]
+
+
 def download_collections(config: FanslyConfig, state: DownloadState):
     """Downloads Fansly purchased item collections."""
 
@@ -26,21 +32,21 @@ def download_collections(config: FanslyConfig, state: DownloadState):
 
     if collections_response.status_code == 200:
         collections_response = collections_response.json()
-        
-        # format all ids from /account/media/orders (collections)
-        accountMediaIds = ','.join(
-            [order['accountMediaId']
-             for order in collections_response['response']['accountMediaOrders']]
-        )
-        
-        # input them into /media?ids= to get all relevant information about each purchased media in a 2nd request
-        post_object = config.http_session.get(
-            f"https://apiv3.fansly.com/api/v1/account/media?ids={accountMediaIds}",
-            headers=config.http_headers())
-
-        post_object = post_object.json()
-        
-        process_download_accessible_media(config, state, post_object['response'])
+        account_media_orders = collections_response['response']['accountMediaOrders']
+        account_media_ids = [order['accountMediaId'] for order in account_media_orders]
+  
+        # Batch size based on API's limits
+        batch_size = 150
+  
+        # Splitting the list into batches and making separate API calls for each
+        for batch in batch_list(account_media_ids, batch_size):
+            batched_ids = ','.join(batch)
+            post_object = config.http_session.get(
+                f"https://apiv3.fansly.com/api/v1/account/media?ids={batched_ids}",
+                headers=config.http_headers())
+            post_object = post_object.json()
+  
+            process_download_accessible_media(config, state, post_object['response'])
 
     else:
         print_error(f"Failed Collections download. Response code: {collections_response.status_code}\n{collections_response.text}", 23)
