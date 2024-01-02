@@ -15,7 +15,15 @@ from errors import ConfigError
 def batch_list(input_list: list[Any], batch_size: int) -> Iterable[list[Any]]:
     """Yield successive n-sized batches from input_list.
     
-    batch_size must be >= 1.
+    :param input_list: An arbitrary list to split into equal-sized chunks.
+    :type input_list: list[Any]
+
+    :param batch_size: The number of elements in a chunk to
+        split the list into. Batch size must be >= 1.
+    :type batch_size: int
+
+    :return: An iterable of sub-lists of size `batch_size`.
+    :rtype: Iterable[list[Any]]
     """
     if batch_size < 1:
         raise ValueError(f'batch_list(): Invalid batch size of {batch_size} is less than 1.')
