@@ -31,8 +31,8 @@ def download_collections(config: FanslyConfig, state: DownloadState):
     )
 
     if collections_response.status_code == 200:
-        collections_response = collections_response.json()
-        account_media_orders = collections_response['response']['accountMediaOrders']
+        collections = collections_response.json()
+        account_media_orders = collections['response']['accountMediaOrders']
         account_media_ids = [order['accountMediaId'] for order in account_media_orders]
   
         # Batch size based on API's limits
@@ -40,11 +40,14 @@ def download_collections(config: FanslyConfig, state: DownloadState):
   
         # Splitting the list into batches and making separate API calls for each
         for batch in batch_list(account_media_ids, batch_size):
+
             batched_ids = ','.join(batch)
-            post_object = config.http_session.get(
+
+            post_object_response = config.http_session.get(
                 f"https://apiv3.fansly.com/api/v1/account/media?ids={batched_ids}",
                 headers=config.http_headers())
-            post_object = post_object.json()
+
+            post_object = post_object_response.json()
   
             process_download_accessible_media(config, state, post_object['response'])
 
