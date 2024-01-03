@@ -8,7 +8,7 @@ from .types import DownloadType
 
 from config import FanslyConfig
 from textio import input_enter_continue, print_error, print_info, print_warning
-from utils.common import is_valid_post_id
+from utils.common import is_valid_post_id, batch_list
 
 
 def download_single_post(config: FanslyConfig, state: DownloadState):
@@ -63,12 +63,15 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
         post_object = post_response.json()['response']
         
         # if access to post content / post contains content
-        if post_object['accountMedia']:
+        if post_object['accountMediaBundles']:
+            account_media_bundles = post_object['accountMediaBundles']
+            account_media_bundles_media_ids = [bundle['accountMediaIds'] for bundle in account_media_bundles]
+            account_media_ids = [media_id for media_ids in account_media_bundles_media_ids for media_id in media_ids]
 
             # parse post creator name
             if creator_username is None:
                 # the post creators reliable accountId
-                state.creator_id = post_object['accountMedia'][0]['accountId']
+                state.creator_id = post_object['accountMediaBundles'][0]['accountId']
 
                 creator_display_name, creator_username = next(
                     (account.get('displayName'), account.get('username'))
@@ -90,8 +93,32 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
             # depending on post creator (!= configured creator)    
             dedupe_init(config, state)
 
-            process_download_accessible_media(config, state, post_object['accountMedia'], post_id)
-        
+            # Batch size based on API's limits
+            batch_size = 150
+
+            # Splitting the list into batches and making separate API calls for each
+            for batch in batch_list(account_media_ids, batch_size):
+
+                batched_ids = ','.join(batch)
+
+                post_object_response = config.http_session.get(
+                    f"https://apiv3.fansly.com/api/v1/account/media?ids={batched_ids}",
+                    headers=config.http_headers())
+
+                if post_object_response.status_code == 200:
+                    post_object = post_object_response.json()
+
+                    process_download_accessible_media(config, state, post_object['response'])
+
+                else:
+                    print_error(
+                        f"Media batch download failed. Response code: "
+                        f"{post_object_response.status_code}"
+                        f"\n{post_object_response.text}"
+                        f"\n\nAffected media IDs: {batched_ids}",
+                        23
+                    )
+                    input_enter_continue(config.interactive)
         else:
             print_warning(f"Could not find any accessible content in the single post.")
     
