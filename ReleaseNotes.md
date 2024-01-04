@@ -2,6 +2,14 @@
 
 ## 🗒️ Release Notes
 
+### v0.7.9 2024-01-04
+
+Fixed statistics message counting bug.
+
+### v0.7.8 2024-01-04
+
+Safe dictionary access for media info access in Fansly objects.
+
 ### v0.7.7 2024-01-04
 
 Preliminary release of missing items fix.

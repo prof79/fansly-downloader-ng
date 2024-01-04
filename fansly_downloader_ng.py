@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.8'
-__date__ = '2024-01-04T18:40:00+01'
+__version__ = '0.7.9'
+__date__ = '2024-01-04T19:04:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -15,6 +15,7 @@ __authors__ = [
 ]
 __credits__ = [
     'Avnsx',
+    'KasumiDev',
 ]
 
 # TODO: Fix in future: audio needs to be properly transcoded from mp4 to mp3, instead of just saved as

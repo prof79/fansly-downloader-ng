@@ -128,7 +128,7 @@ def process_download_accessible_media(
     original_duplicate_threshold = config.DUPLICATE_THRESHOLD
 
     if state.download_type == DownloadType.MESSAGES:
-        state.total_message_items = len(accessible_media)
+        state.total_message_items += len(accessible_media)
 
         # Overwrite base dup threshold with 20% of total accessible content in messages.
         # Don't forget to save/reset afterwards.

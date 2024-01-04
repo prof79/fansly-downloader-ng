@@ -115,9 +115,9 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ## 📰 What's New (Release Notes)
 
-### v0.7.7 2024-01-04
+### v0.7.9 2024-01-04
 
-Preliminary release of missing items fix.
+Fixed statistics message counting bug.
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 
