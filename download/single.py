@@ -1,12 +1,13 @@
 """Single Post Downloading"""
 
 
-from fileio.dedupe import dedupe_init
-from .common import process_download_accessible_media
+from .common import get_unique_media_ids, process_download_accessible_media
 from .core import DownloadState
+from .media import download_media_infos
 from .types import DownloadType
 
 from config import FanslyConfig
+from fileio.dedupe import dedupe_init
 from textio import input_enter_continue, print_error, print_info, print_warning
 from utils.common import is_valid_post_id
 
@@ -63,12 +64,15 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
         post_object = post_response.json()['response']
         
         # if access to post content / post contains content
-        if post_object['accountMedia']:
+        if post_object['accountMediaBundles'] or post_object['accountMedia']:
 
             # parse post creator name
             if creator_username is None:
                 # the post creators reliable accountId
-                state.creator_id = post_object['accountMedia'][0]['accountId']
+                if post_object['accountMediaBundles']:
+                    state.creator_id = post_object['accountMediaBundles'][0]['accountId']
+                else:
+                    state.creator_id = post_object['accountMedia'][0]['accountId']
 
                 creator_display_name, creator_username = next(
                     (account.get('displayName'), account.get('username'))
@@ -90,7 +94,10 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
             # depending on post creator (!= configured creator)    
             dedupe_init(config, state)
 
-            process_download_accessible_media(config, state, post_object['accountMedia'], post_id)
+            all_media_ids = get_unique_media_ids(post_object)
+            media_infos = download_media_infos(config, all_media_ids)
+
+            process_download_accessible_media(config, state, media_infos, post_id)
         
         else:
             print_warning(f"Could not find any accessible content in the single post.")

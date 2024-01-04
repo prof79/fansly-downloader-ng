@@ -3,6 +3,8 @@
 
 import traceback
 
+from typing import Any
+
 from .downloadstate import DownloadState
 from .media import download_media
 from .types import DownloadType
@@ -12,6 +14,59 @@ from errors import DuplicateCountError
 from media import MediaItem, parse_media_info
 from pathio import set_create_directory_for_download
 from textio import print_error, print_info, print_warning, input_enter_continue
+
+
+def get_unique_media_ids(info_object: dict[str, Any]) -> list[str]:
+    """Extracts a unique list of media IDs from `accountMedia` and
+    `accountMediaBundles` of prominent Fansly API objects.
+
+    :param info_object: A dictionary object obtained via JSON representing
+        a timeline, post or messages object.
+    
+    :return: An unique list of media ID strings.
+    :rtype: list[str]
+    """
+    # Notes for the "bundles desaster":
+    #
+    # https://apiv3.fansly.com/api/v1/post?ids=XXX&ngsw-bypass=true
+    # response.post.attachments.contentId
+    # https://apiv3.fansly.com/api/v1/timelinenew/XXX?before=YYY&after=0&wallId=&contentSearch=&ngsw-bypass=true
+    # response posts[0].attachments.contentId
+    # points to response.accountMediaBundles
+    #
+    # response.accountMediaBundles[0].accountMediaIds
+    # has media IDs (array) -> no locations, use "account/media" API!!!
+    # response.accountMediaBundles[0]
+    # has properties like "previewId" and "createdAt"
+
+    account_media = info_object['accountMedia']
+    media_bundles = info_object['accountMediaBundles']
+
+    account_media_ids = [
+        media['id']
+        for media in account_media
+    ]
+
+    bundle_media_ids = []
+
+    media_id_bundles = [
+        bundle['accountMediaIds']
+        for bundle in media_bundles
+    ]
+
+    # Flatten the ID lists
+    for id_list in media_id_bundles:
+        bundle_media_ids.extend(id_list)
+
+    all_media_ids = set()
+
+    for id in account_media_ids:
+        all_media_ids.add(id)
+
+    for id in bundle_media_ids:
+        all_media_ids.add(id)
+
+    return list(all_media_ids)
 
 
 def print_download_info(config: FanslyConfig) -> None:
@@ -47,7 +102,7 @@ def process_download_accessible_media(
         "True" otherwise.
     :rtype: bool
     """
-    contained_posts: list[MediaItem] = []
+    media_items: list[MediaItem] = []
 
     # Timeline
 
@@ -55,7 +110,7 @@ def process_download_accessible_media(
     for media_info in media_infos:
         try:
             # add details into a list
-            contained_posts += [parse_media_info(state, media_info, post_id)]
+            media_items += [parse_media_info(state, media_info, post_id)]
 
         except Exception:
             print_error(f"Unexpected error during parsing {state.download_type_str()} content;\n{traceback.format_exc()}", 42)
@@ -63,7 +118,7 @@ def process_download_accessible_media(
 
     # summarise all scrapable & wanted media
     accessible_media = [
-        item for item in contained_posts
+        item for item in media_items
         if item.download_url \
             and (item.is_preview == config.download_media_previews \
                     or not item.is_preview)

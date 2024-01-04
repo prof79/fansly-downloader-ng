@@ -5,8 +5,9 @@ import random
 
 from time import sleep
 
-from .common import process_download_accessible_media
+from .common import get_unique_media_ids, process_download_accessible_media
 from .downloadstate import DownloadState
+from .media import download_media_infos
 from .types import DownloadType
 
 from config import FanslyConfig
@@ -60,27 +61,41 @@ def download_messages(config: FanslyConfig, state: DownloadState):
 
                 if messages_response.status_code == 200:
                 
-                    # post object contains: messages, accountMedia, accountMediaBundles, tips, tipGoals, stories
-                    post_object = messages_response.json()['response']
+                    # Object contains: messages, accountMedia, accountMediaBundles, tips, tipGoals, stories
+                    messages = messages_response.json()['response']
 
-                    process_download_accessible_media(config, state, post_object['accountMedia'])
+                    all_media_ids = get_unique_media_ids(messages)
+                    media_infos = download_media_infos(config, all_media_ids)
+
+                    process_download_accessible_media(config, state, media_infos)
 
                     # get next cursor
                     try:
                         # Fansly rate-limiting fix
                         # (don't know if messages were affected at all)
                         sleep(random.uniform(2, 4))
-                        msg_cursor = post_object['messages'][-1]['id']
+                        msg_cursor = messages['messages'][-1]['id']
 
                     except IndexError:
                         break # break if end is reached
 
                 else:
-                    print_error(f"Failed messages download. messages_req failed with response code: {messages_response.status_code}\n{messages_response.text}", 30)
+                    print_error(
+                        f"Failed messages download. messages_req failed with response code: "
+                        f"{messages_response.status_code}\n{messages_response.text}", 
+                        30
+                    )
 
         elif group_id is None:
-            print_warning(f"Could not find a chat history with {state.creator_name}; skipping messages download ...")
+            print_warning(
+                f"Could not find a chat history with "
+                f"{state.creator_name}; skipping messages download ..."
+            )
 
     else:
-        print_error(f"Failed Messages download. Response code: {groups_response.status_code}\n{groups_response.text}", 31)
+        print_error(
+            f"Failed Messages download. Response code: "
+            f"{groups_response.status_code}\n{groups_response.text}",
+            31
+        )
         input_enter_continue(config.interactive)

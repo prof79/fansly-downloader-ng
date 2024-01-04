@@ -7,8 +7,9 @@ import traceback
 from requests import Response
 from time import sleep
 
-from .common import process_download_accessible_media
+from .common import get_unique_media_ids, process_download_accessible_media
 from .core import DownloadState
+from .media import download_media_infos
 from .types import DownloadType
 
 from config import FanslyConfig
@@ -53,12 +54,14 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
 
             if timeline_response.status_code == 200:
 
-                post_object = timeline_response.json()['response']
+                timeline = timeline_response.json()['response']
         
                 if config.debug:
-                    print_debug(f'Post object: {post_object}')
+                    print_debug(f'Timeline object: {timeline}')
 
-                if len(post_object['accountMedia']) == 0:
+                all_media_ids = get_unique_media_ids(timeline)
+
+                if len(all_media_ids) == 0:
                     # We might be a rate-limit victim, slow extremely down -
                     # but only if there are retries left
                     if attempts < config.timeline_retries:
@@ -67,11 +70,14 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                     # Try again
                     attempts += 1
                     continue
+
                 else:
                     # Reset attempts eg. new timeline
                     attempts = 0
 
-                if not process_download_accessible_media(config, state, post_object['accountMedia']):
+                media_infos = download_media_infos(config, all_media_ids)
+
+                if not process_download_accessible_media(config, state, media_infos):
                     # Break on deduplication error - already downloaded
                     break
 
@@ -82,7 +88,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                     # Slow down to avoid the Fansly rate-limit which was introduced in late August 2023
                     sleep(random.uniform(2, 4))
 
-                    timeline_cursor = post_object['posts'][-1]['id']
+                    timeline_cursor = timeline['posts'][-1]['id']
 
                 except IndexError:
                     # break the whole while loop, if end is reached

@@ -115,12 +115,9 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ## 📰 What's New (Release Notes)
 
-### v0.7.6 2024-01-02
+### v0.7.7 2024-01-04
 
-Thanks to [@icewinterberry12](https://github.com/icewinterberry12) a Fansly API size limitation was uncovered and fixed by them. Kudos!
-Further research required whether this also fixes issues other people are having or not.
-
-Compared to v0.7.5 I added some error handling for batching and did minor restructuring myself.
+Preliminary release of missing items fix.
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 

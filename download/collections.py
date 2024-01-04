@@ -30,11 +30,8 @@ def download_collections(config: FanslyConfig, state: DownloadState):
         account_media_orders = collections['response']['accountMediaOrders']
         account_media_ids = [order['accountMediaId'] for order in account_media_orders]
   
-        # Batch size based on API's limits
-        batch_size = 150
-  
         # Splitting the list into batches and making separate API calls for each
-        for batch in batch_list(account_media_ids, batch_size):
+        for batch in batch_list(account_media_ids, config.BATCH_SIZE):
 
             batched_ids = ','.join(batch)
 

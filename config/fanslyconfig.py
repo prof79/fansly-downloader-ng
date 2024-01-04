@@ -24,6 +24,9 @@ class FanslyConfig(object):
     # Define base threshold (used for when modules don't provide vars)
     DUPLICATE_THRESHOLD: int = 50
 
+    # Batch size for batched API access (Fansly API size limit)
+    BATCH_SIZE: int = 150
+
     # Configuration file
     config_path: Path | None = None
 

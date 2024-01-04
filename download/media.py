@@ -14,11 +14,12 @@ from .m3u8 import download_m3u8
 from .types import DownloadType
 
 from config import FanslyConfig
-from errors import DownloadError, DuplicateCountError, M3U8Error, MediaError
+from errors import ApiError, DownloadError, DuplicateCountError, M3U8Error, MediaError
 from fileio.dedupe import dedupe_media_content
 from media import MediaItem
 from pathio import set_create_directory_for_download
 from textio import print_info, print_warning
+from utils.common import batch_list
 
 
 # tell PIL to be tolerant of files that are truncated
@@ -26,6 +27,53 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # turn off for our purpose unnecessary PIL safety features
 Image.MAX_IMAGE_PIXELS = None
+
+
+def download_media_infos(
+            config: FanslyConfig,
+            media_ids: list[str]
+        ) -> list[dict]:
+
+    media_infos: list[dict] = []
+
+    for ids in batch_list(media_ids, config.BATCH_SIZE):
+        media_ids_str = ','.join(ids)
+
+        url = f'https://apiv3.fansly.com/api/v1/account/media?ids={media_ids_str}&ngsw-bypass=true'
+
+        config.cors_options_request(url)
+
+        media_info_response = config.http_session.get(
+            url,
+            headers=config.http_headers()
+        )
+
+        media_info_response.raise_for_status()
+
+        if media_info_response.status_code == 200:
+            media_info = media_info_response.json()
+
+            if not media_info['success']:
+                raise ApiError(
+                    f"Could not retrieve media info for {media_ids_str} due to an "
+                    f"API error - unsuccessful "
+                    f"| content: \n{media_info}"
+                )
+
+            for info in media_info['response']:
+                media_infos.append(info)
+
+        else:
+            raise DownloadError(
+                f"Could not retrieve media info for {media_ids_str} due to an "
+                f"error --> status_code: {media_info_response.status_code} "
+                f"| content: \n{media_info_response.content.decode('utf-8')}"
+            )
+
+        # Slow down a bit to be sure
+        sleep(random.uniform(0.4, 0.75))
+
+    return media_infos
 
 
 def download_media(config: FanslyConfig, state: DownloadState, accessible_media: list[MediaItem]):
@@ -169,8 +217,8 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
             else:
                 raise DownloadError(
-                    f"Download failed on filename: {filename} - due to a "
-                    f"network error --> status_code: {response.status_code} "
+                    f"Download failed on filename {filename} due to an "
+                    f"error --> status_code: {response.status_code} "
                     f"| content: \n{response.content.decode('utf-8')} [13]"
                 )
 
