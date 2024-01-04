@@ -39,8 +39,8 @@ def get_unique_media_ids(info_object: dict[str, Any]) -> list[str]:
     # response.accountMediaBundles[0]
     # has properties like "previewId" and "createdAt"
 
-    account_media = info_object['accountMedia']
-    media_bundles = info_object['accountMediaBundles']
+    account_media = info_object.get('accountMedia', [])
+    media_bundles = info_object.get('accountMediaBundles', [])
 
     account_media_ids = [
         media['id']

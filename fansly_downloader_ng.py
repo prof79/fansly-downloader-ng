@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.7'
-__date__ = '2024-01-04T18:10:00+01'
+__version__ = '0.7.8'
+__date__ = '2024-01-04T18:40:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
