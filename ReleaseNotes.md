@@ -2,6 +2,12 @@
 
 ## 🗒️ Release Notes
 
+### v0.7.10 2024-01-05
+
+Binary release fixing the [missing media downloads issue #3](../../issues/3). Thanks to all participants!
+Also fixes a statistics message counting bug.
+Summary release for v0.7.7-v0.7.9, no code changes in this one.
+
 ### v0.7.9 2024-01-04
 
 Fixed statistics message counting bug.
