@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.11'
-__date__ = '2024-01-20T18:04:00+01'
+__version__ = '0.7.13'
+__date__ = '2024-01-20T19:41:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -107,6 +107,16 @@ def main(config: FanslyConfig) -> int:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
 
     global_download_state = GlobalState()
+
+    # M3U8 fixing interim
+    print()
+    print_warning(
+        "THIS IS AN EXPERIMENTAL IMPROVED VIDEO DOWNLOAD VERSION -"
+        f"\n{' '*19} EXISTING VIDEOS WILL BE DOWNLOADED AGAIN/DE-DUPLICATION WILL NOT WORK"
+        f"\n{' '*19} FOR DOWNLOADS FROM OLDER VERSIONS!!!"
+        f"\n{' '*19} CTRL+C TO ABORT"
+    )
+    input_enter_continue(config.interactive)
 
     for creator_name in sorted(config.user_names):
         with Timer(creator_name):

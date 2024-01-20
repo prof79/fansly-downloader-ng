@@ -54,7 +54,7 @@ def get_m3u8_progress(disable_loading_bar: bool) -> Progress:
 
 
 @profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
-def download_m3u8(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
+def download_m3u8_old(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
     """Download M3U8 content as MP4.
     
     :param config: The downloader configuration.
@@ -200,35 +200,70 @@ def download_m3u8(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
 
 
 @profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
-def download_video(
+def download_m3u8(
             config: FanslyConfig,
             m3u8_url: str,
             save_path: Path,
-        ) -> None:
+        ) -> bool:
+    """Download M3U8 content as MP4.
+    
+    :param config: The downloader configuration.
+    :type config: FanslyConfig
 
+    :param m3u8_url: The URL string of the M3U8 to download.
+    :type m3u8_url: str
+
+    :param save_path: The suggested file to save the video to.
+        This will be changed to MP4 (.mp4).
+    :type save_path: Path
+
+    :return: True if successful or False otherwise.
+    :rtype: bool
+    """
     CHUNK_SIZE = 65_536
 
-    # TODO: Full path?
-    video_path = save_path.parent
-    full_path = save_path
-    stream_uri = m3u8_url
+    cookies = get_m3u8_cookies(m3u8_url)
 
-    with config.http_session.get(stream_uri, headers=config.http_headers()) as stream_response:
+    m3u8_base_url, m3u8_file_url = split_url(m3u8_url)
+
+    video_path = save_path.parent
+    full_path = video_path / f'{save_path.stem}.mp4'
+
+    with config.http_session.get(
+                m3u8_file_url,
+                headers=config.http_headers(),
+                cookies=cookies,
+            ) as stream_response:
+
+        if stream_response.status_code != 200:
+            print_error(
+                f'Failed downloading M3U8 at playlist_content request. '
+                f'Response code: {stream_response.status_code}\n'
+                f'{stream_response.text}',
+                12
+            )
+            return False        
+
         segments_text = stream_response.text
-        segments_playlist = M3U8(content=segments_text)
+
+        segments_playlist = M3U8(
+            content=segments_text,
+            base_uri=m3u8_base_url,
+        )
 
         if segments_playlist.is_endlist != True \
             or segments_playlist.playlist_type != 'vod':
-                raise M3U8Error(f'Invalid video stream info for {stream_uri}')
+                raise M3U8Error(f'Invalid video stream info for {m3u8_file_url}')
 
         #region Nested function to download TS segments
         def download_ts(segment_uri: str, segment_full_path: Path) -> None:
-            with open(segment_full_path, 'wb') as ts_file:
-                with config.http_session.get(
-                            segment_uri,
-                            headers=config.http_headers(),
-                            stream=True
-                        ) as segment_response:
+            with config.http_session.get(
+                        segment_uri,
+                        headers=config.http_headers(),
+                        cookies=cookies,
+                        stream=True
+                    ) as segment_response:
+                with open(segment_full_path, 'wb') as ts_file:
                     for chunk in segment_response.iter_content(CHUNK_SIZE):
                         if chunk is not None:
                             ts_file.write(chunk)
@@ -249,44 +284,47 @@ def download_video(
             segment_files.append(segment_full_path)
             segment_uris.append(segment_uri)
 
-            #download_ts(segment_uri, segment_full_path)
-
         # Display loading bar if there are many segments
         progress = get_m3u8_progress(
             disable_loading_bar=len(segment_files) < 5
         )
 
-        with progress:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                _ = list(
-                    progress.track(
-                        executor.map(download_ts, segment_uris, segment_files),
-                        total=len(segment_files)
-                    )
-                )
-
-        # Check multi-threaded downloads
-        for file in segment_files:
-            if not file.exists():
-                raise M3U8Error(f'Stream segment failed to download: {file}')
-
         ffmpeg_list_file = video_path / '_ffmpeg_concat_.ffc'
 
-        with open(ffmpeg_list_file, 'w', encoding='utf-8') as list_file:
-            list_file.write('ffconcat version 1.0\n')
-            list_file.writelines([f"file '{f.name}'\n" for f in segment_files])
+        try:
 
-        ffmpeg = FFmpeg(enable_log=config.debug)
+            with progress:
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    _ = list(
+                        progress.track(
+                            executor.map(download_ts, segment_uris, segment_files),
+                            total=len(segment_files)
+                        )
+                    )
 
-        ffmpeg.options(
-            f'-f concat -i "{ffmpeg_list_file}" -c copy "{full_path}"'
-        )
+            # Check multi-threaded downloads
+            for file in segment_files:
+                if not file.exists():
+                    raise M3U8Error(f'Stream segment failed to download: {file}')
 
-        #region Clean up
+            with open(ffmpeg_list_file, 'w', encoding='utf-8') as list_file:
+                list_file.write('ffconcat version 1.0\n')
+                list_file.writelines([f"file '{f.name}'\n" for f in segment_files])
 
-        ffmpeg_list_file.unlink()
+            ffmpeg = FFmpeg(enable_log=config.debug)
 
-        for file in segment_files:
-            file.unlink()
-        
-        #endregion
+            ffmpeg.options(
+                f'-f concat -i "{ffmpeg_list_file}" -c copy "{full_path}"'
+            )
+
+        finally:
+            #region Clean up
+
+            ffmpeg_list_file.unlink(missing_ok=True)
+
+            for file in segment_files:
+                file.unlink(missing_ok=True)
+            
+            #endregion
+
+    return True
