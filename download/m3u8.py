@@ -1,19 +1,15 @@
 """M3U8 Media Download Handling"""
 
 
-import av
 import concurrent.futures
-import io
 
-from av.audio.stream import AudioStream
-from av.video.stream import VideoStream
-from memory_profiler import profile
+#from memory_profiler import profile
 from pyffmpeg import FFmpeg
 from m3u8 import M3U8
 from pathlib import Path
 from rich.table import Column
 from rich.progress import BarColumn, TextColumn, Progress
-from typing import Optional, Any
+from typing import Any
 
 from config.fanslyconfig import FanslyConfig
 from errors import M3U8Error
@@ -53,153 +49,7 @@ def get_m3u8_progress(disable_loading_bar: bool) -> Progress:
     )
 
 
-@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
-def download_m3u8_old(config: FanslyConfig, m3u8_url: str, save_path: Path) -> bool:
-    """Download M3U8 content as MP4.
-    
-    :param config: The downloader configuration.
-    :type config: FanslyConfig
-
-    :param m3u8_url: The URL string of the M3U8 to download.
-    :type m3u8_url: str
-
-    :param save_path: The suggested file to save the video to.
-        This will be changed to MP4 (.mp4).
-    :type save_path: Path
-
-    :return: True if successful or False otherwise.
-    :rtype: bool
-    """
-    CHUNK_SIZE = 65_536
-
-    # Remove file extension (.m3u8) from save_path
-    save_path = save_path.parent / save_path.stem
-
-    cookies = get_m3u8_cookies(m3u8_url)
-
-    m3u8_base_url, m3u8_file_url = split_url(m3u8_url)
-
-    # download the m3u8 playlist
-    playlist_response = config.http_session.get(
-        m3u8_file_url,
-        headers=config.http_headers(),
-        cookies=cookies,
-    )
-
-    if playlist_response.status_code != 200:
-        print_error(
-            f'Failed downloading m3u8; at playlist_content request. '
-            f'Response code: {playlist_response.status_code}\n'
-            f'{playlist_response.text}',
-            12
-        )
-        return False
-
-    playlist_text = playlist_response.text
-
-    # parse the m3u8 playlist content using the m3u8 library
-    playlist: M3U8 = M3U8(playlist_text, base_uri=m3u8_base_url)
-
-    # get a list of all the .ts files in the playlist
-    ts_files = [segment.absolute_uri for segment in playlist.segments if segment.uri.endswith('.ts')]
-
-    # define a nested function to download a single .ts file and return the content
-    def download_ts(ts_url: str) -> bytes:
-        ts_response = config.http_session.get(
-            ts_url,
-            headers=config.http_headers(),
-            cookies=cookies,
-            stream=True,
-        )
-
-        buffer = io.BytesIO()
-
-        for chunk in ts_response.iter_content(chunk_size=CHUNK_SIZE):
-            buffer.write(chunk)
-
-        ts_content = buffer.getvalue()
-
-        return ts_content
-
-    # Display loading bar if there are many segments
-    progress = get_m3u8_progress(
-        disable_loading_bar=len(ts_files) < 15
-    )
-
-    with progress:
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            segment_bytes_list = [
-                file for file in progress.track(
-                    executor.map(download_ts, ts_files),
-                    total=len(ts_files)
-                )
-            ]
-    
-    all_ts_bytes = bytearray()
-
-    for segment_bytes in segment_bytes_list:
-        all_ts_bytes += segment_bytes
-    
-    input_container = av.open(io.BytesIO(all_ts_bytes), format='mpegts')
-
-    first_video_stream: Optional[VideoStream] = None
-    first_audio_stream: Optional[AudioStream] = None
-
-    for stream in input_container.streams.video:
-        first_video_stream = stream
-        break
-
-    for stream in input_container.streams.audio:
-        first_audio_stream = stream
-        break
-
-    has_video = first_video_stream is not None
-    has_audio = first_audio_stream is not None
-
-    if not has_video and not has_audio:
-        raise M3U8Error(f'Neither audio nor video in M3U8 file: {m3u8_file_url}')
-
-    # define output container and streams
-    output_container = av.open(f"{save_path}.mp4", 'w') # add .mp4 file extension
-
-    video_stream: Optional[VideoStream] = None
-    audio_stream: Optional[AudioStream] = None
-
-    if has_video:
-        video_stream = output_container.add_stream(template=first_video_stream)
-
-    if has_audio:
-        audio_stream = output_container.add_stream(template=first_audio_stream)
-
-    start_pts = None
-
-    for packet in input_container.demux():
-
-        if packet.dts is None:
-            continue
-
-        if start_pts is None:
-            start_pts = packet.pts
-
-        packet.pts -= start_pts
-        packet.dts -= start_pts
-
-        if packet.stream == first_video_stream:
-            packet.stream = video_stream
-
-        elif packet.stream == first_audio_stream:
-            packet.stream = audio_stream
-
-        output_container.mux(packet)
-
-    # close containers
-    input_container.close()
-    output_container.close()
-
-    return True
-
-
-@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
+#@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
 def download_m3u8(
             config: FanslyConfig,
             m3u8_url: str,

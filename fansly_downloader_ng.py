@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.13'
-__date__ = '2024-01-20T19:41:00+01'
+__version__ = '0.7.14'
+__date__ = '2024-01-20T19:59:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -26,7 +26,7 @@ __credits__ = [
 import base64
 import traceback
 
-from memory_profiler import profile
+#from memory_profiler import profile
 
 from config import FanslyConfig, load_config, validate_adjust_config
 from config.args import parse_args, map_args_to_config
@@ -67,7 +67,7 @@ def print_logo() -> None:
     print(f"{(100 - len(__version__) - 1)//2*' '}v{__version__}\n")
 
 
-@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
+#@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
 def main(config: FanslyConfig) -> int:
     """The main logic of the downloader program.
     
