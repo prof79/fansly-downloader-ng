@@ -159,7 +159,11 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
         if media_item.file_extension == 'm3u8':
             # handle the download of a m3u8 file
             try:
-                file_downloaded = download_m3u8(config, m3u8_url=media_item.download_url, save_path=file_save_path)
+                file_downloaded = download_m3u8(
+                    config,
+                    m3u8_url=media_item.download_url,
+                    save_path=file_save_path
+                )
 
                 if file_downloaded:
                     state.pic_count += 1 if 'image' in media_item.mimetype else 0
