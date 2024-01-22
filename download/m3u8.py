@@ -4,15 +4,16 @@
 import concurrent.futures
 
 #from memory_profiler import profile
-from pyffmpeg import FFmpeg
 from m3u8 import M3U8
 from pathlib import Path
 from rich.table import Column
 from rich.progress import BarColumn, TextColumn, Progress
+from subprocess import CalledProcessError
 from typing import Any
 
 from config.fanslyconfig import FanslyConfig
 from errors import M3U8Error
+from utils.ffmpeg import run_ffmpeg
 from utils.web import get_file_name_from_url, get_qs_value, split_url
 from textio import print_error
 
@@ -145,7 +146,7 @@ def download_m3u8(
 
             with progress:
                 with concurrent.futures.ThreadPoolExecutor() as executor:
-                    _ = list(
+                    list(
                         progress.track(
                             executor.map(download_ts, segment_uris, segment_files),
                             total=len(segment_files)
@@ -161,11 +162,23 @@ def download_m3u8(
                 list_file.write('ffconcat version 1.0\n')
                 list_file.writelines([f"file '{f.name}'\n" for f in segment_files])
 
-            ffmpeg = FFmpeg(enable_log=config.debug)
+            args = [
+                '-f',
+                'concat',
+                '-i',
+                str(ffmpeg_list_file),
+                '-c',
+                'copy',
+                str(full_path),
+            ]
 
-            ffmpeg.options(
-                f'-f concat -i "{ffmpeg_list_file}" -c copy "{full_path}"'
-            )
+            try:
+                run_ffmpeg(args)
+            
+            except CalledProcessError as ex:
+                raise M3U8Error(
+                    f'Error running ffmpeg - exit code {ex.returncode}: {ex.stderr}'
+                )
 
         finally:
             #region Clean up

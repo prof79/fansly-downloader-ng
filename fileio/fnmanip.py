@@ -16,6 +16,8 @@ from config import FanslyConfig
 from download.downloadstate import DownloadState
 from textio import print_debug, print_error
 
+from .mp4 import hash_mp4file
+
 
 # turn off for our purpose unnecessary PIL safety features
 Image.MAX_IMAGE_PIXELS = None
@@ -31,9 +33,19 @@ def extract_media_id(filename: str) -> int | None:
     return None
 
 
-def extract_hash_from_filename(filename: str) -> str | None:
+def extract_old_hash0_from_filename(filename: str) -> str | None:
     """Extracts the hash from an existing file's name."""
     match = re.search(r'_hash_([a-fA-F0-9]+)', filename)
+
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def extract_hash_from_filename(filename: str) -> str | None:
+    """Extracts the hash from an existing file's name."""
+    match = re.search(r'_hash1_([a-fA-F0-9]+)', filename)
 
     if match:
         return match.group(1)
@@ -44,7 +56,12 @@ def extract_hash_from_filename(filename: str) -> str | None:
 def add_hash_to_filename(filename: Path, file_hash: str) -> str:
     """Adds a hash to an existing file's name."""
     base_name, extension = str(filename.parent / filename.stem), filename.suffix
-    hash_suffix = f"_hash_{file_hash}{extension}"
+    old_hash_suffix = f"_hash_{file_hash}{extension}"
+    hash_suffix = f"_hash1_{file_hash}{extension}"
+
+    # Remove old hash(es)
+    if extract_old_hash0_from_filename(str(filename)) is not None:
+        base_name = base_name.split('_hash_')[0]
 
     # adjust filename for 255 bytes filename limit, on all common operating systems
     max_length = 250
@@ -116,13 +133,9 @@ def add_hash_to_other_content(state: DownloadState, filepath: Path, content_form
                 state.recent_audio_hashes.add(existing_hash)
 
         else:
-            h = hashlib.md5()
+            algorithm = hashlib.md5()
 
-            with open(filepath, 'rb') as f:
-                while (part := f.read(1_048_576)):
-                    h.update(part)
-
-            file_hash = h.hexdigest()
+            file_hash = hash_mp4file(algorithm, filepath)
 
             if content_format == 'video':
                 state.recent_video_hashes.add(file_hash)

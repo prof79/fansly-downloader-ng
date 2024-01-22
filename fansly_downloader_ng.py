@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.14'
-__date__ = '2024-01-20T19:59:00+01'
+__version__ = '0.7.17'
+__date__ = '2024-01-22T19:53:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -110,13 +110,13 @@ def main(config: FanslyConfig) -> int:
 
     # M3U8 fixing interim
     print()
-    print_warning(
-        "THIS IS AN EXPERIMENTAL IMPROVED VIDEO DOWNLOAD VERSION -"
-        f"\n{' '*19} EXISTING VIDEOS WILL BE DOWNLOADED AGAIN/DE-DUPLICATION WILL NOT WORK"
-        f"\n{' '*19} FOR DOWNLOADS FROM OLDER VERSIONS!!!"
-        f"\n{' '*19} CTRL+C TO ABORT"
+    print_info(
+        "Due to important memory usage and video format bugfixes, "
+        "existing media items "
+        f"\n{' '*16} need to be re-hashed (`_hash_` to `_hash1_`)."
+        f"\n{' '*16} Affected files will automatically be renamed in the background."
     )
-    input_enter_continue(config.interactive)
+    print()
 
     for creator_name in sorted(config.user_names):
         with Timer(creator_name):
