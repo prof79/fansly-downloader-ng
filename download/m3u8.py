@@ -71,7 +71,7 @@ def download_m3u8(
     :return: True if successful or False otherwise.
     :rtype: bool
     """
-    CHUNK_SIZE = 65_536
+    CHUNK_SIZE = 1_048_576
 
     cookies = get_m3u8_cookies(m3u8_url)
 

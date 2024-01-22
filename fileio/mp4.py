@@ -58,7 +58,7 @@ def hash_mp4box(algorithm, reader: BufferedReader, box: MP4Box):
     
     `algorithm` must be a `hashlib` algorithm.
     """
-    CHUNK_SIZE = 65536
+    CHUNK_SIZE = 1_048_576
 
     reader.seek(box.position, os.SEEK_SET)
 
