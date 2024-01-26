@@ -1,4 +1,10 @@
-"""MPEG-4 Binary File Manipulation"""
+"""MPEG-4 Binary File Manipulation
+
+Kudos to Alfred Gutierrez' (alfg) and Sanjeev Pandey's well-summarizing articles:
+
+https://dev.to/alfg/a-quick-dive-into-mp4-57fo
+https://sanjeev-pandey.medium.com/understanding-the-mpeg-4-moov-atom-pseudo-streaming-in-mp4-93935e1b9e9a
+"""
 
 
 __all__ = [
