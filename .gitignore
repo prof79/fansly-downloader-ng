@@ -170,3 +170,5 @@ config.ini
 *.bak
 logo*.txt
 dummy.*
+# Linux/macOS binary
+fansly-downloader-ng

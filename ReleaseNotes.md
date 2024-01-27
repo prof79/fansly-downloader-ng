@@ -2,6 +2,33 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.0 2024-01-27
+
+Video Fix Edition
+
+This version fixes some graving bugs in regard to video downloading:
+
+* Ludicrous memory usage, whole MPEG-4 files were buffered to RAM using up to several gigabytes ([#8](../../issues/8))
+* Manual re-muxing of MPEG streams which a) caused incompatibilites with certain media ([#9](../../issues/9)) and b) could also lead to malformed MPEG-4 files
+* Hashing video files is tricky and broke due to the fix for ([#9](../../issues/9)) but was bound to unnoticeably break in the future anyway, like a timebomb
+
+As a side effect, existing files will be re-hashed and now have a `_hash1_` part instead of `_hash_`. The front remains the same. Sorry for the inconvenience. I also have plans for a new (opt-in) shorter naming scheme using a checksum probably but that's a story for another day.
+
+Along the way I also fixed a configuration file issue where timeline settings where not honored and a file-rename bug.
+
+Long read:
+
+Video files are actually split into chunks of several MPEG-TS streams in varying resolutions and a web video player can decide what to load in (adaptive streaming, DASH, whatever technology and naming). It is common to have such info in playlists using a text format called `M3U8`. So to get an MPEG-4 out of this you need to take the playlist with the highest resolution, fetch all MPEG-TS streams and merge them into an MPEG-4 file. This should be done by software written by video experts who know the standards, not by hand; Avnsx, for whatever reason, decided to re-mux the streams not only on-the-fly in RAM but also fixing DTS packet sequences by hand. People with some tech knowledge can see what all could go and went wrong with this and how I might feel about that.
+
+First, all streams (`.ts`) must be downloaded to disk first instead of buffering all to RAM. Second, regarding concatenation/merging a web search usually ends up with the go-to tool for manipulation of audio and video files - `ffmpeg`. Thus I ended up using `pyffmpeg` which is platform-independent and downloads an appropriate `ffmpeg` binary to help with re-encoding tasks. The lib misses some fixes regarding Linux support - but I could easily launch `ffmpeg` with appropriate arguments by hand. I then use the "demuxer" concat protocol of `ffmpeg` using a concat file (that gets deleted afterwards) to properly merge all streams into an MPEG-4 file, using copy-encoding, with proper timing info and no artifacts (except the original already had problems). This results in a structurally clean `.mp4`.
+
+Merging (concatenating) to a proper MPEG-4 file makes the file look totally different at first glance. Two vids downloaded with the old and new methods differ in file sizes and metadata info like bitrate and duration although they are essentially the same content-wise. What is more, I also discovered that all `libav*`-based software like `ffmpeg` and `PyAV` write the framework's version number into the user metadata portion of the `.mp4`. That's the timebomb I referred to, upgrade to a new library and files that would be the same suddenly differ.
+
+Using some online articles about the essentials of the MPEG-4 format I devised a new hashing method for `.mp4` files: I exclude the so-called `moov` and `mdat` boxes (or atoms) which essentially include all varying header data/metadata like bitrate, duration and so on and also have user data (`udta`) with the `Lavf` version as a sub-part. I'm no MPEG-4 expert at all so hopefully I haven't missed something essential here - but from my tests this works beautifully. The bytes of the audio-video-content itself are the same so they hash the same 🙂.
+However, since there is no way to distinguish old-style from new-style hashed files I had to introduce a marker, like a version number, `_hash1_` - and re-hash all existing old-version files on program launch including images. Although image hashing has not changed, differentiating here would have only led to a buggy, unintelligible mess.
+
+Obviously, if a creator re-encoded existing material then the file will be totally different from a binary perspective - even though it may optically check out the same as a previous release; this would require something like a "perceptive hash" - but I still have doubts of that tech probably being too vague - and thus missing content. Therefore, after testing, I might remove pHashing from images in the future.
+
 ### v0.7.10 2024-01-05
 
 Binary release fixing the [missing media downloads issue #3](../../issues/3). Thanks to all participants!

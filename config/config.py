@@ -213,6 +213,7 @@ def load_config(config: FanslyConfig) -> None:
         metadata_handling = config._parser.get(options_section, 'metadata_handling', fallback='Advanced')
         config.metadata_handling = MetadataHandling(metadata_handling.lower())
 
+        # Booleans
         config.download_media_previews = config._parser.getboolean(options_section, 'download_media_previews', fallback=True)
         config.open_folder_when_finished = config._parser.getboolean(options_section, 'open_folder_when_finished', fallback=True)
         config.separate_messages = config._parser.getboolean(options_section, 'separate_messages', fallback=True)
@@ -221,6 +222,12 @@ def load_config(config: FanslyConfig) -> None:
         config.show_downloads = config._parser.getboolean(options_section, 'show_downloads', fallback=True)
         config.interactive = config._parser.getboolean(options_section, 'interactive', fallback=True)
         config.prompt_on_exit = config._parser.getboolean(options_section, 'prompt_on_exit', fallback=True)
+
+        # Numbers
+        config.timeline_retries = config._parser.getint(options_section, 'timeline_retries', fallback=1)
+        config.timeline_delay_seconds = config._parser.getint(options_section, 'timeline_delay_seconds', fallback=60)
+
+        #region Renamed Options
 
         # I renamed this to "use_duplicate_threshold" but retain older config.ini compatibility
         # True, False -> boolean
@@ -231,6 +238,7 @@ def load_config(config: FanslyConfig) -> None:
         else:
             config.use_duplicate_threshold = config._parser.getboolean(options_section, 'use_duplicate_threshold', fallback=False)
 
+        # Renamed this to "use_folder_suffix"
         # True, False -> boolean
         if config._parser.has_option(options_section, 'use_suffix'):
             config.use_folder_suffix = config._parser.getboolean(options_section, 'use_suffix', fallback=True)
@@ -239,6 +247,8 @@ def load_config(config: FanslyConfig) -> None:
         else:
             config.use_folder_suffix = config._parser.getboolean(options_section, 'use_folder_suffix', fallback=True)
 
+        #endregion
+            
         #endregion
 
         # Safe to save! :-)

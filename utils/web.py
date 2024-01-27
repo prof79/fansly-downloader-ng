@@ -6,17 +6,97 @@ import re
 import requests
 import traceback
 
+from collections import namedtuple
+from urllib.parse import urlparse, parse_qs
 from time import sleep
+from typing import Any, NamedTuple
 
-from config.fanslyconfig import FanslyConfig
-from textio import print_error, print_info_highlight, print_warning
+from textio import print_error, print_warning
+
+
+def get_file_name_from_url(url: str) -> str:
+    """Parses an URL and returns the last part which usually is a
+    file name or directory/section.
+    
+    :param url: The URL to parse.
+    :type url: str
+    
+    :return: The last part of the path ie. everything after the
+        last slash excluding the query string.
+    :rtype: str
+    """
+    parsed_url = urlparse(url)
+
+    last_part = parsed_url.path.split('/')[-1]
+
+    return last_part
+
+
+def get_qs_value(url: str, key: str, default: Any=None) -> Any:
+    """Returns the value of a specific key of an URL query string.
+    
+    :param url: The URL to parse for a query string.
+    :type url: str
+
+    :param key: The key in the query string (&key1=value1&key2=value2 ...)
+        whose value to return.
+    :type key: str
+
+    :param default: The default value to return if the
+        key was not found.
+    :type default: Any
+
+    :return: The value of `key` in the query string or `default` otherwise.
+    :rtype: Any
+    """
+    parsed_url = urlparse(url)
+    qs = parsed_url.query
+    parsed_qs = parse_qs(qs)
+
+    result = parsed_qs.get(key, default)
+
+    if result is default:
+        return result
+    
+    if len(result) == 0:
+        return None
+    
+    return result[0]
+
+
+def split_url(url: str) -> NamedTuple:
+    """Splits an URL into absolue base and file name URLs
+    without query strings et al.
+
+    Eg.:
+        https://my.server/some/path/interesting.txt?k1=v1&a2=b4
+    
+    becomes
+
+        (
+            base_url='https://my.server/some/path',
+            file_url='https://my.server/some/path/interesting.txt'
+        )
+    """
+    parsed_url = urlparse(url)
+
+    # URL without query string et al
+    file_url = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}'
+
+    # Base URL
+    base_url = file_url.rsplit('/', 1)[0]
+
+    SplitURL = namedtuple('SplitURL', ['base_url', 'file_url'])
+
+    return SplitURL(base_url, file_url)
 
 
 # mostly used to attempt to open fansly downloaders documentation
 def open_url(url_to_open: str) -> None:
     """Opens an URL in a browser window.
     
-    :param str url_to_open: The URL to open in the browser.
+    :param url_to_open: The URL to open in the browser.
+    :type url_to_open: str
     """
     sleep(10)
 
@@ -124,8 +204,9 @@ def guess_user_agent(user_agents: dict, based_on_browser: str, default_ua: str) 
 def get_release_info_from_github(current_program_version: str) -> dict | None:
     """Fetches and parses the Fansly Downloader NG release info JSON from GitHub.
     
-    :param str current_program_version: The current program version to be
+    :param current_program_version: The current program version to be
         used in the user agent of web requests.
+    :type current_program_version: str
 
     :return: The release info from GitHub as dictionary or
         None if there where any complications eg. network error.

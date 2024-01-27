@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.10'
-__date__ = '2024-01-05T14:55:00+01'
+__version__ = '0.8.0'
+__date__ = '2024-01-27T17:10:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -18,6 +18,7 @@ __credits__ = [
     'KasumiDev',
 ]
 
+# TODO: Remove pyffmpeg's "Github Activeness" message
 # TODO: Fix in future: audio needs to be properly transcoded from mp4 to mp3, instead of just saved as
 # TODO: Rate-limiting fix works but is terribly slow - would be nice to know how to interface with Fansly API properly
 # TODO: Check whether messages are rate-limited too or not
@@ -25,6 +26,8 @@ __credits__ = [
 
 import base64
 import traceback
+
+#from memory_profiler import profile
 
 from config import FanslyConfig, load_config, validate_adjust_config
 from config.args import parse_args, map_args_to_config
@@ -65,6 +68,7 @@ def print_logo() -> None:
     print(f"{(100 - len(__version__) - 1)//2*' '}v{__version__}\n")
 
 
+#@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
 def main(config: FanslyConfig) -> int:
     """The main logic of the downloader program.
     
@@ -104,6 +108,16 @@ def main(config: FanslyConfig) -> int:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
 
     global_download_state = GlobalState()
+
+    # M3U8 fixing interim
+    print()
+    print_info(
+        "Due to important memory usage and video format bugfixes, "
+        "existing media items "
+        f"\n{' '*16} need to be re-hashed (`_hash_` to `_hash1_`)."
+        f"\n{' '*16} Affected files will automatically be renamed in the background."
+    )
+    print()
 
     for creator_name in sorted(config.user_names):
         with Timer(creator_name):
