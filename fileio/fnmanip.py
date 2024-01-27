@@ -88,19 +88,23 @@ def add_hash_to_image(state: DownloadState, filepath: Path):
             state.recent_photo_hashes.add(existing_hash)
 
         else:
-            with Image.open(filepath) as img:
+            file_hash = None
 
+            with Image.open(filepath) as img:
                 file_hash = str(imagehash.phash(img, hash_size = 16))
 
-                state.recent_photo_hashes.add(file_hash)
-                
-                new_filename = add_hash_to_filename(Path(filename), file_hash)
-                new_filepath = filepath.parent / new_filename
+            if file_hash is None:
+                raise RuntimeError('add_hash_to_image: file_hash should not be "None"')
 
-                if new_filepath.exists():
-                    filepath.unlink()
-                else:
-                    filepath.rename(new_filepath)
+            state.recent_photo_hashes.add(file_hash)
+            
+            new_filename = add_hash_to_filename(Path(filename), file_hash)
+            new_filepath = filepath.parent / new_filename
+
+            if new_filepath.exists():
+                filepath.unlink()
+            else:
+                filepath.rename(new_filepath)
 
     except Exception:
         print_error(f"\nError processing image '{filepath}': {traceback.format_exc()}", 15)
