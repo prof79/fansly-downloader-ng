@@ -2,7 +2,7 @@
 
 ## 🗒️ Release Notes
 
-### v0.7.23 2024-01-27
+### v0.8.0 2024-01-27
 
 Video Fix Edition
 
