@@ -218,7 +218,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '-tr', '--timeline-retries',
         required=False,
-        default=1,
+        default=None,
         type=int,
         dest='timeline_retries',
         help="Number of retries on empty timelines. Defaults to 1. "
@@ -229,7 +229,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '-td', '--timeline-delay-seconds',
         required=False,
-        default=60,
+        default=None,
         type=int,
         dest='timeline_delay_seconds',
         help="Number of seconds to wait before retrying empty timelines. "
@@ -459,6 +459,10 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
     for attr_name in unsigned_ints:
         check_attr(attr_name, attr_name)
         arg_attribute = getattr(args, attr_name)
+
+        if arg_attribute is None:
+            # No arg given, keep default or config.ini value
+            continue
 
         int_value = 0
 
