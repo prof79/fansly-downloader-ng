@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.7.22'
-__date__ = '2024-01-27T14:45:00+01'
+__version__ = '0.7.23'
+__date__ = '2024-01-27T17:06:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -18,6 +18,7 @@ __credits__ = [
     'KasumiDev',
 ]
 
+# TODO: Remove pyffmpeg's "Github Activeness" message
 # TODO: Fix in future: audio needs to be properly transcoded from mp4 to mp3, instead of just saved as
 # TODO: Rate-limiting fix works but is terribly slow - would be nice to know how to interface with Fansly API properly
 # TODO: Check whether messages are rate-limited too or not
