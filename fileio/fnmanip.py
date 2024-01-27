@@ -97,10 +97,10 @@ def add_hash_to_image(state: DownloadState, filepath: Path):
                 new_filename = add_hash_to_filename(Path(filename), file_hash)
                 new_filepath = filepath.parent / new_filename
 
-                filepath = filepath.rename(new_filepath)
-
-    except FileExistsError:
-        filepath.unlink()
+                if new_filepath.exists():
+                    filepath.unlink()
+                else:
+                    filepath.rename(new_filepath)
 
     except Exception:
         print_error(f"\nError processing image '{filepath}': {traceback.format_exc()}", 15)
@@ -146,10 +146,10 @@ def add_hash_to_other_content(state: DownloadState, filepath: Path, content_form
             new_filename = add_hash_to_filename(Path(filename), file_hash)
             new_filepath = filepath.parent / new_filename
 
-            filepath = filepath.rename(new_filepath)
-
-    except FileExistsError:
-        filepath.unlink()
+            if new_filepath.exists():
+                filepath.unlink()
+            else:            
+                filepath = filepath.rename(new_filepath)
 
     except Exception:
         print_error(f"\nError processing {content_format} '{filepath}': {traceback.format_exc()}", 16)
