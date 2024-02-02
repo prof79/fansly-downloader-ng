@@ -15,19 +15,24 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description='Hashes an MPEG-4 except the "moov" and "mdat" portions using MD5.',
     )
-
     parser.add_argument(
         dest='file',
         metavar='FILE',
         help='MPEG4 file',
     )
-
     parser.add_argument(
         '-d', '--debug',
         required=False,
         action='store_true',
         default=False,
         help='Debug output',
+    )
+    parser.add_argument(
+        '-b', '--use-broken-algo',
+        required=False,
+        action='store_true',
+        default=False,
+        help='Use broken algorithm',
     )
 
     return parser.parse_args()
@@ -40,7 +45,12 @@ def main() -> None:
 
     md5 = hashlib.md5()
 
-    hash = hash_mp4file(md5, file_name, print=print if args.debug else None)
+    hash = hash_mp4file(
+        md5,
+        file_name,
+        print=print if args.debug else None,
+        use_broken_algo=args.use_broken_algo,
+    )
 
     print(f'{hash}\t*{file_name.name}')
 

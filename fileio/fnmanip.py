@@ -35,8 +35,18 @@ def extract_media_id(filename: str) -> int | None:
 
 
 def extract_old_hash0_from_filename(filename: str) -> str | None:
-    """Extracts the hash from an existing file's name."""
+    """Extracts hash v0 from an existing file's name."""
     match = re.search(r'_hash_([a-fA-F0-9]+)', filename)
+
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def extract_old_hash1_from_filename(filename: str) -> str | None:
+    """Extracts hash v1 from an existing file's name."""
+    match = re.search(r'_hash1_([a-fA-F0-9]+)', filename)
 
     if match:
         return match.group(1)
@@ -46,7 +56,7 @@ def extract_old_hash0_from_filename(filename: str) -> str | None:
 
 def extract_hash_from_filename(filename: str) -> str | None:
     """Extracts the hash from an existing file's name."""
-    match = re.search(r'_hash1_([a-fA-F0-9]+)', filename)
+    match = re.search(r'_hash2_([a-fA-F0-9]+)', filename)
 
     if match:
         return match.group(1)
@@ -57,12 +67,16 @@ def extract_hash_from_filename(filename: str) -> str | None:
 def add_hash_to_filename(filename: Path, file_hash: str) -> str:
     """Adds a hash to an existing file's name."""
     base_name, extension = str(filename.parent / filename.stem), filename.suffix
-    old_hash_suffix = f"_hash_{file_hash}{extension}"
-    hash_suffix = f"_hash1_{file_hash}{extension}"
+    old_hash_suffix_0 = f"_hash_{file_hash}{extension}"
+    old_hash_suffix_1 = f"_hash1_{file_hash}{extension}"
+    hash_suffix = f"_hash2_{file_hash}{extension}"
 
-    # Remove old hash(es)
+    # Remove old hashes
     if extract_old_hash0_from_filename(str(filename)) is not None:
         base_name = base_name.split('_hash_')[0]
+
+    if extract_old_hash1_from_filename(str(filename)) is not None:
+        base_name = base_name.split('_hash1_')[0]
 
     # adjust filename for 255 bytes filename limit, on all common operating systems
     max_length = 250

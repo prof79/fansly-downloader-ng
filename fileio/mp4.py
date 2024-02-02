@@ -106,7 +106,8 @@ def hash_mp4box(algorithm, reader: BufferedReader, box: MP4Box):
 def hash_mp4file(
             algorithm,
             file_name: Path,
-            print: Optional[Callable]=None
+            print: Optional[Callable]=None,
+            use_broken_algo: bool=False,
         ) -> str:
 
     if not file_name.exists():
@@ -130,8 +131,13 @@ def hash_mp4file(
                 if print is not None:
                     print(box)
 
-                if box.fourcc != 'moov' and box.fourcc != 'mdat':
-                    hash_mp4box(algorithm, mp4file, box)
+                if use_broken_algo:
+                    if box.fourcc != 'moov' and box.fourcc != 'mdat':
+                        hash_mp4box(algorithm, mp4file, box)
+
+                else:
+                    if box.fourcc != 'free' and box.fourcc != 'moov':
+                        hash_mp4box(algorithm, mp4file, box)
             
             if print is not None:
                 print()

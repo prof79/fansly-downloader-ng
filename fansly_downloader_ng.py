@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.8.1'
-__date__ = '2024-02-02T16:12:00+01'
+__version__ = '0.8.2'
+__date__ = '2024-02-02T18:19:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -114,7 +114,7 @@ def main(config: FanslyConfig) -> int:
     print_info(
         "Due to important memory usage and video format bugfixes, "
         "existing media items "
-        f"\n{' '*16} need to be re-hashed (`_hash_` to `_hash1_`)."
+        f"\n{' '*16} need to be re-hashed (`_hash_`/`_hash1_` to `_hash2_`)."
         f"\n{' '*16} Affected files will automatically be renamed in the background."
     )
     print()
