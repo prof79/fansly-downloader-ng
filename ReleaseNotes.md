@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.2 2024-02-02
+
+Emergency bugfix, due to [botched hashing](../../issues/12) videos might not have been downloaded with v0.8.0/v0.8.1 any longer. I'm terribly sorry! Files will get a `_hash2_` designation before a hopefully proper `_hash3_` comes along.
+
 ### v0.8.1 2024-02-02
 
 Bugfix release:
