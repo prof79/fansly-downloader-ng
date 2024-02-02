@@ -14,6 +14,7 @@ from PIL import Image
 
 from config import FanslyConfig
 from download.downloadstate import DownloadState
+from errors.mp4 import InvalidMP4Error
 from textio import print_debug, print_error
 
 from .mp4 import hash_mp4file
@@ -154,6 +155,13 @@ def add_hash_to_other_content(state: DownloadState, filepath: Path, content_form
                 filepath.unlink()
             else:            
                 filepath = filepath.rename(new_filepath)
+
+    except InvalidMP4Error as ex:
+        print_error(
+            f"Invalid MPEG-4 file found on disk - maybe a broken download due to server or Internet issues."
+            f"\n{' '*17} Delete it if it doesn't play in your favorite video player so it will be re-downloaded if still available."
+            f"\n{' '*17} {ex}"
+        )
 
     except Exception:
         print_error(f"\nError processing {content_format} '{filepath}': {traceback.format_exc()}", 16)

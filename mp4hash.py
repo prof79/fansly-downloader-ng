@@ -7,6 +7,7 @@ import hashlib
 from pathlib import Path
 from rich import print
 
+from errors.mp4 import InvalidMP4Error
 from fileio.mp4 import hash_mp4file
 
 
@@ -50,6 +51,12 @@ if __name__ == '__main__':
     
     except KeyboardInterrupt:
         pass
+
+    except InvalidMP4Error as ex:
+        print()
+        print(f"Invalid MPEG-4 file: {ex}")
+        print()
+        print()
 
     except Exception as ex:
         print()

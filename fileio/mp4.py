@@ -21,6 +21,8 @@ from io import BufferedReader
 from pathlib import Path
 from typing import Iterable, Optional, Callable
 
+from errors.mp4 import InvalidMP4Error
+
 
 class MP4Box(object):
     """Represents an MPEG-4 binary box/atom object.
@@ -28,11 +30,35 @@ class MP4Box(object):
     def __init__(self, size_bytes: bytes, fourcc_bytes: bytes, position: int) -> None:
         self.position = position
         self.size = int.from_bytes(size_bytes, byteorder='big')
-        self.fourcc = str(fourcc_bytes, encoding='ascii')
+        self.fourcc = MP4Box.convert_to_fourcc(fourcc_bytes)
 
 
     def __str__(self) -> str:
         return f'MP4Box ( Position: {self.position}, FourCC: {self.fourcc}, Size: {self.size} )'
+
+
+    @staticmethod
+    def convert_to_fourcc(fourcc_bytes: bytes) -> str:
+        fourcc: str = ''
+
+        try:
+            fourcc = str(fourcc_bytes, encoding='ascii')
+        
+        except UnicodeDecodeError:
+            for by in fourcc_bytes:
+                # See: http://facweb.cs.depaul.edu/sjost/it212/documents/ascii-pr.htm
+                # 32-126 inclusive
+                by_str: str = ''
+
+                if (by < 32 or by > 126):
+                    by_str = f'[{by}]'
+                
+                else:
+                    by_str = chr(by)
+
+                fourcc += by_str
+
+        return fourcc
 
 
 
@@ -48,7 +74,7 @@ def get_boxes(reader: BufferedReader) -> Iterable[MP4Box]:
         )
 
         if first and box.fourcc != 'ftyp':
-            raise RuntimeError(f'Not an MP4 file.')
+            raise InvalidMP4Error(f'File header missing, not an MPEG-4 file.')
         
         first = False
 
@@ -89,7 +115,7 @@ def hash_mp4file(
     file_size = file_name.stat().st_size
 
     if file_size < 8:
-        raise RuntimeError('File is too small.')
+        raise InvalidMP4Error(f'{file_name} is too small to be an MPEG-4 file.')
 
     if print is not None:
         print(f'File: {file_name}')
@@ -97,18 +123,22 @@ def hash_mp4file(
 
     with open(file_name, 'rb') as mp4file:
         
-        boxes = get_boxes(mp4file)
+        try:
+            boxes = get_boxes(mp4file)
 
-        for box in boxes:
+            for box in boxes:
+                if print is not None:
+                    print(box)
+
+                if box.fourcc != 'moov' and box.fourcc != 'mdat':
+                    hash_mp4box(algorithm, mp4file, box)
+            
             if print is not None:
-                print(box)
+                print()
+                print(f'Hash: {algorithm.hexdigest()}')
+                print()
 
-            if box.fourcc != 'moov' and box.fourcc != 'mdat':
-                hash_mp4box(algorithm, mp4file, box)
-        
-        if print is not None:
-            print()
-            print(f'Hash: {algorithm.hexdigest()}')
-            print()
+            return algorithm.hexdigest()
 
-        return algorithm.hexdigest()
+        except InvalidMP4Error as ex:
+            raise InvalidMP4Error(f'{file_name}: {ex}')
