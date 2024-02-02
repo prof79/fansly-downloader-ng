@@ -67,9 +67,17 @@ def get_boxes(reader: BufferedReader) -> Iterable[MP4Box]:
     first = True
 
     while reader.peek():
+        size_bytes = reader.read(4)
+        fourcc_bytes = reader.read(4)
+        size = int.from_bytes(size_bytes, byteorder='big')
+
+        # Cope with wide box sizes
+        if size == 1:
+            size_bytes = reader.read(8)
+
         box = MP4Box(
-            size_bytes=reader.read(4),
-            fourcc_bytes=reader.read(4),
+            size_bytes=size_bytes,
+            fourcc_bytes=fourcc_bytes,
             position=position,
         )
 
