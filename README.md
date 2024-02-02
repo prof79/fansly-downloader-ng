@@ -115,6 +115,8 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ## 📰 What's New (Release Notes)
 
+⚠️ I'm terribly sorry, but a [stupid bug](../../issues/12) crept in. Impact should be minimal but be aware that duplicate videos might be downloaded if a creator re-posts a lot and that downloaded videos will have to be renamed in a future fixed version to correct the hashing mistake.
+
 ### v0.8.1 2024-02-02
 
 Bugfix release:
