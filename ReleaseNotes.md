@@ -2,6 +2,13 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.1 2024-02-02
+
+Bugfix release:
+
+- MPEG-4 FourCC codes may contain non-printable characters. The box parser can now handle that.
+- Show proper error info and suggestions when invalid MPEG-4 files are encountered.
+
 ### v0.8.0 2024-01-27
 
 Video Fix Edition
