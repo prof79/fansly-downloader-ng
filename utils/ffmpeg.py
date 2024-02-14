@@ -3,14 +3,15 @@
 
 import subprocess
 
-from pyffmpeg import FFmpeg
+import shutil
+ffmpeg_bin = shutil.which("ffmpeg")
+if ffmpeg_bin is None:
+    from pyffmpeg import FFmpeg
+    ffmpeg = FFmpeg(enable_log=False)
+    ffmpeg_bin = ffmpeg.get_ffmpeg_bin()
 
 
 def run_ffmpeg(args: list[str]) -> bool:
-    ffmpeg = FFmpeg(enable_log=False)
-
-    ffmpeg_bin = ffmpeg.get_ffmpeg_bin()
-
     proc_args = [ffmpeg_bin]
 
     proc_args += args
