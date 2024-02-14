@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.8.4'
-__date__ = '2024-02-02T23:24:00+01'
+__version__ = '0.8.5'
+__date__ = '2024-02-14T22:23:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -16,6 +16,7 @@ __authors__ = [
 __credits__ = [
     'Avnsx',
     'KasumiDev',
+    'FletcherD',
 ]
 
 # TODO: Remove pyffmpeg's "Github Activeness" message

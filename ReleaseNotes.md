@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.5 2024-02-14
+
+Workaround for [Linux issue #20](../../issues/20) thanks to [FletcherD](https://github.com/FletcherD).
+
 ### v0.8.4 2024-02-02
 
 Program version number for v0.8.3 still showed v0.8.2. Version number corrected, no code changes.
