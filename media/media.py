@@ -69,7 +69,8 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
 
             # if key-pair-id is not in there we'll know it's the new .m3u8 format, so we construct a generalised url, which we can pass relevant auth strings with
             # note: this url won't actually work, its purpose is to just pass the strings through the download_url variable
-            if not 'Key-Pair-Id' in item.highest_variants_resolution_url:
+            if item.highest_variants_resolution_url is not None and \
+                    not 'Key-Pair-Id' in item.highest_variants_resolution_url:
                 try:
                     # use very specific metadata, bound to the specific media to get auth info
                     item.metadata = content['locations'][0]['metadata']

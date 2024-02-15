@@ -113,7 +113,7 @@ def process_download_accessible_media(
             media_items += [parse_media_info(state, media_info, post_id)]
 
         except Exception:
-            print_error(f"Unexpected error during parsing {state.download_type_str()} content;\n{traceback.format_exc()}", 42)
+            print_error(f"Unexpected error parsing {state.download_type_str()} content;\n{traceback.format_exc()}", 42)
             input_enter_continue(config.interactive)
 
     # summarise all scrapable & wanted media

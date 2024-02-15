@@ -117,6 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.8.7 2024-02-15
+
+This should hopefully fix [#18](../../issues/18).
+
 ### v0.8.6 2024-02-15
 
 This primarily fixes [video download issue #17](../../issues/17) but I also made sure [#21 workaround](../../issues/21) only applies to Linux as I had a bad experience on my Windows machine with an old ImageMagick including old ffmpeg installed, not working with concat at all.
