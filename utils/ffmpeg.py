@@ -1,12 +1,16 @@
 """FFmpeg Launcher Module"""
 
 
+import platform
 import shutil
 import subprocess
 
 
 def get_ffmpeg_bin() -> str:
-    ffmpeg_bin = shutil.which("ffmpeg")
+    ffmpeg_bin = None
+
+    if platform.system() == 'Linux':
+        ffmpeg_bin = shutil.which("ffmpeg")
 
     if ffmpeg_bin is None:
         from pyffmpeg import FFmpeg

@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.6 2024-02-15
+
+This primarily fixes [video download issue #17](../../issues/17) but I also made sure [#21 workaround](../../issues/21) only applies to Linux as I had a bad experience on my Windows machine with an old ImageMagick including old ffmpeg installed, not working with concat at all.
+
 ### v0.8.5 2024-02-14
 
 Workaround for [Linux issue #20](../../issues/20) thanks to [FletcherD](https://github.com/FletcherD).

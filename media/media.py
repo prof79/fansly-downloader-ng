@@ -74,8 +74,11 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
                     # use very specific metadata, bound to the specific media to get auth info
                     item.metadata = content['locations'][0]['metadata']
 
+                    # item.highest_variants_resolution_url = \
+                    #     f"{item.highest_variants_resolution_url.split('.m3u8')[0]}_{parse_variant_metadata(content['metadata'])}.m3u8?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
+
                     item.highest_variants_resolution_url = \
-                        f"{item.highest_variants_resolution_url.split('.m3u8')[0]}_{parse_variant_metadata(content['metadata'])}.m3u8?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
+                        f"{item.highest_variants_resolution_url}?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
 
                 except KeyError:
                     # we pass here and catch below
