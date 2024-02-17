@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.12 2024-02-17
+
+Self updater testing. ([#21](../../issues/21))
+
 ### v0.8.11 2024-02-17
 
 A fix for the [self updater](../../issues/21).

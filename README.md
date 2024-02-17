@@ -117,6 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.8.12 2024-02-17
+
+Self updater testing. ([#21](../../issues/21))
+
 ### v0.8.11 2024-02-17
 
 A fix for the [self updater](../../issues/21).
