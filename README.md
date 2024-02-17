@@ -117,17 +117,9 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.8.12-15 2024-02-17
+### v0.8.16 2024-02-17
 
-Self updater testing. Automatic updating disabled, this is too complicated as of now. ([#21](../../issues/21))
-
-### v0.8.11 2024-02-17
-
-A fix for the [self updater](../../issues/21).
-
-### v0.8.10 2024-02-17
-
-Fixed another stupid [memory bug](../../issues/14) and discovered and fixed some hashing inconsistencies during on-the-fly dedupe along the way.
+Hopefully finally fix [#7](../../issues/7).
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 

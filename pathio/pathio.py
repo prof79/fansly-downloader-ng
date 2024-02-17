@@ -11,7 +11,7 @@ from tkinter import Tk, filedialog
 from config import FanslyConfig
 from download.downloadstate import DownloadState
 from download.types import DownloadType
-from textio import print_info, print_warning, print_error
+from textio import print_info, print_error
 
 
 # if the users custom provided filepath is invalid; a tkinter dialog will open during runtime, asking to adjust download path
@@ -73,9 +73,8 @@ def set_create_directory_for_download(config: FanslyConfig, state: DownloadState
         elif state.download_type == DownloadType.TIMELINE and config.separate_timeline:
             download_directory = user_base_path / 'Timeline'
 
-        elif state.download_type == DownloadType.SINGLE:
-            # TODO: Maybe for "Single" we should use the post_id as subdirectory?
-            pass
+        elif state.download_type == DownloadType.SINGLE and config.separate_timeline:
+            download_directory = user_base_path / 'Timeline'
 
         # Save state
         state.base_path = user_base_path
