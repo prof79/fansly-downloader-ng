@@ -117,93 +117,77 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     
     # if in executable environment, allow self-update
     print_update('Please be patient, automatic update initialized ...')
-
-    # download new release
-    release_download = requests.get(
-        release_info['download_url'],
-        allow_redirects=True,
-        headers = {
-            'user-agent': f'Fansly Downloader NG {program_version}',
-            'accept-language': 'en-US,en;q=0.9'
-        }
-    )
-
-    if release_download.status_code != 200:
-        print_error(f"Failed downloading latest build. Status code: {release_download.status_code} | Body: \n{release_download.text}")
-        return False
     
     # re-name current executable, so that the new version can delete it
-    try:
-        downloader_name = 'Fansly Downloader'
-        new_name = 'deprecated_version'
-        suffix = ''
-
-        if platform.system() == 'Windows':
-            suffix = '.exe'
-
-        downloader_path = Path.cwd() / f'{downloader_name}{suffix}'
-        downloader_path.rename(downloader_path.parent / f'{new_name}{suffix}')
-
-    except FileNotFoundError:
-        pass
+    binary_name = 'fansly-downloader-ng'
+    suffix = ''
+    new_name = 'deprecated_version'
     
-    # re-name old config ini, so new executable can read, compare and delete old one
-    try:
-        config_file = Path.cwd() / 'config.ini'
-        config_file.rename(config_file.parent / 'old_config.ini')
+    if platform.system() == 'Windows':
+        suffix = '.exe'
+        binary_name = 'Fansly Downloader NG'
 
-    except Exception:
-        pass
+    current_binary = Path.cwd() / f'{binary_name}{suffix}'
+    current_binary.rename(current_binary.parent / f'{new_name}{suffix}')
 
-    # declare new release filepath
+    # Declare new release filepath
     new_release_archive = Path.cwd() / release_info['release_name']
 
-    # write to disk
-    with open(new_release_archive, 'wb') as f:
-        f.write(release_download.content)
+    CHUNK_SIZE = 1_048_576
+
+    # download new release
+    with requests.get(
+                release_info['download_url'],
+                allow_redirects=True,
+                headers = {
+                    'user-agent': f'Fansly Downloader NG {program_version}',
+                    'accept-language': 'en-US,en;q=0.9'
+                },
+                stream=True,
+            ) as release_download:
+
+        if release_download.status_code != 200:
+            print_error(f"Failed downloading latest build. Status code: {release_download.status_code} | Body: \n{release_download.text}")
+            return False
+
+        # write to disk
+        with open(new_release_archive, 'wb') as f:
+            for chunk in release_download.iter_content(CHUNK_SIZE):
+                if chunk:
+                    f.write(chunk)
     
-    # unpack if possible; for macOS .dmg this won't work though
-    try:
         # must be a common archive format (.zip, .tar, .tar.gz, .tar.bz2, etc.)
+        print_update('Unpacking new files ...')
         unpack_archive(new_release_archive)
+
         # remove .zip leftovers
         new_release_archive.unlink()
 
-    except Exception:
-        pass
+        # start executable from just downloaded latest platform compatible release, with a start argument
+        # which instructs it to delete old executable & display release notes for newest version
+        additional_arguments = ['--updated-to', release_info['release_version']]
+        # Carry command-line arguments over
+        arguments = sys.argv[1:] + additional_arguments
+        
+        current_platform = platform.system()
 
-    # start executable from just downloaded latest platform compatible release, with a start argument
-    # which instructs it to delete old executable & display release notes for newest version
-    current_platform = platform.system()
-    # from now on executable will be called Fansly Downloader NG
-    filename = 'Fansly Downloader NG'
+        if current_platform == 'Windows':
+            # i'm open for improvement suggestions, which will be insensitive to file paths & succeed passing start arguments to compiled executables
+            subprocess.run(['powershell', '-Command', f"Start-Process -FilePath '{current_binary}' -ArgumentList {', '.join(arguments)}"], shell=True)
 
-    if current_platform == 'Windows':
-        filename = filename + '.exe'
+        elif current_platform == 'Linux':
+            # still sensitive to file paths?
+            subprocess.run([current_binary, *arguments], shell=True)
 
-    filepath = Path.cwd() / filename
+        elif current_platform == 'Darwin':
+            # still sensitive to file paths?
+            subprocess.run(['open', current_binary, *arguments], shell=False)
 
-    # Carry command-line arguments over
-    additional_arguments = ['--updated-to', release_info['release_version']]
-    arguments = sys.argv[1:] + additional_arguments
-    
-    if current_platform == 'Windows':
-        # i'm open for improvement suggestions, which will be insensitive to file paths & succeed passing start arguments to compiled executables
-        subprocess.run(['powershell', '-Command', f"Start-Process -FilePath '{filepath}' -ArgumentList {', '.join(arguments)}"], shell=True)
-
-    elif current_platform == 'Linux':
-        # still sensitive to file paths?
-        subprocess.run([filepath, *arguments], shell=True)
-
-    elif current_platform == 'Darwin':
-        # still sensitive to file paths?
-        subprocess.run(['open', filepath, *arguments], shell=False)
-
-    else:
-        input(f"Platform {current_platform} not supported for auto-update, please update manually instead.")
-        os._exit(errors.UPDATE_MANUALLY)
-    
-    os._exit(errors.UPDATE_SUCCESS)
+        else:
+            input(f"Platform {current_platform} not supported for auto-update, please update manually instead.")
+            os._exit(errors.UPDATE_MANUALLY)
+        
+        os._exit(errors.UPDATE_SUCCESS)
 
 
 def post_update_steps(program_version: str, release_info: dict | None) -> None:
