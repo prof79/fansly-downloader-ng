@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.11 2024-02-17
+
+A fix for the [self updater](../../issues/21).
+
 ### v0.8.10 2024-02-17
 
 Fixed another stupid [memory bug](../../issues/14) and discovered and fixed some hashing inconsistencies during on-the-fly dedupe along the way.

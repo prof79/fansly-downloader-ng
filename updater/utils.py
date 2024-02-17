@@ -102,7 +102,12 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     """
     print_warning(f"A new version of Fansly Downloader NG has been found on GitHub - update required!")
     
-    print_info(f"Latest Build:\n{18*' '}Version: {release_info['release_version']}\n{18*' '}Published: {release_info['created_at']}\n{18*' '}Download count: {release_info['download_count']}\n\n{17*' '}Your version: {program_version} is outdated!")
+    print_info(
+        f"Latest Build:"
+        f"\n{16*' '} Version: {release_info['release_version']}"
+        f"\n{16*' '} Published: {release_info['created_at']}"
+        f"\n{16*' '} Download count: {release_info['download_count']}"
+        f"\n\n{16*' '} Your version {program_version} is outdated.")
     
     # If current environment is pure Python prompt user to update Fansly Downloader NG themselves
     if not getattr(sys, 'frozen', False):
@@ -271,4 +276,4 @@ def check_for_update(config: FanslyConfig) -> bool:
             return True
 
         else:
-            return perform_update(config.program_version, release_info)
+            return perform_update(config.program_version, new_release)
