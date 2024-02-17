@@ -119,7 +119,7 @@ def download_m3u8(
             config: FanslyConfig,
             m3u8_url: str,
             save_path: Path,
-        ) -> bool:
+        ) -> Path:
     """Download M3U8 content as MP4.
     
     :param config: The downloader configuration.
@@ -132,8 +132,8 @@ def download_m3u8(
         This will be changed to MP4 (.mp4).
     :type save_path: Path
 
-    :return: True if successful or False otherwise.
-    :rtype: bool
+    :return: The file path of the MPEG-4 download/conversion.
+    :rtype: Path
     """
     CHUNK_SIZE = 1_048_576
 
@@ -211,6 +211,8 @@ def download_m3u8(
 
         try:
             run_ffmpeg(args)
+
+            return full_path
         
         except CalledProcessError as ex:
             raise M3U8Error(
@@ -226,5 +228,3 @@ def download_m3u8(
             file.unlink(missing_ok=True)
         
         #endregion
-
-    return True

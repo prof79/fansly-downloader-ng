@@ -1,26 +1,14 @@
 """Item Deduplication"""
 
 
-import hashlib
-import imagehash
-import io
-
-from PIL import Image, ImageFile
+from pathlib import Path
 from random import randint
-
-from fileio.fnmanip import add_hash_to_folder_items
 
 from config import FanslyConfig
 from download.downloadstate import DownloadState
+from fileio.fnmanip import add_hash_to_filename, add_hash_to_folder_items, get_hash_for_image, get_hash_for_other_content
 from pathio import set_create_directory_for_download
 from textio import print_info, print_warning
-
-
-# tell PIL to be tolerant of files that are truncated
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-
-# turn off for our purpose unnecessary PIL safety features
-Image.MAX_IMAGE_PIXELS = None
 
 
 def dedupe_init(config: FanslyConfig, state: DownloadState):
@@ -62,22 +50,20 @@ def dedupe_init(config: FanslyConfig, state: DownloadState):
         # adding metadata to all common file types, that would be nice.
 
 
-def dedupe_media_content(state: DownloadState, content: bytearray, mimetype: str, filename: str) -> str | None:
-    """Hashes binary media data and checks wheter it is a duplicate or not.
+def dedupe_media_file(state: DownloadState, mimetype: str, filename: Path) -> bool:
+    """Hashes media file data and checks on-the-fly
+    whether it is a duplicate or not.
 
     The hash will be added to the respective set of hashes if it is not
     a duplicate.
-    Returns the content hash or None if the media content is a duplicate.
 
     :param DownloadState state: The current download state, for statistics and
         to populate the respective set of hashes.
-    :param bytearray content: The binary content of the media item.
     :param str mimetype: The MIME type of the media item.
-    :param str filename: The file name to be used for saving, for
-        informational purposes.
+    :param str filename: The full path of the file to examine.
     
-    :return: The content hash or None if it is a duplicate.
-    :rtype: str | None
+    :return: True if it is a duplicate or False otherwise.
+    :rtype: bool
     """
     file_hash = None
     hashlist = None
@@ -85,15 +71,12 @@ def dedupe_media_content(state: DownloadState, content: bytearray, mimetype: str
     # Use specific hashing for images
     if 'image' in mimetype:
         # open the image
-        with Image.open(io.BytesIO(content)) as image:
-
-            # calculate the hash of the resized image
-            file_hash = str(imagehash.phash(image, hash_size = 16))
+        file_hash = get_hash_for_image(filename)
         
         hashlist = state.recent_photo_hashes
 
     else:
-        file_hash = hashlib.md5(content).hexdigest()
+        file_hash = get_hash_for_other_content(filename)
 
         if 'audio' in mimetype:
             hashlist = state.recent_audio_hashes
@@ -106,10 +89,19 @@ def dedupe_media_content(state: DownloadState, content: bytearray, mimetype: str
 
     # Deduplication - part 2.1: decide if this media is even worth further processing; by hashing
     if file_hash in hashlist:
-        print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename}' → skipped")
+        print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename.name}' → skipped")
+        filename.unlink()
         state.duplicate_count += 1
-        return None
+        return True
 
     else:
         hashlist.add(file_hash)
-        return file_hash
+
+        new_filename = Path(add_hash_to_filename(filename, file_hash))
+
+        if new_filename.exists():
+            filename.unlink()
+        else:
+            filename.rename(new_filename)
+
+        return False

@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.10 2024-02-17
+
+Fixed another stupid [memory bug](../../issues/14) and discovered and fixed some hashing inconsistencies during on-the-fly dedupe along the way.
+
 ### v0.8.9 2024-02-17
 
 Removed the weird [file hierarchy checks](../../issues/7).

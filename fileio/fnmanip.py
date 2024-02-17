@@ -64,6 +64,24 @@ def extract_hash_from_filename(filename: str) -> str | None:
     return None
 
 
+def get_hash_for_image(filename: Path) -> str:
+    file_hash = None
+
+    with Image.open(filename) as img:
+        file_hash = str(imagehash.phash(img, hash_size = 16))
+
+    if file_hash is None:
+        raise RuntimeError('add_hash_to_image: file_hash should not be "None"')
+
+    return file_hash
+
+
+def get_hash_for_other_content(filename: Path) -> str:
+    algorithm = hashlib.md5()
+    file_hash = hash_mp4file(algorithm, filename)
+    return file_hash
+
+
 def add_hash_to_filename(filename: Path, file_hash: str) -> str:
     """Adds a hash to an existing file's name."""
     base_name, extension = str(filename.parent / filename.stem), filename.suffix
@@ -103,13 +121,7 @@ def add_hash_to_image(state: DownloadState, filepath: Path):
             state.recent_photo_hashes.add(existing_hash)
 
         else:
-            file_hash = None
-
-            with Image.open(filepath) as img:
-                file_hash = str(imagehash.phash(img, hash_size = 16))
-
-            if file_hash is None:
-                raise RuntimeError('add_hash_to_image: file_hash should not be "None"')
+            file_hash = get_hash_for_image(filepath)
 
             state.recent_photo_hashes.add(file_hash)
             
@@ -152,9 +164,7 @@ def add_hash_to_other_content(state: DownloadState, filepath: Path, content_form
                 state.recent_audio_hashes.add(existing_hash)
 
         else:
-            algorithm = hashlib.md5()
-
-            file_hash = hash_mp4file(algorithm, filepath)
+            file_hash = get_hash_for_other_content(filepath)
 
             if content_format == 'video':
                 state.recent_video_hashes.add(file_hash)

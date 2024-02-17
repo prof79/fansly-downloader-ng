@@ -117,9 +117,9 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.8.9 2024-02-17
+### v0.8.10 2024-02-17
 
-Removed the weird [file hierarchy checks](../../issues/7).
+Fixed another stupid [memory bug](../../issues/14) and discovered and fixed some hashing inconsistencies during on-the-fly dedupe along the way.
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 
