@@ -117,6 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.8.8 2024-02-17
+
+Fix corner cases discussed in [#17](../../issues/17), go to 1080p as a last resort and fetch M3U8s recursively.
+
 ### v0.8.7 2024-02-15
 
 This should hopefully fix [#18](../../issues/18).

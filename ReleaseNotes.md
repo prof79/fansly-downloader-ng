@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.8 2024-02-17
+
+Fix corner cases discussed in [#17](../../issues/17), go to 1080p as a last resort and fetch M3U8s recursively.
+
 ### v0.8.7 2024-02-15
 
 This should hopefully fix [#18](../../issues/18).
