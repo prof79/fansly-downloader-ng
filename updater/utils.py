@@ -108,7 +108,11 @@ def perform_update(program_version: str, release_info: dict) -> bool:
         f"\n{16*' '} Published: {release_info['created_at']}"
         f"\n{16*' '} Download count: {release_info['download_count']}"
         f"\n\n{16*' '} Your version {program_version} is outdated.")
-    
+
+    print_warning(
+        f"To update Fansly Downloader NG, please download the latest version from the GitHub repository.")
+    return False
+
     # If current environment is pure Python prompt user to update Fansly Downloader NG themselves
     if not getattr(sys, 'frozen', False):
         print_warning(f"To update Fansly Downloader, please download the latest version from the GitHub repository.\n{20*' '}Only executable versions of the downloader receive & apply updates automatically.\n")

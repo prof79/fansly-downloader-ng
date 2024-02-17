@@ -2,9 +2,9 @@
 
 ## 🗒️ Release Notes
 
-### v0.8.12-14 2024-02-17
+### v0.8.12-15 2024-02-17
 
-Self updater testing. ([#21](../../issues/21))
+Self updater testing. Automatic updating disabled, this is too complicated as of now. ([#21](../../issues/21))
 
 ### v0.8.11 2024-02-17
 
