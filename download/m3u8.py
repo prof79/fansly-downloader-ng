@@ -15,7 +15,7 @@ from config.fanslyconfig import FanslyConfig
 from errors import M3U8Error
 from utils.ffmpeg import run_ffmpeg
 from utils.web import get_file_name_from_url, get_qs_value, split_url
-from textio import print_error
+from textio import print_error, print_warning
 
 
 def get_m3u8_cookies(m3u8_url: str) -> dict[str, Any]:
@@ -102,6 +102,7 @@ def fetch_m3u8_segment_playlist(
 
         if len(playlist.playlists) == 0:
             # Guess 1080p as a last resort
+            print_warning(f"Fansly returned an empty M3U8 playlist. I'll try fetch a 1080p version, this might fail!")
             segments_url = f"{m3u8_url.split('.m3u8')[0]}_1080.m3u8"
 
         else:

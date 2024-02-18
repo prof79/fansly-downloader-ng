@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.17 2024-02-18
+
+Better error handling to diagnose another [M3U8 error](../../issues/23).
+
 ### v0.8.16 2024-02-17
 
 Hopefully finally fix [#7](../../issues/7).

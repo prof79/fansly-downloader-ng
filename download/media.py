@@ -147,74 +147,75 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
         if config.show_downloads:
             print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
 
-        if media_item.file_extension == 'm3u8':
-            # handle the download of a m3u8 file
-            try:
+        try:
+
+            if media_item.file_extension == 'm3u8':
+                # handle the download of a m3u8 file
                 file_save_path = download_m3u8(
                     config,
                     m3u8_url=media_item.download_url,
                     save_path=file_save_path
                 )
 
-            except M3U8Error as ex:
-                print_warning(f'Skipping invalid item: {ex}')
+            else:
+                # handle the download of a normal media file
+                with config.http_session.get(
+                            media_item.download_url,
+                            stream=True,
+                            headers=config.http_headers()
+                        ) as response:
 
-        else:
-            # handle the download of a normal media file
-            with config.http_session.get(
-                        media_item.download_url,
-                        stream=True,
-                        headers=config.http_headers()
-                    ) as response:
+                    if response.status_code == 200:
+                        text_column = TextColumn(f"", table_column=Column(ratio=1))
+                        bar_column = BarColumn(bar_width=60, table_column=Column(ratio=5))
 
-                if response.status_code == 200:
-                    text_column = TextColumn(f"", table_column=Column(ratio=1))
-                    bar_column = BarColumn(bar_width=60, table_column=Column(ratio=5))
+                        file_size = int(response.headers.get('content-length', 0))
 
-                    file_size = int(response.headers.get('content-length', 0))
+                        # if file size is above 20 MB display loading bar
+                        disable_loading_bar = False if file_size >= 20_000_000 else True
 
-                    # if file size is above 20 MB display loading bar
-                    disable_loading_bar = False if file_size >= 20_000_000 else True
+                        progress = Progress(
+                            text_column,
+                            bar_column,
+                            expand=True,
+                            transient=True,
+                            disable=disable_loading_bar
+                        )
 
-                    progress = Progress(
-                        text_column,
-                        bar_column,
-                        expand=True,
-                        transient=True,
-                        disable=disable_loading_bar
-                    )
+                        task_id = progress.add_task('', total=file_size)
 
-                    task_id = progress.add_task('', total=file_size)
+                        progress.start()
 
-                    progress.start()
+                        CHUNK_SIZE = 1_048_576
 
-                    CHUNK_SIZE = 1_048_576
+                        with open(file_save_path, 'wb') as output_file:
+                            for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                                if chunk:
+                                    output_file.write(chunk)
+                                    progress.advance(task_id, len(chunk))
 
-                    with open(file_save_path, 'wb') as output_file:
-                        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-                            if chunk:
-                                output_file.write(chunk)
-                                progress.advance(task_id, len(chunk))
+                        progress.refresh()
+                        progress.stop()
 
-                    progress.refresh()
-                    progress.stop()
+                    else:
+                        raise DownloadError(
+                            f"Download failed on filename {filename} due to an "
+                            f"error --> status_code: {response.status_code} "
+                            f"| content: \n{response.content.decode('utf-8')} [13]"
+                        )
 
-                else:
-                    raise DownloadError(
-                        f"Download failed on filename {filename} due to an "
-                        f"error --> status_code: {response.status_code} "
-                        f"| content: \n{response.content.decode('utf-8')} [13]"
-                    )
+            is_dupe = dedupe_media_file(state, media_item.mimetype, file_save_path)
 
-        is_dupe = dedupe_media_file(state, media_item.mimetype, file_save_path)
+            # Is it a duplicate?
+            if is_dupe:
+                continue
 
-        # Is it a duplicate?
-        if is_dupe:
-            continue
+            # We only count them if the file was actually kept
+            state.pic_count += 1 if 'image' in media_item.mimetype else 0
+            state.vid_count += 1 if 'video' in media_item.mimetype else 0
 
-        # We only count them if the file was actually kept
-        state.pic_count += 1 if 'image' in media_item.mimetype else 0
-        state.vid_count += 1 if 'video' in media_item.mimetype else 0
+        except M3U8Error as ex:
+            print_warning(f'Skipping invalid item: {ex}')
 
         # Slow down a bit to be sure
         sleep(random.uniform(0.4, 0.75))
