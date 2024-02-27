@@ -166,6 +166,14 @@ def parse_args() -> argparse.Namespace:
         help="Do not show download information.",
     )
     parser.add_argument(
+        '-hsd', '--hide-skipped-downloads',
+        required=False,
+        default=False,
+        action='store_true',
+        dest='hide_skipped_downloads',
+        help="Do not show download information for skipped files.",
+    )
+    parser.add_argument(
         '-nof', '--no-open-folder',
         required=False,
         default=False,
@@ -431,6 +439,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         ('no_folder_suffix', 'use_folder_suffix'),
         ('no_media_previews', 'download_media_previews'),
         ('hide_downloads', 'show_downloads'),
+        ('hide_skipped_downloads', 'show_skipped_downloads'),
         ('no_open_folder', 'open_folder_when_finished'),
         ('no_separate_messages', 'separate_messages'),
         ('no_separate_timeline', 'separate_timeline'),

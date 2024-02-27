@@ -220,6 +220,7 @@ def load_config(config: FanslyConfig) -> None:
         config.separate_previews = config._parser.getboolean(options_section, 'separate_previews', fallback=False)
         config.separate_timeline = config._parser.getboolean(options_section, 'separate_timeline', fallback=True)
         config.show_downloads = config._parser.getboolean(options_section, 'show_downloads', fallback=True)
+        config.show_skipped_downloads = config._parser.getboolean(options_section, 'show_skipped_downloads', fallback=True)
         config.interactive = config._parser.getboolean(options_section, 'interactive', fallback=True)
         config.prompt_on_exit = config._parser.getboolean(options_section, 'prompt_on_exit', fallback=True)
 

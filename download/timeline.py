@@ -31,6 +31,8 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
 
     # Careful - "retry" means (1 + retries) runs
     while True and attempts <= config.timeline_retries:
+        starting_duplicates = state.duplicate_count
+
         if timeline_cursor == 0:
             print_info(f"Inspecting most recent Timeline cursor ... [CID: {state.creator_id}]")
 
@@ -80,6 +82,13 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
                 if not process_download_accessible_media(config, state, media_infos):
                     # Break on deduplication error - already downloaded
                     break
+
+                # Print info on skipped downloads if `show_skipped_downloads` is enabled
+                skipped_downloads = state.duplicate_count - starting_duplicates
+                if skipped_downloads > 1 and not config.show_skipped_downloads:
+                    print_info(
+                        f"Skipped {skipped_downloads} already downloaded media item{'' if skipped_downloads == 1 else 's'}."
+                    )
 
                 print()
 

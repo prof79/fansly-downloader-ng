@@ -47,6 +47,7 @@ def download_messages(config: FanslyConfig, state: DownloadState):
             msg_cursor: str = '0'
 
             while True:
+                starting_duplicates = state.duplicate_count
 
                 params = {'groupId': group_id, 'limit': '25', 'ngsw-bypass': 'true'}
 
@@ -68,6 +69,15 @@ def download_messages(config: FanslyConfig, state: DownloadState):
                     media_infos = download_media_infos(config, all_media_ids)
 
                     process_download_accessible_media(config, state, media_infos)
+
+                    # Print info on skipped downloads if `show_skipped_downloads` is enabled
+                    skipped_downloads = state.duplicate_count - starting_duplicates
+                    if skipped_downloads > 1 and not config.show_skipped_downloads:
+                        print_info(
+                            f"Skipped {skipped_downloads} already downloaded media item{'' if skipped_downloads == 1 else 's'}."
+                        )
+
+                    print()
 
                     # get next cursor
                     try:
