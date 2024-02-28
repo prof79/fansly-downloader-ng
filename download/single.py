@@ -98,6 +98,11 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
             media_infos = download_media_infos(config, all_media_ids)
 
             process_download_accessible_media(config, state, media_infos, post_id)
+
+            if state.duplicate_count > 0 and config.show_downloads and not config.show_skipped_downloads:
+                print_info(
+                    f"Skipped {state.duplicate_count} already downloaded media item{'' if state.duplicate_count == 1 else 's'}."
+                )
         
         else:
             print_warning(f"Could not find any accessible content in the single post.")
