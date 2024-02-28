@@ -72,7 +72,7 @@ def download_messages(config: FanslyConfig, state: DownloadState):
 
                     # Print info on skipped downloads if `show_skipped_downloads` is enabled
                     skipped_downloads = state.duplicate_count - starting_duplicates
-                    if skipped_downloads > 1 and not config.show_skipped_downloads:
+                    if skipped_downloads > 1 and config.show_downloads and not config.show_skipped_downloads:
                         print_info(
                             f"Skipped {skipped_downloads} already downloaded media item{'' if skipped_downloads == 1 else 's'}."
                         )
