@@ -54,6 +54,11 @@ def download_collections(config: FanslyConfig, state: DownloadState):
                 )
                 input_enter_continue(config.interactive)
 
+        if state.duplicate_count > 0 and config.show_downloads and not config.show_skipped_downloads:
+            print_info(
+                f"Skipped {state.duplicate_count} already downloaded media item{'' if state.duplicate_count == 1 else 's'}."
+            )
+
 
     else:
         print_error(
