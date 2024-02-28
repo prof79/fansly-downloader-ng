@@ -207,11 +207,11 @@ def load_config(config: FanslyConfig) -> None:
         
         # Normal (Timeline & Messages), Timeline, Messages, Single (Single by post id) or Collections -> str
         download_mode = config._parser.get(options_section, 'download_mode', fallback='Normal')
-        config.download_mode = DownloadMode(download_mode.lower())
+        config.download_mode = DownloadMode(download_mode.upper())
 
         # Advanced, Simple -> str
         metadata_handling = config._parser.get(options_section, 'metadata_handling', fallback='Advanced')
-        config.metadata_handling = MetadataHandling(metadata_handling.lower())
+        config.metadata_handling = MetadataHandling(metadata_handling.upper())
 
         # Booleans
         config.download_media_previews = config._parser.getboolean(options_section, 'download_media_previews', fallback=True)

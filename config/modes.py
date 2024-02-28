@@ -1,7 +1,7 @@
 """Download Modes"""
 
-
-from enum import StrEnum, auto
+from strenum import StrEnum
+from enum import auto
 
 
 class DownloadMode(StrEnum):

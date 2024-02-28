@@ -1,7 +1,7 @@
 """Metadata Handling"""
 
-
-from enum import StrEnum, auto
+from strenum import StrEnum
+from enum import auto
 
 
 class MetadataHandling(StrEnum):
