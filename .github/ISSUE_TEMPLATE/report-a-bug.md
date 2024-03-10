@@ -18,7 +18,7 @@ assignees: ''
 ## Actual behavior
 {{ What actually happened? ⚠️}}
 
-*( If applicable, add screenshots (just paste/CTRL+V - or see [this guide](https://stackoverflow.com/a/14494775/15163882)) to help explain your problem. )*
+*If applicable, add screenshots (just paste/`CTRL+V` - or see [this guide](https://stackoverflow.com/a/14494775/15163882)) to help explain your problem.*
 
 ## Environment Information
  - Operating System: {{e.g. Windows, Linux, macOS ⚠️}}
