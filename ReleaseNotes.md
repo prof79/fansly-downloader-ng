@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.21 2024-03-15
+
+Be more precise with errors when potential Fansly API error happen.
+
 ### v0.8.20 2024-03-15
 
 Changed wording to `update recommended` instead of `update required`.

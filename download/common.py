@@ -10,7 +10,7 @@ from .media import download_media
 from .types import DownloadType
 
 from config import FanslyConfig
-from errors import DuplicateCountError
+from errors import DuplicateCountError, ApiError
 from media import MediaItem, parse_media_info
 from pathio import set_create_directory_for_download
 from textio import print_error, print_info, print_warning, input_enter_continue
@@ -42,16 +42,23 @@ def get_unique_media_ids(info_object: dict[str, Any]) -> list[str]:
     account_media = info_object.get('accountMedia', [])
     media_bundles = info_object.get('accountMediaBundles', [])
 
+    def check(item) -> bool:
+        if item is None:
+            raise ApiError(
+                'Media items in response are empty - this is most probably a Fansly API/countermeasure issue.'
+            )
+        return True
+
     account_media_ids = [
         media['id']
-        for media in account_media
+        for media in account_media if check(media)
     ]
 
     bundle_media_ids = []
 
     media_id_bundles = [
         bundle['accountMediaIds']
-        for bundle in media_bundles
+        for bundle in media_bundles if check(bundle)
     ]
 
     # Flatten the ID lists
