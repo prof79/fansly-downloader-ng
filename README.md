@@ -1,3 +1,12 @@
+<div align="center" style="color:#bb1122; font-weight: bold;">
+  <h2>Please note that downloading from Fansly currently does not work across all versions due to some additional Fansly security measures.
+  This is under investigation and tracked in <a href="https://github.com/prof79/fansly-downloader-ng/issues/34">issue #34</a>.
+  Thank you for your patience in advance.
+  </hs>
+</div>
+
+<p>&nbsp;</p>
+
 <div align="center" style="font-size: smaller;">
   <h1><code>Fansly Downloader NG</code>: The Ultimate Content Downloading Tool</h1>
 </div>
