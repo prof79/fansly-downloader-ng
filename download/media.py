@@ -94,7 +94,8 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
         # deduplication - part 1: decide if this media is even worth further processing; by media id
         if any([media_item.media_id in state.recent_photo_media_ids, media_item.media_id in state.recent_video_media_ids]):
-            print_info(f"Deduplication [Media ID]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
+            if config.show_downloads and config.show_skipped_downloads:
+                print_info(f"Deduplication [Media ID]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
             state.duplicate_count += 1
             continue
 
@@ -204,7 +205,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
                             f"| content: \n{response.content.decode('utf-8')} [13]"
                         )
 
-            is_dupe = dedupe_media_file(state, media_item.mimetype, file_save_path)
+            is_dupe = dedupe_media_file(config, state, media_item.mimetype, file_save_path)
 
             # Is it a duplicate?
             if is_dupe:

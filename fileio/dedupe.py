@@ -50,7 +50,7 @@ def dedupe_init(config: FanslyConfig, state: DownloadState):
         # adding metadata to all common file types, that would be nice.
 
 
-def dedupe_media_file(state: DownloadState, mimetype: str, filename: Path) -> bool:
+def dedupe_media_file(config: FanslyConfig, state: DownloadState, mimetype: str, filename: Path) -> bool:
     """Hashes media file data and checks on-the-fly
     whether it is a duplicate or not.
 
@@ -89,7 +89,8 @@ def dedupe_media_file(state: DownloadState, mimetype: str, filename: Path) -> bo
 
     # Deduplication - part 2.1: decide if this media is even worth further processing; by hashing
     if file_hash in hashlist:
-        print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename.name}' → skipped")
+        if config.show_downloads and config.show_skipped_downloads:
+            print_info(f"Deduplication [Hashing]: {mimetype.split('/')[-2]} '{filename.name}' → skipped")
         filename.unlink()
         state.duplicate_count += 1
         return True
