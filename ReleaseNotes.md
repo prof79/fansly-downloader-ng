@@ -2,7 +2,14 @@
 
 ## 🗒️ Release Notes
 
-### v0.8.18 2024-02-18
+### v0.8.19 2024-03-15
+
+Kudos to [sunbart](https://github.com/sunbart) who contributed a switch to hide skipped item messages in PR #26 - meaning less clutter for those running headless and relying on the logs.
+There are one or two caveats and I'll try to improve on them later.
+
+And sorry, v0.8.18 docs had a wrong datestamp.
+
+### v0.8.18 2024-03-15
 
 Ubuntu 22.04 support for built-in Python by [XelaRellum](https://github.com/XelaRellum). Kudos!
 

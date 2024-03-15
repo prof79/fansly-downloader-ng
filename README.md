@@ -117,7 +117,14 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.8.18 2024-02-18
+### v0.8.19 2024-03-15
+
+Kudos to [sunbart](https://github.com/sunbart) who contributed a switch to hide skipped item messages in PR #26 - meaning less clutter for those running headless and relying on the logs.
+There are one or two caveats and I'll try to improve on them later.
+
+And sorry, v0.8.18 docs had a wrong datestamp.
+
+### v0.8.18 2024-03-15
 
 Ubuntu 22.04 support for built-in Python by [XelaRellum](https://github.com/XelaRellum). Kudos!
 
