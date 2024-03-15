@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.18 2024-02-18
+
+Ubuntu 22.04 support for built-in Python by [XelaRellum](https://github.com/XelaRellum). Kudos!
+
 ### v0.8.17 2024-02-18
 
 Better error handling to diagnose another [M3U8 error](../../issues/23).
