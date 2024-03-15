@@ -100,7 +100,7 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     :return: True if successful or False otherwise.
     :rtype: bool
     """
-    print_warning(f"A new version of Fansly Downloader NG has been found on GitHub - update required!")
+    print_warning(f"A new version of Fansly Downloader NG has been found on GitHub - update recommended.")
     
     print_info(
         f"Latest Build:"
@@ -111,6 +111,7 @@ def perform_update(program_version: str, release_info: dict) -> bool:
 
     print_warning(
         f"To update Fansly Downloader NG, please download the latest version from the GitHub repository.")
+
     return False
 
     # If current environment is pure Python prompt user to update Fansly Downloader NG themselves

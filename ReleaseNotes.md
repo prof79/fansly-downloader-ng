@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.8.20 2024-03-15
+
+Changed wording to `update recommended` instead of `update required`.
+
 ### v0.8.19 2024-03-15
 
 Kudos to [sunbart](https://github.com/sunbart) who contributed a switch to hide skipped item messages in PR #26 - meaning less clutter for those running headless and relying on the logs.
