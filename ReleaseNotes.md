@@ -2,7 +2,7 @@
 
 ## 🗒️ Release Notes
 
-### v0.9.0 2024-03-19
+### v0.9.1 2024-03-19
 
 Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.
 

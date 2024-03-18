@@ -117,7 +117,7 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.0 2024-03-18
+### v0.9.1 2024-03-19
 
 Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.
 
