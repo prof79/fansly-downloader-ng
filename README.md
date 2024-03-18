@@ -1,12 +1,3 @@
-<div align="center" style="color:#bb1122; font-weight: bold;">
-  <h2>Please note that downloading from Fansly currently does not work across all versions due to some additional Fansly security measures.
-  This is under investigation and tracked in <a href="https://github.com/prof79/fansly-downloader-ng/issues/34">issue #34</a>.
-  Thank you for your patience in advance.
-  </hs>
-</div>
-
-<p>&nbsp;</p>
-
 <div align="center" style="font-size: smaller;">
   <h1><code>Fansly Downloader NG</code>: The Ultimate Content Downloading Tool</h1>
 </div>
@@ -125,6 +116,14 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 ## 📰 What's New (Release Notes)
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
+
+### v0.9.0 2024-03-18
+
+Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.
+
+I've totally rewritten almost all web calls into a separate Fansly API class that handles all the wild details with a a lot of foundation functions the more specific ones build upon, like a pyramid.
+
+Long story short it should work again now 😊 I've tested my standard set of creators plus an empty-config alternate-browser set of creators with public content I do not follow. However, after those graving changes some bugs might linger - create an [issue](../../issues/) should you encounter something out of the ordinary.
 
 ### v0.8.19 2024-03-15
 

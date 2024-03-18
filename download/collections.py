@@ -19,11 +19,8 @@ def download_collections(config: FanslyConfig, state: DownloadState):
     state.download_type = DownloadType.COLLECTIONS
 
     # send a first request to get all available "accountMediaId" ids, which are basically media ids of every graphic listed on /collections
-    collections_response = config.http_session.get(
-        'https://apiv3.fansly.com/api/v1/account/media/orders/',
-        params={'limit': '9999','offset': '0','ngsw-bypass': 'true'},
-        headers=config.http_headers()
-    )
+    collections_response = config.get_api() \
+        .get_media_collections()
 
     if collections_response.status_code == 200:
         collections = collections_response.json()
@@ -35,20 +32,19 @@ def download_collections(config: FanslyConfig, state: DownloadState):
 
             batched_ids = ','.join(batch)
 
-            post_object_response = config.http_session.get(
-                f"https://apiv3.fansly.com/api/v1/account/media?ids={batched_ids}",
-                headers=config.http_headers())
+            media_info_response = config.get_api() \
+                .get_account_media(batched_ids)
 
-            if post_object_response.status_code == 200:
-                post_object = post_object_response.json()
+            if media_info_response.status_code == 200:
+                media_info = media_info_response.json()['response']
     
-                process_download_accessible_media(config, state, post_object['response'])
+                process_download_accessible_media(config, state, media_info)
             
             else:
                 print_error(
                     f"Media batch download failed. Response code: "
-                    f"{post_object_response.status_code}"
-                    f"\n{post_object_response.text}"
+                    f"{media_info_response.status_code}"
+                    f"\n{media_info_response.text}"
                     f"\n\nAffected media IDs: {batched_ids}",
                     23
                 )

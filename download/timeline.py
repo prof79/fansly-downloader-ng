@@ -42,15 +42,11 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
         timeline_response = Response()
     
         try:
-            timeline_url = \
-                f"https://apiv3.fansly.com/api/v1/timelinenew/{state.creator_id}?before={timeline_cursor}&after=0&wallId=&contentSearch=&ngsw-bypass=true"
+            if state.creator_id is None or timeline_cursor is None:
+                raise RuntimeError('Creator name or timeline cursor should not be None')
 
-            config.cors_options_request(timeline_url)
-
-            timeline_response = config.http_session.get(
-                timeline_url,
-                headers=config.http_headers(),
-            )
+            timeline_response = config.get_api() \
+                .get_timeline(state.creator_id, str(timeline_cursor))
 
             timeline_response.raise_for_status()
 

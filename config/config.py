@@ -163,7 +163,7 @@ def load_config(config: FanslyConfig) -> None:
             config.user_names = \
                 sanitize_creator_names(parse_items_from_line(user_names))
 
-        #endregion
+        #endregion TargetedCreator
 
         #region MyAccount
 
@@ -175,7 +175,7 @@ def load_config(config: FanslyConfig) -> None:
         config.token = config._parser.get(account_section, 'Authorization_Token', fallback=replace_me_str) # string
         config.user_agent = config._parser.get(account_section, 'User_Agent', fallback=replace_me_str) # string
 
-        #endregion
+        #endregion MyAccount
 
         #region Other
 
@@ -191,7 +191,7 @@ def load_config(config: FanslyConfig) -> None:
                 and len(config._parser[other_section]) == 0:
             config._parser.remove_section(other_section)
 
-        #endregion
+        #endregion Other
 
         #region Options
 
@@ -248,9 +248,23 @@ def load_config(config: FanslyConfig) -> None:
         else:
             config.use_folder_suffix = config._parser.getboolean(options_section, 'use_folder_suffix', fallback=True)
 
-        #endregion
+        #endregion Renamed
             
-        #endregion
+        #endregion Options
+
+        #region Cache
+        
+        cache_section = 'Cache'
+
+        if not config._parser.has_section(cache_section):
+            config._parser.add_section(cache_section)
+
+        config.cached_device_id = \
+            config._parser.get(cache_section, 'device_id', fallback=None)
+        config.cached_device_id_timestamp = \
+            config._parser.getint(cache_section, 'device_id_timestamp', fallback=None)
+
+        #endregion Cache
 
         # Safe to save! :-)
         save_config_or_raise(config)

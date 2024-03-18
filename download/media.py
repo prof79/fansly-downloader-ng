@@ -30,14 +30,8 @@ def download_media_infos(
     for ids in batch_list(media_ids, config.BATCH_SIZE):
         media_ids_str = ','.join(ids)
 
-        url = f'https://apiv3.fansly.com/api/v1/account/media?ids={media_ids_str}&ngsw-bypass=true'
-
-        config.cors_options_request(url)
-
-        media_info_response = config.http_session.get(
-            url,
-            headers=config.http_headers()
-        )
+        media_info_response = config.get_api() \
+            .get_account_media(media_ids_str)
 
         media_info_response.raise_for_status()
 
@@ -160,10 +154,10 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
             else:
                 # handle the download of a normal media file
-                with config.http_session.get(
-                            media_item.download_url,
+                with config.get_api().get_with_ngsw(
+                            url=media_item.download_url,
                             stream=True,
-                            headers=config.http_headers()
+                            add_fansly_headers=False,
                         ) as response:
 
                     if response.status_code == 200:

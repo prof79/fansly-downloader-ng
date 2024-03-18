@@ -6,7 +6,7 @@ import re
 import requests
 import traceback
 
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 from urllib.parse import urlparse, parse_qs
 from time import sleep
 from typing import Any, NamedTuple
@@ -64,6 +64,33 @@ def get_qs_value(url: str, key: str, default: Any=None) -> Any:
     return result[0]
 
 
+def get_flat_qs_dict(url: str) -> dict[str, str]:
+    """Returns a flattened version of the dictionary
+    as returned by `parse_qs`.
+    
+    :param url: The URL to parse for a query string.
+    :type url: str
+
+    :return: The dictionary as returned by `parse_qs` but with
+        the values flattened (first element of list or `''`).
+    :rtype: Any
+    """
+    query = parse_qs(urlparse(url).query)
+
+    new_dict = OrderedDict()
+
+    for key in query.keys():
+        value = query[key]
+
+        if len(value) == 0:
+            new_dict[key] = ''
+        
+        else:
+            new_dict[key] = value[0]
+
+    return new_dict
+
+
 def split_url(url: str) -> NamedTuple:
     """Splits an URL into absolue base and file name URLs
     without query strings et al.
@@ -110,47 +137,6 @@ def open_url(url_to_open: str) -> None:
 
 def open_get_started_url() -> None:
     open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Getting-Started')
-
-
-def get_fansly_account_for_token(auth_token: str) -> str | None:
-    """Fetches user account information for a particular authorization token.
-
-    :param auth_token: The Fansly authorization token.
-    :type auth_token: str
-
-    :return: The account user name or None.
-    :rtype: str | None
-    """
-    headers = {
-        'authority': 'apiv3.fansly.com',
-        'accept': 'application/json, text/plain, */*',
-        'accept-language': 'en;q=0.8,en-US;q=0.7',
-        'authorization': auth_token,
-        'origin': 'https://fansly.com',
-        'referer': 'https://fansly.com/',
-        'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-site',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    }
-
-    me_req = requests.get(
-        'https://apiv3.fansly.com/api/v1/account/me',
-        params={'ngsw-bypass': 'true'},
-        headers=headers
-    )
-
-    if me_req.status_code == 200:
-        me_req = me_req.json()['response']['account']
-        account_username = me_req['username']
-
-        if account_username:
-            return account_username
-
-    return None
 
 
 def guess_user_agent(user_agents: dict, based_on_browser: str, default_ua: str) -> str:

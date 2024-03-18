@@ -50,11 +50,8 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
                     17
                 )
 
-    post_response = config.http_session.get(
-        'https://apiv3.fansly.com/api/v1/post',
-        params={'ids': post_id, 'ngsw-bypass': 'true',},
-        headers=config.http_headers()
-    )
+    post_response = config.get_api() \
+        .get_post(post_id)
 
     if post_response.status_code == 200:
         # From: "accounts"

@@ -1,6 +1,8 @@
 """Configuration Validation"""
 
 
+import requests
+
 from pathlib import Path
 from time import sleep
 from requests.exceptions import RequestException
@@ -147,8 +149,6 @@ def validate_adjust_token(config: FanslyConfig) -> None:
             parse_browser_from_string,
         )
 
-        from utils.web import get_fansly_account_for_token
-
         print_warning(
             f"Authorization token '{config.token}' is unmodified, missing or malformed"
             f"\n{20*' '}in the configuration file."
@@ -172,7 +172,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
                     browser_fansly_token = get_auth_token_from_leveldb_folder(folder, interactive=config.interactive)
 
                     if browser_fansly_token:
-                        fansly_account = get_fansly_account_for_token(browser_fansly_token)
+                        fansly_account = config.get_api().get_client_user_name(browser_fansly_token)
                         break  # exit the inner loop if a valid processed_token is found
         
             # if firefox, process sqlite db instead
@@ -180,7 +180,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
                 browser_fansly_token = get_token_from_firefox_profile(browser_path)
 
                 if browser_fansly_token:
-                    fansly_account = get_fansly_account_for_token(browser_fansly_token)
+                    fansly_account = config.get_api().get_client_user_name(browser_fansly_token)
         
             if all([fansly_account, browser_fansly_token]):
                 # we might also utilise this for guessing the useragent
@@ -267,7 +267,7 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
 
         try:
             # thanks Jonathan Robson (@jnrbsn) - for continuously providing these up-to-date user-agents
-            user_agent_response = config.http_session.get(
+            user_agent_response = requests.get(
                 'https://jnrbsn.github.io/user-agents/user-agents.json',
                 headers = {
                     'User-Agent': ua_if_failed,

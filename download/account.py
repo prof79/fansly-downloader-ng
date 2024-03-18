@@ -35,10 +35,8 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
         raw_response = requests.Response()
 
         try:
-            raw_response = config.http_session.get(
-                f"https://apiv3.fansly.com/api/v1/account?usernames={state.creator_name}",
-                headers=config.http_headers()
-            )
+            raw_response = config.get_api() \
+                .get_creator_account_info(state.creator_name)
 
             account = raw_response.json()['response'][0]
 
@@ -48,7 +46,11 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
 
             if raw_response.status_code == 401:
                 message = \
-                    f"API returned unauthorized (24). This is most likely because of a wrong authorization token, in the configuration file.\n{21*' '}Used authorization token: '{config.token}'" \
+                    f"API returned unauthorized (24). " \
+                    f"This is most likely because of a wrong authorization " \
+                    f"token in the configuration file." \
+                    f"\n{21*' '}Have you surfed Fansly on this browser recently?" \
+                    f"\n{21*' '}Used authorization token: '{config.token}'" \
                     f'\n  {str(e)}\n  {raw_response.text}'
                 
                 raise ApiAuthenticationError(message)

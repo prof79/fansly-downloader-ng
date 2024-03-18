@@ -2,6 +2,14 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.0 2024-03-19
+
+Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.
+
+I've totally rewritten almost all web calls into a separate Fansly API class that handles all the wild details with a a lot of foundation functions the more specific ones build upon, like a pyramid.
+
+Long story short it should work again now 😊 I've tested my standard set of creators plus an empty-config alternate-browser set of creators with public content I do not follow. However, after those graving changes some bugs might linger - create an [issue](../../issues/) should you encounter something out of the ordinary.
+
 ### v0.8.21 2024-03-15
 
 Be more precise with errors when potential Fansly API error happen.

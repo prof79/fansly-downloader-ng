@@ -172,3 +172,5 @@ logo*.txt
 dummy.*
 # Linux/macOS binary
 fansly-downloader-ng
+# Test scripts
+api_tester.py

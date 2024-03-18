@@ -21,10 +21,8 @@ def download_messages(config: FanslyConfig, state: DownloadState):
     print_info(f"Initiating Messages procedure. Standby for results.")
     print()
     
-    groups_response = config.http_session.get(
-        'https://apiv3.fansly.com/api/v1/group',
-        headers=config.http_headers()
-    )
+    groups_response = config.get_api() \
+        .get_group()
 
     if groups_response.status_code == 200:
         groups_response = groups_response.json()['response']['groups']
@@ -54,11 +52,8 @@ def download_messages(config: FanslyConfig, state: DownloadState):
                 if msg_cursor != '0':
                     params['before'] = msg_cursor
 
-                messages_response = config.http_session.get(
-                    'https://apiv3.fansly.com/api/v1/message',
-                    headers=config.http_headers(),
-                    params=params,
-                )
+                messages_response = config.get_api() \
+                    .get_message(params)
 
                 if messages_response.status_code == 200:
                 

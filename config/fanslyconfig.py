@@ -1,14 +1,16 @@
 """Configuration Class for Shared State"""
 
 
-import requests
-
 from configparser import ConfigParser
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from .metadatahandling import MetadataHandling
 from .modes import DownloadMode
+
+from api import FanslyApi
 
 
 @dataclass
@@ -40,10 +42,9 @@ class FanslyConfig(object):
 
     # Objects
     _parser = ConfigParser(interpolation=None)
-    # Define requests session
-    http_session = requests.Session()
+    _api: Optional[FanslyApi] = None
 
-    #endregion
+    #endregion File-Independent
 
     #region config.ini Fields
 
@@ -81,11 +82,40 @@ class FanslyConfig(object):
     # Anti-rate-limiting delay in seconds
     timeline_delay_seconds: int = 60
 
-    #endregion
+    # Cache
+    cached_device_id: Optional[str] = None
+    cached_device_id_timestamp: Optional[int] = None
 
-    #endregion
+    #endregion config.ini
+
+    #endregion Fields
 
     #region Methods
+
+    def get_api(self) -> FanslyApi:
+        if self._api is None:
+            token = self.get_unscrambled_token()
+            user_agent = self.user_agent
+
+            if token is not None and user_agent is not None:
+                self._api = FanslyApi(
+                    token=token,
+                    user_agent=user_agent,
+                    device_id=self.cached_device_id,
+                    device_id_timestamp=self.cached_device_id_timestamp,
+                    on_device_updated=self._save_config,
+                )
+
+                # Explicit save - on init of FanslyApi() self._api was None
+                self._save_config()
+            
+            else:
+                raise RuntimeError(
+                    'Token or user agent error creating Fansly API object.'
+                )
+
+        return self._api
+
 
     def user_names_str(self) -> str | None:
         """Returns a nicely formatted and alphabetically sorted list of
@@ -147,6 +177,13 @@ class FanslyConfig(object):
         # Unsigned ints
         self._parser.set('Options', 'timeline_retries', str(self.timeline_retries))
         self._parser.set('Options', 'timeline_delay_seconds', str(self.timeline_delay_seconds))
+
+        # Cache
+        if self._api is not None:
+            self._parser.set('Cache', 'device_id', str(self._api.device_id))
+            self._parser.set('Cache', 'device_id_timestamp', str(self._api.device_id_timestamp))
+            self.cached_device_id = self._api.device_id
+            self.cached_device_id_timestamp = self._api.device_id_timestamp
 
 
     def _load_raw_config(self) -> list[str]:
@@ -219,42 +256,5 @@ class FanslyConfig(object):
                 return self.token
 
         return self.token
-
-
-    def http_headers(self) -> dict[str, str]:
-        token = self.get_unscrambled_token()
-
-        if token is None or self.user_agent is None:
-            raise RuntimeError('Internal error generating HTTP headers - token and user agent not set.')
-
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'authorization': token,
-            'Referer': 'https://fansly.com/',
-            'User-Agent': self.user_agent,
-        }
-
-        return headers
-
-
-    def cors_options_request(self, url: str) -> None:
-        """Performs an OPTIONS CORS request to Fansly servers."""
-
-        headers = {
-            'Accept': '*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Access-Control-Request-Headers':
-                'authorization,fansly-client-check,fansly-client-id,fansly-client-ts,fansly-session-id',
-            'Access-Control-Request-Method': 'GET',
-            'Origin': 'https://fansly.com',
-            'Referer': 'https://fansly.com/',
-            'User-Agent': self.user_agent,
-        }
-
-        self.http_session.options(
-            url=url,
-            headers=headers,
-        )
 
     #endregion

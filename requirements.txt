@@ -10,3 +10,4 @@ python-dateutil==2.8.2
 requests==2.31.0
 rich==13.7.0
 strenum==0.4.15
+websockets==12.0

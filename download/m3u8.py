@@ -75,10 +75,10 @@ def fetch_m3u8_segment_playlist(
 
     m3u8_base_url, m3u8_file_url = split_url(m3u8_url)
 
-    with config.http_session.get(
-                m3u8_file_url,
-                headers=config.http_headers(),
+    with config.get_api().get_with_ngsw(
+                url=m3u8_file_url,
                 cookies=cookies,
+                add_fansly_headers=False,
             ) as stream_response:
 
         if stream_response.status_code != 200:
@@ -147,11 +147,11 @@ def download_m3u8(
 
     #region Nested function to download TS segments
     def download_ts(segment_uri: str, segment_full_path: Path) -> None:
-        with config.http_session.get(
-                    segment_uri,
-                    headers=config.http_headers(),
+        with config.get_api().get_with_ngsw(
+                    url=segment_uri,
                     cookies=cookies,
-                    stream=True
+                    stream=True,
+                    add_fansly_headers=False,
                 ) as segment_response:
             with open(segment_full_path, 'wb') as ts_file:
                 for chunk in segment_response.iter_content(CHUNK_SIZE):

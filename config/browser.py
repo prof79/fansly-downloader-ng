@@ -227,7 +227,7 @@ def close_browser_by_name(browser_name: str) -> None:
             closed = True
 
     if closed:
-        print_config(f"Succesfully closed {browser_name} browser.")
+        print_config(f"Successfully closed {browser_name} browser.")
         sleep(3) # give browser time to close its children processes
 
 
