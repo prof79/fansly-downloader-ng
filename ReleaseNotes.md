@@ -2,6 +2,13 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.3 2024-03-19
+
+Be warned, Fansly may ban you using this! If you get errors be careful not to challenge your luck/try too often.
+
+Well, stupid me, being overworked and tired, forgot to put an essential function call in after successful testing was complete!
+Seems to work again, for now - I hope ...
+
 ### v0.9.2 2024-03-19
 
 Be warned, Fansly may ban you using this!

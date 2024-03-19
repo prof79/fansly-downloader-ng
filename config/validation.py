@@ -1,13 +1,14 @@
 """Configuration Validation"""
 
 
+import re
 import requests
 
 from pathlib import Path
 from time import sleep
 from requests.exceptions import RequestException
 
-from textio.textio import input_enter_continue
+from textio.textio import input_enter_close, input_enter_continue
 
 from .config import username_has_valid_chars, username_has_valid_length
 from .fanslyconfig import FanslyConfig
@@ -305,6 +306,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
     print_warning(
         f'!!! FANSLY MAY BAN YOU FOR USING THIS SOFTWARE, BE WARNED !!!'
     )
+    print()
 
     print_warning(
         f"Make sure, checking the main.js sources of the Fansly homepage, "
@@ -336,6 +338,41 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
     
     else:
         input_enter_continue()
+
+
+def validate_adjust_session_id(config: FanslyConfig) -> None:
+    """Validates the input value for `session_id` in `config.ini`.
+
+    :param FanslyConfig config: The configuration to validate and correct.
+    """
+
+    if config.session_id is None or config.session_id.lower() == 'null':
+        print_warning(
+            f"Session ID is invalid. Please provide a valid value from your browser's DevTools:"
+            f"\n{20*' '}Look for `fansly-session-id` in requests or `id` from `session_active_session`"
+            f"\n{20*' '}in local storage for https://fansly.com (18 digits)."
+        )
+    
+    if config.interactive:
+
+        done = False
+
+        while not done:
+            session_id = input(f"\n{20*' '}► Session ID: "
+            ).strip()
+
+            if re.match(r'\d{18}', session_id):
+                done = True
+                config.session_id = session_id
+                save_config_or_raise(config)
+            
+            else:
+                print_warning(
+                    f'Invalid session ID, should be 18 digits. Please try again.'
+                )
+    
+    else:
+        input_enter_close()
 
 
 def validate_adjust_download_directory(config: FanslyConfig) -> None:
@@ -388,5 +425,7 @@ def validate_adjust_config(config: FanslyConfig) -> None:
     validate_adjust_user_agent(config)
 
     validate_adjust_check_key(config)
+
+    #validate_adjust_session_id(config)
 
     validate_adjust_download_directory(config)

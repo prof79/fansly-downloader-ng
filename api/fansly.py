@@ -24,6 +24,7 @@ class FanslyApi(object):
                 token: str,
                 user_agent: str,
                 check_key: str,
+                #session_id: str,
                 device_id: Optional[str]=None,
                 device_id_timestamp: Optional[int]=None,
                 on_device_updated: Optional[Callable[[], Any]]=None,
@@ -52,6 +53,9 @@ class FanslyApi(object):
         else:
             self.device_id_timestamp = int(datetime(1990, 1, 1, 0, 0).timestamp())
             self.update_device_id()
+
+        if self.session_id == 'null':
+            self.setup_session()
 
 
     #region HTTP Header Management

@@ -117,13 +117,12 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.2 2024-03-19
+### v0.9.3 2024-03-19
 
-Be warned, Fansly may ban you using this!
+Be warned, Fansly may ban you using this! If you get errors be careful not to challenge your luck/try too often.
 
-I've made the `_checkKey` configurable but don't expect this to work any more - it feels they have done more like invalidating (changing) authorization tokens and I'm probably be done with this and unsubscribe from my paid creators and I suggest you do the same.
-
-Fansly totally lacks imagination of legit use cases like using VR where a proper media player experience requires a local library.
+Well, stupid me, being overworked and tired, forgot to put an essential function call in after successful testing was complete!
+Seems to work again, for now - I hope ...
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 

@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.9.2'
-__date__ = '2024-03-19T22:00:00+01'
+__version__ = '0.9.3'
+__date__ = '2024-03-19T23:56:00+01'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -31,6 +31,7 @@ import base64
 import traceback
 
 #from memory_profiler import profile
+from datetime import datetime
 
 from config import FanslyConfig, load_config, validate_adjust_config
 from config.args import parse_args, map_args_to_config
@@ -109,6 +110,15 @@ def main(config: FanslyConfig) -> int:
     if config.user_names is None \
             or config.download_mode == DownloadMode.NOTSET:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
+
+    print()
+    print_info(f'Token: {config.token}')
+    print_info(f'Check Key: {config.check_key}')
+    print_info(
+        f'Device ID: {config.get_api().device_id} '
+        f'({datetime.fromtimestamp(config.get_api().device_id_timestamp / 1000)})'
+    )
+    print_info(f'Session ID: {config.get_api().session_id}')
 
     global_download_state = GlobalState()
 
