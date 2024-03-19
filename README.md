@@ -117,24 +117,13 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.1 2024-03-19
+### v0.9.2 2024-03-19
 
-Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.
+Be warned, Fansly may ban you using this!
 
-I've totally rewritten almost all web calls into a separate Fansly API class that handles all the wild details with a a lot of foundation functions the more specific ones build upon, like a pyramid.
+I've made the `_checkKey` configurable but don't expect this to work any more - it feels they have done more like invalidating (changing) authorization tokens and I'm probably be done with this and unsubscribe from my paid creators and I suggest you do the same.
 
-Long story short it should work again now 😊 I've tested my standard set of creators plus an empty-config alternate-browser set of creators with public content I do not follow. However, after those graving changes some bugs might linger - create an [issue](../../issues/) should you encounter something out of the ordinary.
-
-### v0.8.19 2024-03-15
-
-Kudos to [sunbart](https://github.com/sunbart) who contributed a switch to hide skipped item messages in PR #26 - meaning less clutter for those running headless and relying on the logs.
-There are one or two caveats and I'll try to improve on them later.
-
-And sorry, v0.8.18 docs had a wrong datestamp.
-
-### v0.8.18 2024-03-15
-
-Ubuntu 22.04 support for built-in Python by [XelaRellum](https://github.com/XelaRellum). Kudos!
+Fansly totally lacks imagination of legit use cases like using VR where a proper media player experience requires a local library.
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 

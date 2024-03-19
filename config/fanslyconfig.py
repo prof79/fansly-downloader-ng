@@ -54,6 +54,7 @@ class FanslyConfig(object):
     # MyAccount
     token: str | None = None
     user_agent: str | None = None
+    check_key: str = 'negwij-zyZnek-wavje1'
 
     # Options
     # "Normal" | "Timeline" | "Messages" | "Single" | "Collection"
@@ -101,6 +102,7 @@ class FanslyConfig(object):
                 self._api = FanslyApi(
                     token=token,
                     user_agent=user_agent,
+                    check_key=self.check_key,
                     device_id=self.cached_device_id,
                     device_id_timestamp=self.cached_device_id_timestamp,
                     on_device_updated=self._save_config,
@@ -152,6 +154,7 @@ class FanslyConfig(object):
 
         self._parser.set('MyAccount', 'authorization_token', self.token)
         self._parser.set('MyAccount', 'user_agent', self.user_agent)
+        self._parser.set('MyAccount', 'check_key', self.check_key)
 
         if self.download_directory is None:
             self._parser.set('Options', 'download_directory', 'Local_directory')

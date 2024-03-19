@@ -23,6 +23,7 @@ class FanslyApi(object):
                 self,
                 token: str,
                 user_agent: str,
+                check_key: str,
                 device_id: Optional[str]=None,
                 device_id_timestamp: Optional[int]=None,
                 on_device_updated: Optional[Callable[[], Any]]=None,
@@ -35,7 +36,7 @@ class FanslyApi(object):
         self.http_session = requests.Session()
 
         # Internal Fansly stuff
-        self.check_key = 'Qindoj-mitci1-fevtev'
+        self.check_key = check_key
 
         # Cache important data
         self.client_timestamp = self.get_client_timestamp()

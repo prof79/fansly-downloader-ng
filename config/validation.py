@@ -7,6 +7,8 @@ from pathlib import Path
 from time import sleep
 from requests.exceptions import RequestException
 
+from textio.textio import input_enter_continue
+
 from .config import username_has_valid_chars, username_has_valid_length
 from .fanslyconfig import FanslyConfig
 
@@ -295,6 +297,47 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
         print_info(f"Success! Applied a browser user-agent to config.ini file.\n")
 
 
+def validate_adjust_check_key(config: FanslyConfig) -> None:
+    """Validates the input value for `check_key` in `config.ini`.
+
+    :param FanslyConfig config: The configuration to validate and correct.
+    """
+    print_warning(
+        f'!!! FANSLY MAY BAN YOU FOR USING THIS SOFTWARE, BE WARNED !!!'
+    )
+
+    print_warning(
+        f"Make sure, checking the main.js sources of the Fansly homepage, "
+        f"\n{20*' '}that the `this.checkKey_` value is identical to this "
+        f"\n{20*' '}(text within the single quotes only): `{config.check_key}`"
+    )
+    
+    if config.interactive:
+
+        key_confirmation = input(
+            f"\n{20*' '}► Is this key correct (y/n)? "
+        ).strip().lower()
+
+        if key_confirmation.startswith('n'):
+            done = False
+
+            while not done:
+                new_key = input(f"\n{20*' '}► New key: "
+                ).strip()
+
+                new_key_confirmation = input(
+                    f"\n{20*' '}► Does this look reasonable `{new_key}` (y/n)? "
+                ).strip().lower()
+
+                if new_key_confirmation.startswith('y'):
+                    done = True
+                    config.check_key = new_key
+                    save_config_or_raise(config)
+    
+    else:
+        input_enter_continue()
+
+
 def validate_adjust_download_directory(config: FanslyConfig) -> None:
     """Validates the `download_directory` value from `config.ini`
     and corrects it if possible.
@@ -343,5 +386,7 @@ def validate_adjust_config(config: FanslyConfig) -> None:
     validate_adjust_token(config)
 
     validate_adjust_user_agent(config)
+
+    validate_adjust_check_key(config)
 
     validate_adjust_download_directory(config)

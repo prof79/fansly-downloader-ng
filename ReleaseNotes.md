@@ -2,6 +2,14 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.2 2024-03-19
+
+Be warned, Fansly may ban you using this!
+
+I've made the `_checkKey` configurable but don't expect this to work any more - it feels they have done more like invalidating (changing) authorization tokens and I'm probably be done with this and unsubscribe from my paid creators and I suggest you do the same.
+
+Fansly totally lacks imagination of legit use cases like using VR where a proper media player experience requires a local library.
+
 ### v0.9.1 2024-03-19
 
 Well, helluva ride - Fansly stepped up their security game and only allow properly constructed web calls from now on or the results will come out empty.

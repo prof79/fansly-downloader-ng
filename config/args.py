@@ -66,8 +66,16 @@ def parse_args() -> argparse.Namespace:
             "of the browser you use to view Fansly pages and where the "
             "authorization token was obtained from.",
     )
+    parser.add_argument(
+        '-ck', '--check-key',
+        required=False,
+        default=None,
+        dest='check_key',
+        help="Fansly's _checkKey in the main.js on https://fansly.com. "
+            "Essential for digital signature and preventing bans.",
+    )
 
-    #endregion
+    #endregion Essentials
 
     #region Download modes
 
@@ -117,7 +125,7 @@ def parse_args() -> argparse.Namespace:
             "Example - https://fansly.com/post/1283998432982 -> ID is: 1283998432982",
     )
 
-    #endregion
+    #endregion Download Modes
 
     #region Other Options
 
@@ -254,7 +262,7 @@ def parse_args() -> argparse.Namespace:
             "NUMBER_OF_CREATORS * TIMELINE_RETRIES * TIMELINE_DELAY_SECONDS",
     )
 
-    #endregion
+    #endregion Other Options
 
     #region Developer/troubleshooting arguments
 
@@ -272,7 +280,7 @@ def parse_args() -> argparse.Namespace:
         help="This is for internal use of the self-updating functionality only.",
     )
 
-    #endregion
+    #endregion Dev/Tshoot
 
     return parser.parse_args()
 
@@ -399,6 +407,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         'download_directory',
         'token',
         'user_agent',
+        'check_key',
         'updated_to',
     ]
 
