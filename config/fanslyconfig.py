@@ -3,12 +3,11 @@
 
 from configparser import ConfigParser
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from .metadatahandling import MetadataHandling
-from .modes import DownloadMode
+from config.modes import DownloadMode
+from config.metadatahandling import MetadataHandling
 
 from api import FanslyApi
 
@@ -54,7 +53,7 @@ class FanslyConfig(object):
     # MyAccount
     token: str | None = None
     user_agent: str | None = None
-    check_key: str = 'negwij-zyZnek-wavje1'
+    check_key: str | None = None
     #session_id: str = 'null'
 
     # Options
@@ -99,7 +98,7 @@ class FanslyConfig(object):
             token = self.get_unscrambled_token()
             user_agent = self.user_agent
 
-            if token is not None and user_agent is not None:
+            if token and user_agent and self.check_key:
                 self._api = FanslyApi(
                     token=token,
                     user_agent=user_agent,

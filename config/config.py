@@ -9,9 +9,9 @@ from os import getcwd
 from os.path import join
 from pathlib import Path
 
-from .fanslyconfig import FanslyConfig
-from .metadatahandling import MetadataHandling
-from .modes import DownloadMode
+from config.fanslyconfig import FanslyConfig
+from config.metadatahandling import MetadataHandling
+from config.modes import DownloadMode
 
 from errors import ConfigError
 from textio import print_info, print_config, print_warning
@@ -174,6 +174,7 @@ def load_config(config: FanslyConfig) -> None:
 
         config.token = config._parser.get(account_section, 'Authorization_Token', fallback=replace_me_str) # string
         config.user_agent = config._parser.get(account_section, 'User_Agent', fallback=replace_me_str) # string
+        config.check_key = config._parser.get(account_section, 'Check_Key', fallback='negwij-zyZnak-wavje1') # string
 
         #endregion MyAccount
 
