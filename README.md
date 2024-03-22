@@ -117,6 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.9.4 2024-03-22
+
+Fix `check_key` setting in `config.ini` not honored.
+
 ### v0.9.3 2024-03-19
 
 Be warned, Fansly may ban you using this! If you get errors be careful not to challenge your luck/try too often.
