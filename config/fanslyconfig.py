@@ -29,15 +29,15 @@ class FanslyConfig(object):
     BATCH_SIZE: int = 150
 
     # Configuration file
-    config_path: Path | None = None
+    config_path: Optional[Path] = None
 
     # Misc
-    token_from_browser_name: str | None = None
+    token_from_browser_name: Optional[str] = None
     debug: bool = False
     # If specified on the command-line
-    post_id: str | None = None
+    post_id: Optional[str] = None
     # Set on start after self-update
-    updated_to: str | None = None
+    updated_to: Optional[str] = None
 
     # Objects
     _parser = ConfigParser(interpolation=None)
@@ -48,12 +48,12 @@ class FanslyConfig(object):
     #region config.ini Fields
 
     # TargetedCreator > username
-    user_names: set[str] | None = None
+    user_names: Optional[set[str]] = None
 
     # MyAccount
-    token: str | None = None
-    user_agent: str | None = None
-    check_key: str | None = None
+    token: Optional[str] = None
+    user_agent: Optional[str] = None
+    check_key: Optional[str] = None
     #session_id: str = 'null'
 
     # Options
@@ -86,6 +86,10 @@ class FanslyConfig(object):
     # Cache
     cached_device_id: Optional[str] = None
     cached_device_id_timestamp: Optional[int] = None
+
+    # Logic
+    check_key_pattern: Optional[str] = None
+    main_js_pattern: Optional[str] = None
 
     #endregion config.ini
 
@@ -120,14 +124,14 @@ class FanslyConfig(object):
         return self._api
 
 
-    def user_names_str(self) -> str | None:
+    def user_names_str(self) -> Optional[str]:
         """Returns a nicely formatted and alphabetically sorted list of
         creator names - for console or config file output.
         
         :return: A single line of all creator names, alphabetically sorted
             and separated by commas eg. "alice, bob, chris, dora".
             Returns None if user_names is None.
-        :rtype: str | None
+        :rtype: Optional[str]
         """
         if self.user_names is None:
             return None
@@ -190,6 +194,10 @@ class FanslyConfig(object):
             self.cached_device_id = self._api.device_id
             self.cached_device_id_timestamp = self._api.device_id_timestamp
 
+        # Logic
+        self._parser.set('Logic', 'check_key_pattern', str(self.check_key_pattern))
+        self._parser.set('Logic', 'main_js_pattern', str(self.main_js_pattern))
+
 
     def _load_raw_config(self) -> list[str]:
         if self.config_path is None:
@@ -235,13 +243,13 @@ class FanslyConfig(object):
         )
     
 
-    def get_unscrambled_token(self) -> str | None:
+    def get_unscrambled_token(self) -> Optional[str]:
         """Gets the unscrambled Fansly authorization token.
 
         Unscrambles the token if necessary.
                 
         :return: The unscrambled Fansly authorization token.
-        :rtype: str | None
+        :rtype: Optional[str]
         """
 
         if self.token is not None:

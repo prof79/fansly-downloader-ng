@@ -2,6 +2,11 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.6 2024-03-22
+
+Yay! I coded automatic retrieval of the check key from Fansly's page. Fallback to user input if it fails.
+Should the need arise the patterns for locating the JS file and check key are saved/loaded in the `[Logic]` section in `config.ini`.
+
 ### v0.9.5 2024-03-22
 
 Fixed headless/non-interactive input blooper during "check key" validation.

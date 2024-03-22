@@ -267,6 +267,23 @@ def load_config(config: FanslyConfig) -> None:
 
         #endregion Cache
 
+        #region Logic
+
+        key_default_pattern = r'''this\.checkKey_\s*=\s*["']([^"']+)["']'''
+        main_js_default_pattern = r'''\ssrc\s*=\s*"(main\..*?\.js)"'''
+
+        logic_section = 'Logic'
+
+        if not config._parser.has_section(logic_section):
+            config._parser.add_section(logic_section)
+
+        config.check_key_pattern = \
+            config._parser.get(logic_section, 'check_key_pattern', fallback=key_default_pattern)
+        config.main_js_pattern = \
+            config._parser.get(logic_section, 'main_js_pattern', fallback=main_js_default_pattern)
+
+        #endregion Logic
+
         # Safe to save! :-)
         save_config_or_raise(config)
 

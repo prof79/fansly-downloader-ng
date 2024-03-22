@@ -117,6 +117,11 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.9.6 2024-03-22
+
+Yay! I coded automatic retrieval of the check key from Fansly's page. Fallback to user input if it fails.
+Should the need arise the patterns for locating the JS file and check key are saved/loaded in the `[Logic]` section in `config.ini`.
+
 ### v0.9.5 2024-03-22
 
 Fixed headless/non-interactive input blooper during "check key" validation.

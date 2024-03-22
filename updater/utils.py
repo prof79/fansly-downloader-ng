@@ -5,15 +5,15 @@ import dateutil.parser
 import os
 import platform
 import re
-import requests
-import subprocess
-import sys
+# import requests
+# import subprocess
+# import sys
 
-import errors
+# import errors
 
 from pathlib import Path
 from pkg_resources._vendor.packaging.version import parse as parse_version
-from shutil import unpack_archive
+# from shutil import unpack_archive
 
 from config import FanslyConfig
 from textio import clear_terminal, print_error, print_info, print_update, print_warning
@@ -114,85 +114,85 @@ def perform_update(program_version: str, release_info: dict) -> bool:
 
     return False
 
-    # If current environment is pure Python prompt user to update Fansly Downloader NG themselves
-    if not getattr(sys, 'frozen', False):
-        print_warning(f"To update Fansly Downloader, please download the latest version from the GitHub repository.\n{20*' '}Only executable versions of the downloader receive & apply updates automatically.\n")
-        # but we don't care if user updates or just wants to see this prompt on every execution further on
-        return False
+    # # If current environment is pure Python prompt user to update Fansly Downloader NG themselves
+    # if not getattr(sys, 'frozen', False):
+    #     print_warning(f"To update Fansly Downloader, please download the latest version from the GitHub repository.\n{20*' '}Only executable versions of the downloader receive & apply updates automatically.\n")
+    #     # but we don't care if user updates or just wants to see this prompt on every execution further on
+    #     return False
     
-    # if in executable environment, allow self-update
-    print_update('Please be patient, automatic update initialized ...')
+    # # if in executable environment, allow self-update
+    # print_update('Please be patient, automatic update initialized ...')
     
-    # re-name current executable, so that the new version can delete it
-    binary_name = 'fansly-downloader-ng'
-    suffix = ''
-    new_name = 'deprecated_version'
+    # # re-name current executable, so that the new version can delete it
+    # binary_name = 'fansly-downloader-ng'
+    # suffix = ''
+    # new_name = 'deprecated_version'
     
-    if platform.system() == 'Windows':
-        suffix = '.exe'
-        binary_name = 'Fansly Downloader NG'
+    # if platform.system() == 'Windows':
+    #     suffix = '.exe'
+    #     binary_name = 'Fansly Downloader NG'
 
-    current_binary = Path.cwd() / f'{binary_name}{suffix}'
-    current_binary.rename(current_binary.parent / f'{new_name}{suffix}')
+    # current_binary = Path.cwd() / f'{binary_name}{suffix}'
+    # current_binary.rename(current_binary.parent / f'{new_name}{suffix}')
 
-    # Declare new release filepath
-    new_release_archive = Path.cwd() / release_info['release_name']
+    # # Declare new release filepath
+    # new_release_archive = Path.cwd() / release_info['release_name']
 
-    CHUNK_SIZE = 1_048_576
+    # CHUNK_SIZE = 1_048_576
 
-    # download new release
-    with requests.get(
-                release_info['download_url'],
-                allow_redirects=True,
-                headers = {
-                    'user-agent': f'Fansly Downloader NG {program_version}',
-                    'accept-language': 'en-US,en;q=0.9'
-                },
-                stream=True,
-            ) as release_download:
+    # # download new release
+    # with requests.get(
+    #             release_info['download_url'],
+    #             allow_redirects=True,
+    #             headers = {
+    #                 'user-agent': f'Fansly Downloader NG {program_version}',
+    #                 'accept-language': 'en-US,en;q=0.9'
+    #             },
+    #             stream=True,
+    #         ) as release_download:
 
-        if release_download.status_code != 200:
-            print_error(f"Failed downloading latest build. Status code: {release_download.status_code} | Body: \n{release_download.text}")
-            return False
+    #     if release_download.status_code != 200:
+    #         print_error(f"Failed downloading latest build. Status code: {release_download.status_code} | Body: \n{release_download.text}")
+    #         return False
 
-        # write to disk
-        with open(new_release_archive, 'wb') as f:
-            for chunk in release_download.iter_content(CHUNK_SIZE):
-                if chunk:
-                    f.write(chunk)
+    #     # write to disk
+    #     with open(new_release_archive, 'wb') as f:
+    #         for chunk in release_download.iter_content(CHUNK_SIZE):
+    #             if chunk:
+    #                 f.write(chunk)
     
-        # must be a common archive format (.zip, .tar, .tar.gz, .tar.bz2, etc.)
-        print_update('Unpacking new files ...')
-        unpack_archive(new_release_archive)
+    #     # must be a common archive format (.zip, .tar, .tar.gz, .tar.bz2, etc.)
+    #     print_update('Unpacking new files ...')
+    #     unpack_archive(new_release_archive)
 
-        # remove .zip leftovers
-        new_release_archive.unlink()
+    #     # remove .zip leftovers
+    #     new_release_archive.unlink()
 
-        # start executable from just downloaded latest platform compatible release, with a start argument
-        # which instructs it to delete old executable & display release notes for newest version
-        additional_arguments = ['--updated-to', release_info['release_version']]
-        # Carry command-line arguments over
-        arguments = sys.argv[1:] + additional_arguments
+    #     # start executable from just downloaded latest platform compatible release, with a start argument
+    #     # which instructs it to delete old executable & display release notes for newest version
+    #     additional_arguments = ['--updated-to', release_info['release_version']]
+    #     # Carry command-line arguments over
+    #     arguments = sys.argv[1:] + additional_arguments
         
-        current_platform = platform.system()
+    #     current_platform = platform.system()
 
-        if current_platform == 'Windows':
-            # i'm open for improvement suggestions, which will be insensitive to file paths & succeed passing start arguments to compiled executables
-            subprocess.run(['powershell', '-Command', f"Start-Process -FilePath '{current_binary}' -ArgumentList {', '.join(arguments)}"], shell=True)
+    #     if current_platform == 'Windows':
+    #         # i'm open for improvement suggestions, which will be insensitive to file paths & succeed passing start arguments to compiled executables
+    #         subprocess.run(['powershell', '-Command', f"Start-Process -FilePath '{current_binary}' -ArgumentList {', '.join(arguments)}"], shell=True)
 
-        elif current_platform == 'Linux':
-            # still sensitive to file paths?
-            subprocess.run([current_binary, *arguments], shell=True)
+    #     elif current_platform == 'Linux':
+    #         # still sensitive to file paths?
+    #         subprocess.run([current_binary, *arguments], shell=True)
 
-        elif current_platform == 'Darwin':
-            # still sensitive to file paths?
-            subprocess.run(['open', current_binary, *arguments], shell=False)
+    #     elif current_platform == 'Darwin':
+    #         # still sensitive to file paths?
+    #         subprocess.run(['open', current_binary, *arguments], shell=False)
 
-        else:
-            input(f"Platform {current_platform} not supported for auto-update, please update manually instead.")
-            os._exit(errors.UPDATE_MANUALLY)
+    #     else:
+    #         input(f"Platform {current_platform} not supported for auto-update, please update manually instead.")
+    #         os._exit(errors.UPDATE_MANUALLY)
         
-        os._exit(errors.UPDATE_SUCCESS)
+    #     os._exit(errors.UPDATE_SUCCESS)
 
 
 def post_update_steps(program_version: str, release_info: dict | None) -> None:

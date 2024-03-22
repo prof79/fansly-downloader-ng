@@ -17,7 +17,7 @@ from errors import ConfigError
 from pathio.pathio import ask_correct_dir
 from textio import print_config, print_error, print_info, print_warning
 from utils.common import save_config_or_raise
-from utils.web import guess_user_agent, open_get_started_url
+from utils.web import guess_check_key, guess_user_agent, open_get_started_url
 
 
 def validate_creator_names(config: FanslyConfig) -> bool:
@@ -308,12 +308,33 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
     )
     print()
 
+    if config.user_agent \
+            and config.main_js_pattern \
+            and config.check_key_pattern:
+
+        guessed_key = guess_check_key(
+            config.main_js_pattern,
+            config.check_key_pattern,
+            config.user_agent,
+        )
+
+        if guessed_key is not None:
+            config.check_key = guessed_key
+            save_config_or_raise(config)
+
+            print_config(
+                f"Check key guessed from Fansly homepage: `{config.check_key}`"
+            )
+            print()
+
+            return
+
     print_warning(
         f"Make sure, checking the main.js sources of the Fansly homepage, "
         f"\n{20*' '}that the `this.checkKey_` value is identical to this "
         f"\n{20*' '}(text within the single quotes only): `{config.check_key}`"
     )
-    
+
     if config.interactive:
 
         key_confirmation = input(
