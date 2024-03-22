@@ -329,10 +329,16 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 
             return
 
+        else:
+            print_warning(
+                f"Web retrieval of check key failed!"
+            )
+            print()
+
     print_warning(
         f"Make sure, checking the main.js sources of the Fansly homepage, "
-        f"\n{20*' '}that the `this.checkKey_` value is identical to this "
-        f"\n{20*' '}(text within the single quotes only): `{config.check_key}`"
+        f"\n{20*' '}that the expression assigend to `this.checkKey_` evaluates "
+        f"\n{20*' '}to this text: `{config.check_key}`"
     )
 
     if config.interactive:

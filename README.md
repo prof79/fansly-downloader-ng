@@ -117,25 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.6 2024-03-22
+### v0.9.7 2024-03-22
 
-Yay! I coded automatic retrieval of the check key from Fansly's page. Fallback to user input if it fails.
-Should the need arise the patterns for locating the JS file and check key are saved/loaded in the `[Logic]` section in `config.ini`.
-
-### v0.9.5 2024-03-22
-
-Fixed headless/non-interactive input blooper during "check key" validation.
-
-### v0.9.4 2024-03-22
-
-Fix `check_key` setting in `config.ini` not honored.
-
-### v0.9.3 2024-03-19
-
-Be warned, Fansly may ban you using this! If you get errors be careful not to challenge your luck/try too often.
-
-Well, stupid me, being overworked and tired, forgot to put an essential function call in after successful testing was complete!
-Seems to work again, for now - I hope ...
+Fix for update checks (hopefully) and disabled SSL verification for WebSockets due to a specific issue.
+Things are complicated for you now, check key must be deciphered by evaluating a `JavaScript` expression.
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 

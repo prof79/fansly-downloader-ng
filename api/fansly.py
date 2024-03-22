@@ -7,6 +7,7 @@ import json
 import math
 import random
 import requests
+import ssl
 
 from datetime import datetime, timezone
 from requests import Response
@@ -308,11 +309,16 @@ class FanslyApi(object):
 
         headers = self.get_http_headers('', add_fansly_headers=False)
 
+        ssl_context = ssl.SSLContext()
+        ssl_context.verify_mode = ssl.CERT_NONE
+        ssl_context.check_hostname = False
+
         # TODO: Security
         async with ws_client.connect(
                     uri='wss://wsv3.fansly.com',
                     user_agent_header=self.user_agent,
                     origin='https://fansly.com',
+                    ssl=ssl_context,
                     #extra_headers=headers,
                 ) as websocket:
 

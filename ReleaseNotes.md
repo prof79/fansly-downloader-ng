@@ -2,6 +2,11 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.7 2024-03-22
+
+Fix for update checks (hopefully) and disabled SSL verification for WebSockets due to a specific issue.
+Things are complicated for you now, check key must be deciphered by evaluating a `JavaScript` expression.
+
 ### v0.9.6 2024-03-22
 
 Yay! I coded automatic retrieval of the check key from Fansly's page. Fallback to user input if it fails.

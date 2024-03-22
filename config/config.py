@@ -174,7 +174,16 @@ def load_config(config: FanslyConfig) -> None:
 
         config.token = config._parser.get(account_section, 'Authorization_Token', fallback=replace_me_str) # string
         config.user_agent = config._parser.get(account_section, 'User_Agent', fallback=replace_me_str) # string
-        config.check_key = config._parser.get(account_section, 'Check_Key', fallback='negwij-zyZnak-wavje1') # string
+
+        default_check_key = 'qybZy9-fyszis-bybxyf'
+
+        config.check_key = config._parser.get(account_section, 'Check_Key', fallback=default_check_key) # string
+
+        if config.check_key in [
+                    'negwij-zyZnek-wavje1',
+                    'negwij-zyZnak-wavje1',
+                ]:
+            config.check_key = default_check_key
 
         #endregion MyAccount
 

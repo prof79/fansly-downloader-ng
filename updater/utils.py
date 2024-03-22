@@ -102,6 +102,15 @@ def perform_update(program_version: str, release_info: dict) -> bool:
     """
     print_warning(f"A new version of Fansly Downloader NG has been found on GitHub - update recommended.")
     
+    if not release_info:
+        return False
+
+    keys = ['release_version', 'created_at', 'download_count']
+
+    for key in keys:
+        if not key in release_info.keys():
+            return False
+
     print_info(
         f"Latest Build:"
         f"\n{16*' '} Version: {release_info['release_version']}"
