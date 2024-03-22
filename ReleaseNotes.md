@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.4 2024-03-22
+
+Fix `check_key` setting in `config.ini` not honored.
+
 ### v0.9.3 2024-03-19
 
 Be warned, Fansly may ban you using this! If you get errors be careful not to challenge your luck/try too often.
