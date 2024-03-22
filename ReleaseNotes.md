@@ -2,6 +2,10 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.5 2024-03-22
+
+Fixed headless/non-interactive input blooper during "check key" validation.
+
 ### v0.9.4 2024-03-22
 
 Fix `check_key` setting in `config.ini` not honored.

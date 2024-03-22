@@ -337,42 +337,42 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
                     save_config_or_raise(config)
     
     else:
-        input_enter_continue()
+        input_enter_continue(config.interactive)
 
 
-def validate_adjust_session_id(config: FanslyConfig) -> None:
-    """Validates the input value for `session_id` in `config.ini`.
+# def validate_adjust_session_id(config: FanslyConfig) -> None:
+#     """Validates the input value for `session_id` in `config.ini`.
 
-    :param FanslyConfig config: The configuration to validate and correct.
-    """
+#     :param FanslyConfig config: The configuration to validate and correct.
+#     """
 
-    if config.session_id is None or config.session_id.lower() == 'null':
-        print_warning(
-            f"Session ID is invalid. Please provide a valid value from your browser's DevTools:"
-            f"\n{20*' '}Look for `fansly-session-id` in requests or `id` from `session_active_session`"
-            f"\n{20*' '}in local storage for https://fansly.com (18 digits)."
-        )
+#     if config.session_id is None or config.session_id.lower() == 'null':
+#         print_warning(
+#             f"Session ID is invalid. Please provide a valid value from your browser's DevTools:"
+#             f"\n{20*' '}Look for `fansly-session-id` in requests or `id` from `session_active_session`"
+#             f"\n{20*' '}in local storage for https://fansly.com (18 digits)."
+#         )
     
-    if config.interactive:
+#     if config.interactive:
 
-        done = False
+#         done = False
 
-        while not done:
-            session_id = input(f"\n{20*' '}► Session ID: "
-            ).strip()
+#         while not done:
+#             session_id = input(f"\n{20*' '}► Session ID: "
+#             ).strip()
 
-            if re.match(r'\d{18}', session_id):
-                done = True
-                config.session_id = session_id
-                save_config_or_raise(config)
+#             if re.match(r'\d{18}', session_id):
+#                 done = True
+#                 config.session_id = session_id
+#                 save_config_or_raise(config)
             
-            else:
-                print_warning(
-                    f'Invalid session ID, should be 18 digits. Please try again.'
-                )
+#             else:
+#                 print_warning(
+#                     f'Invalid session ID, should be 18 digits. Please try again.'
+#                 )
     
-    else:
-        input_enter_close()
+#     else:
+#         input_enter_close(config.interactive)
 
 
 def validate_adjust_download_directory(config: FanslyConfig) -> None:

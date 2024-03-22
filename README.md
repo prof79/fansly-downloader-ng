@@ -117,6 +117,10 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
+### v0.9.5 2024-03-22
+
+Fixed headless/non-interactive input blooper during "check key" validation.
+
 ### v0.9.4 2024-03-22
 
 Fix `check_key` setting in `config.ini` not honored.

@@ -76,7 +76,7 @@ def print_warning(message: str) -> None:
     output(3, ' WARNING', '<yellow>', message)
 
 
-def input_enter_close(interactive: bool=True) -> None:
+def input_enter_close(interactive: bool) -> None:
     """Asks user for <ENTER> to close and exits the program.
     In non-interactive mode sleeps instead, then exits.
     """
@@ -90,7 +90,7 @@ def input_enter_close(interactive: bool=True) -> None:
     sys.exit()
 
 
-def input_enter_continue(interactive: bool=True) -> None:
+def input_enter_continue(interactive: bool) -> None:
     """Asks user for <ENTER> to continue.
     In non-interactive mode sleeps instead.
     """
