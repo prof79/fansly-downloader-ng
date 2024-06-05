@@ -31,22 +31,25 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
         )
 
     else:
-        print_info(f"Please enter the ID of the post you would like to download."
-            f"\n{17*' '}After you click on a post, it will show in your browsers URL bar."
+        print_info(f"Please enter the link or the ID of the post you would like to download."
+            f"\n{17*' '}After you click on a post, the ID will show in your browser's URL bar."
         )
         print()
         
         while True:
-            post_id = input(f"\n{17*' '}► Post ID: ")
+            requested_post = input(f"\n{17*' '}► Post Link or ID: ")
+            post_id = requested_post
+            if requested_post.startswith("https://fansly.com/"):
+                post_id = requested_post.split('/')[-1]
 
             if is_valid_post_id(post_id):
                 break
 
             else:
-                print_error(f"The input string '{post_id}' can not be a valid post ID."
-                    f"\n{22*' '}The last few numbers in the url is the post ID"
+                print_error(f"The input string '{post_id}' can not be a valid post link or ID."
+                    f"\n{22*' '}The last few numbers in the URL are the post ID"
                     f"\n{22*' '}Example: 'https://fansly.com/post/1283998432982'"
-                    f"\n{22*' '}In the example, '1283998432982' would be the post ID.",
+                    f"\n{22*' '}In the example, '1283998432982' is the post ID.",
                     17
                 )
 
@@ -83,9 +86,9 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
                 state.creator_name = creator_username
     
                 if creator_display_name and creator_username:
-                    print_info(f"Inspecting a post by {creator_display_name} (@{creator_username})")
+                    print_info(f"Inspecting post {post_id} by {creator_display_name} (@{creator_username})")
                 else:
-                    print_info(f"Inspecting a post by {creator_username.capitalize()}")
+                    print_info(f"Inspecting post {post_id} by {creator_username.capitalize()}")
 
             # Deferred deduplication init because directory may have changed
             # depending on post creator (!= configured creator)    
