@@ -9,7 +9,7 @@ from .types import DownloadType
 from config import FanslyConfig
 from fileio.dedupe import dedupe_init
 from textio import input_enter_continue, print_error, print_info, print_warning
-from utils.common import is_valid_post_id
+from utils.common import is_valid_post_id, get_post_id_from_request
 
 
 def download_single_post(config: FanslyConfig, state: DownloadState):
@@ -38,9 +38,7 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
         
         while True:
             requested_post = input(f"\n{17*' '}► Post Link or ID: ")
-            post_id = requested_post
-            if requested_post.startswith("https://fansly.com/"):
-                post_id = requested_post.split('/')[-1]
+            post_id = get_post_id_from_request(requested_post)
 
             if is_valid_post_id(post_id):
                 break
