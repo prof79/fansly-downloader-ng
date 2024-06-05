@@ -73,7 +73,7 @@ def set_create_directory_for_download(config: FanslyConfig, state: DownloadState
         elif state.download_type == DownloadType.TIMELINE and config.separate_timeline:
             download_directory = user_base_path / 'Timeline'
 
-        elif state.download_type == DownloadType.SINGLE and config.separate_timeline:
+        elif state.download_type == DownloadType.POSTS and config.separate_timeline:
             download_directory = user_base_path / 'Timeline'
 
         # Save state
