@@ -124,7 +124,7 @@ def parse_args() -> argparse.Namespace:
         '--single',
         required=False,
         default=None,
-        metavar='POST_ID',
+        metavar='REQUESTED_POST',
         dest='download_mode_single',
         help='Use "Single" download mode. This will download a single post '
             "by link or ID from an arbitrary creator. "
