@@ -1,6 +1,5 @@
 """Fansly Web API"""
 
-
 import asyncio
 import binascii
 import json
@@ -21,19 +20,19 @@ from utils.web import get_flat_qs_dict, split_url
 class FanslyApi(object):
 
     def __init__(
-                self,
-                token: str,
-                user_agent: str,
-                check_key: str,
-                #session_id: str,
-                device_id: Optional[str]=None,
-                device_id_timestamp: Optional[int]=None,
-                on_device_updated: Optional[Callable[[], Any]]=None,
-            ) -> None:
+            self,
+            token: str,
+            user_agent: str,
+            check_key: str,
+            # session_id: str,
+            device_id: Optional[str] = None,
+            device_id_timestamp: Optional[int] = None,
+            on_device_updated: Optional[Callable[[], Any]] = None,
+    ) -> None:
 
         self.token = token
         self.user_agent = user_agent
-    
+
         # Define requests session
         self.http_session = requests.Session()
 
@@ -58,18 +57,16 @@ class FanslyApi(object):
         if self.session_id == 'null':
             self.setup_session()
 
+    # region HTTP Header Management
 
-    #region HTTP Header Management
-
-    def get_text_accept(self) -> str:
+    @staticmethod
+    def get_text_accept() -> str:
         return 'application/json, text/plain, */*'
-
 
     def set_text_accept(self, headers: dict[str, str]):
         headers['Accept'] = self.get_text_accept()
 
-
-    def get_common_headers(self, alternate_token: Optional[str]=None) -> dict[str, str]:
+    def get_common_headers(self, alternate_token: Optional[str] = None) -> dict[str, str]:
         token = self.token
 
         if alternate_token:
@@ -88,13 +85,12 @@ class FanslyApi(object):
 
         return headers
 
-
     def get_http_headers(
-                self,
-                url: str,
-                add_fansly_headers: bool=True,
-                alternate_token: Optional[str]=None,
-            ) -> dict[str, str]:
+            self,
+            url: str,
+            add_fansly_headers: bool = True,
+            alternate_token: Optional[str] = None,
+    ) -> dict[str, str]:
 
         headers = self.get_common_headers(alternate_token=alternate_token)
 
@@ -121,20 +117,19 @@ class FanslyApi(object):
 
         return headers
 
-    #endregion
+    # endregion
 
+    # region HTTP Query String Management
 
-    #region HTTP Query String Management
-
-    def get_ngsw_params(self) -> dict[str, str]:
+    @staticmethod
+    def get_ngsw_params() -> dict[str, str]:
         return {
             'ngsw-bypass': 'true',
         }
 
-    #endregion
+    # endregion
 
-
-    #region HTTP Requests
+    # region HTTP Requests
 
     def cors_options_request(self, url: str) -> None:
         """Performs an OPTIONS CORS request to Fansly servers."""
@@ -156,16 +151,15 @@ class FanslyApi(object):
             cookies=None,
         )
 
-
     def get_with_ngsw(
-                self,
-                url: str,
-                params: dict[str, str]={},
-                cookies: dict[str, str]={},
-                stream: bool=False,
-                add_fansly_headers: bool=True,
-                alternate_token: Optional[str]=None,
-            ) -> Response:
+            self,
+            url: str,
+            params: dict[str, str] = {},
+            cookies: dict[str, str] = {},
+            stream: bool = False,
+            add_fansly_headers: bool = True,
+            alternate_token: Optional[str] = None,
+    ) -> Response:
 
         self.update_client_timestamp()
 
@@ -179,7 +173,7 @@ class FanslyApi(object):
             **params,
         }
 
-        headers=self.get_http_headers(
+        headers = self.get_http_headers(
             url=url,
             add_fansly_headers=add_fansly_headers,
             alternate_token=alternate_token,
@@ -201,19 +195,21 @@ class FanslyApi(object):
 
         return self.http_session.get(**arguments)
 
-
-    def get_client_account_info(self, alternate_token: Optional[str]=None) -> Response:
+    def get_client_account_info(self, alternate_token: Optional[str] = None) -> Response:
         return self.get_with_ngsw(
             url='https://apiv3.fansly.com/api/v1/account/me',
             alternate_token=alternate_token,
         )
 
-
-    def get_creator_account_info(self, creator_name: str) -> Response:
+    def get_creator_account_info_by_name(self, creator_name: str) -> Response:
         return self.get_with_ngsw(
             url=f"https://apiv3.fansly.com/api/v1/account?usernames={creator_name}",
         )
 
+    def get_creator_account_info_by_id(self, creator_id: str) -> Response:
+        return self.get_with_ngsw(
+            url=f"https://apiv3.fansly.com/api/v1/account?ids={creator_id}"
+        )
 
     def get_media_collections(self) -> Response:
         custom_params = {
@@ -224,8 +220,20 @@ class FanslyApi(object):
         return self.get_with_ngsw(
             url='https://apiv3.fansly.com/api/v1/account/media/orders/',
             params=custom_params,
-    )
+        )
 
+    def get_album(self, album_id: str) -> Response:
+        custom_params = {
+            'albumId': album_id,
+            'before': '0',
+            'after': '0',
+            'limit': '9999'
+        }
+
+        return self.get_with_ngsw(
+            url=f'https://apiv3.fansly.com/api/v1/uservault/album/content',
+            params=custom_params
+        )
 
     def get_account_media(self, media_ids: str) -> Response:
         """Retrieve account media by ID(s).
@@ -240,7 +248,6 @@ class FanslyApi(object):
             f"https://apiv3.fansly.com/api/v1/account/media?ids={media_ids}",
         )
 
-
     def get_post(self, post_id: str) -> Response:
         custom_params = {
             'ids': post_id,
@@ -250,7 +257,6 @@ class FanslyApi(object):
             url='https://apiv3.fansly.com/api/v1/post',
             params=custom_params,
         )
-
 
     def get_timeline(self, creator_id: str, timeline_cursor: str) -> Response:
         custom_params = {
@@ -265,12 +271,10 @@ class FanslyApi(object):
             params=custom_params,
         )
 
-
     def get_group(self) -> Response:
         return self.get_with_ngsw(
             url='https://apiv3.fansly.com/api/v1/group',
         )
-
 
     def get_message(self, params: dict[str, str]) -> Response:
         return self.get_with_ngsw(
@@ -278,17 +282,15 @@ class FanslyApi(object):
             params=params,
         )
 
-
     def get_device_id_info(self) -> Response:
         return self.get_with_ngsw(
             url='https://apiv3.fansly.com/api/v1/device/id',
             add_fansly_headers=False,
         )
 
-    #endregion
+    # endregion
 
-
-    #region WebSocket Communication
+    # region WebSocket Communication
 
     async def get_active_session_async(self) -> str:
         # const websocket = WebSocket("ws://localhost:8001/")
@@ -304,7 +306,7 @@ class FanslyApi(object):
             'd': json.dumps(token),
         }
 
-        #message_str = json.dumps(message)
+        # message_str = json.dumps(message)
         message_str = '{"t":1,"d":"{\\"token\\":\\"' + self.token + '\\"}"}'
 
         headers = self.get_http_headers('', add_fansly_headers=False)
@@ -315,13 +317,12 @@ class FanslyApi(object):
 
         # TODO: Security
         async with ws_client.connect(
-                    uri='wss://wsv3.fansly.com',
-                    user_agent_header=self.user_agent,
-                    origin='https://fansly.com',
-                    ssl=ssl_context,
-                    #extra_headers=headers,
-                ) as websocket:
-
+                uri='wss://wsv3.fansly.com',
+                user_agent_header=self.user_agent,
+                origin='https://fansly.com',
+                ssl=ssl_context,
+                # extra_headers=headers,
+        ) as websocket:
             # await websocket.send('p')
             # ping_response = await websocket.recv()
 
@@ -337,14 +338,12 @@ class FanslyApi(object):
 
             return response_data['session']['id']
 
-
     def get_active_session(self) -> str:
         return asyncio.run(self.get_active_session_async())
 
-    #region
+    # region
 
-
-    #region Utility Methods
+    # region Utility Methods
 
     def setup_session(self) -> bool:
         try:
@@ -354,19 +353,17 @@ class FanslyApi(object):
             session_id = self.get_active_session()
 
             self.session_id = session_id
-        
+
         except Exception as ex:
             raise RuntimeError(f'Error during session setup: {ex}')
 
         return True
-
 
     @staticmethod
     def get_timestamp_ms() -> int:
         timestamp = datetime.now(timezone.utc).timestamp()
 
         return int(timestamp * 1000)
-
 
     def get_client_timestamp(self) -> int:
         # this.currentCachedTimestamp_ =
@@ -381,7 +378,6 @@ class FanslyApi(object):
 
         return fansly_client_ts
 
-
     def update_client_timestamp(self):
         new_timestamp = self.get_client_timestamp()
 
@@ -391,14 +387,12 @@ class FanslyApi(object):
         if new_timestamp > self.client_timestamp:
             self.client_timestamp = new_timestamp
 
-
     def to_str16(self, number: int) -> str:
         by = number.to_bytes(64, byteorder='big')
 
         raw_string = binascii.hexlify(by).decode('utf-8')
 
         return raw_string.lstrip('0')
-
 
     @staticmethod
     def int32(val):
@@ -409,26 +403,23 @@ class FanslyApi(object):
 
         return c_int32(val).value
 
-
     @staticmethod
     def rshift32(number: int, bits: int):
         int_max_value = 0x100000000
         return number >> bits if number >= 0 else (number + int_max_value) >> bits
-
 
     @staticmethod
     def imul32(number1: int, number2: int) -> int:
         this = FanslyApi
         return this.int32(number1 * number2)
 
-
     @staticmethod
-    def cyrb53(text: str, seed: int=0) -> int:
+    def cyrb53(text: str, seed: int = 0) -> int:
         # https://github.com/mbaersch/cyrb53-hasher
         # https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript/52171480#52171480
         # cyrb53(message, seed = 0) {
         #     let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    
+
         #     for (let charCode, strPos = 0; strPos < message.length; strPos++) {
         #         charCode = message.charCodeAt(strPos);
         #         h1 = this.imul(h1 ^ charCode, 2654435761);
@@ -450,13 +441,12 @@ class FanslyApi(object):
             h1 = this.imul32(h1 ^ char_code, 2654435761)
             h2 = this.imul32(h2 ^ char_code, 1597334677)
 
-        h1 =  this.imul32(h1 ^ this.rshift32(h1, 16), 2246822507)
+        h1 = this.imul32(h1 ^ this.rshift32(h1, 16), 2246822507)
         h1 ^= this.imul32(h2 ^ this.rshift32(h2, 13), 3266489909)
-        h2 =  this.imul32(h2 ^ this.rshift32(h2, 16), 2246822507)
+        h2 = this.imul32(h2 ^ this.rshift32(h2, 16), 2246822507)
         h2 ^= this.imul32(h1 ^ this.rshift32(h1, 13), 3266489909)
 
         return 4294967296 * (2097151 & h2) + (this.rshift32(h1, 0))
-
 
     def get_fansly_client_check(self, url: str) -> str:
         # let urlPathName = new URL(url).pathname;
@@ -484,7 +474,6 @@ class FanslyApi(object):
 
         return digest_str
 
-
     def validate_json_response(self, response: Response) -> bool:
         response.raise_for_status()
 
@@ -503,17 +492,15 @@ class FanslyApi(object):
             f'Fansly API: Invalid or failed JSON response:\n{decoded_response}'
         )
 
-
     def get_json_response_contents(self, response: Response) -> dict:
         self.validate_json_response(response)
 
         return response.json()['response']
 
-
     def get_client_user_name(
-                self,
-                alternate_token: Optional[str]=None
-            ) -> str | None:
+            self,
+            alternate_token: Optional[str] = None
+    ) -> str | None:
         """Fetches user account information for a particular authorization token.
 
         :param alternate_token: An alternate authorization token string for
@@ -539,12 +526,10 @@ class FanslyApi(object):
 
         return None
 
-
     def get_device_id(self) -> str:
         device_response = self.get_device_id_info()
 
         return str(self.get_json_response_contents(device_response))
-
 
     def update_device_id(self) -> str:
         offset_minutes = 180
@@ -562,4 +547,4 @@ class FanslyApi(object):
 
         return self.device_id
 
-    #region
+    # region

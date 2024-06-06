@@ -1,6 +1,5 @@
 """Fansly Account Information"""
 
-
 import requests
 
 from typing import Any
@@ -36,7 +35,7 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
 
         try:
             raw_response = config.get_api() \
-                .get_creator_account_info(state.creator_name)
+                .get_creator_account_info_by_name(state.creator_name)
 
             account = raw_response.json()['response'][0]
 
@@ -49,10 +48,10 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
                     f"API returned unauthorized (24). " \
                     f"This is most likely because of a wrong authorization " \
                     f"token in the configuration file." \
-                    f"\n{21*' '}Have you surfed Fansly on this browser recently?" \
-                    f"\n{21*' '}Used authorization token: '{config.token}'" \
+                    f"\n{21 * ' '}Have you surfed Fansly on this browser recently?" \
+                    f"\n{21 * ' '}Used authorization token: '{config.token}'" \
                     f'\n  {str(e)}\n  {raw_response.text}'
-                
+
                 raise ApiAuthenticationError(message)
 
             else:
@@ -81,7 +80,8 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
             state.total_timeline_pictures = account['timelineStats']['imageCount']
 
         except KeyError:
-            raise ApiAccountInfoError(f"Can not get timelineStats for creator username '{state.creator_name}'; you most likely misspelled it! (27)")
+            raise ApiAccountInfoError(
+                f"Can not get timelineStats for creator username '{state.creator_name}'; you most likely misspelled it! (27)")
 
         state.total_timeline_videos = account['timelineStats']['videoCount']
 

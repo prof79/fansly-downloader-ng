@@ -158,6 +158,9 @@ def main(config: FanslyConfig) -> int:
                 if config.download_mode == DownloadMode.SINGLE:
                     download_single_post(config, state)
 
+                elif config.download_mode == DownloadMode.ALBUM:
+                    download_album(config, state)
+
                 elif config.download_mode == DownloadMode.COLLECTION:
                     download_collections(config, state)
 
