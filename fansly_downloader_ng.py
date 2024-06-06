@@ -138,7 +138,7 @@ def main(config: FanslyConfig) -> int:
                 state = DownloadState(creator_name=creator_name)
 
                 # Special treatment for deviating folder names later
-                if not config.download_mode == DownloadMode.SINGLE:
+                if not any([config.download_mode == DownloadMode.SINGLE, config.download_mode == DownloadMode.ALBUM]):
                     dedupe_init(config, state)
 
                 print_download_info(config)
