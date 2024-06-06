@@ -1,6 +1,5 @@
 """Configuration Class for Shared State"""
 
-
 from configparser import ConfigParser
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,9 +13,9 @@ from api import FanslyApi
 
 @dataclass
 class FanslyConfig(object):
-    #region Fields
+    # region Fields
 
-    #region File-Independent Fields
+    # region File-Independent Fields
 
     # Mandatory property
     # This should be set to __version__ in the main script.
@@ -43,9 +42,9 @@ class FanslyConfig(object):
     _parser = ConfigParser(interpolation=None)
     _api: Optional[FanslyApi] = None
 
-    #endregion File-Independent
+    # endregion File-Independent
 
-    #region config.ini Fields
+    # region config.ini Fields
 
     # TargetedCreator > username
     user_names: Optional[set[str]] = None
@@ -54,7 +53,7 @@ class FanslyConfig(object):
     token: Optional[str] = None
     user_agent: Optional[str] = None
     check_key: Optional[str] = None
-    #session_id: str = 'null'
+    # session_id: str = 'null'
 
     # Options
     # "Normal" | "Timeline" | "Messages" | "Single" | "Collection"
@@ -69,6 +68,7 @@ class FanslyConfig(object):
     separate_timeline: bool = True
     show_downloads: bool = True
     show_skipped_downloads: bool = True
+    minimize_content: bool = False
     use_duplicate_threshold: bool = False
     use_folder_suffix: bool = True
     # Show input prompts or sleep - for automation/scheduling purposes
@@ -91,11 +91,11 @@ class FanslyConfig(object):
     check_key_pattern: Optional[str] = None
     main_js_pattern: Optional[str] = None
 
-    #endregion config.ini
+    # endregion config.ini
 
-    #endregion Fields
+    # endregion Fields
 
-    #region Methods
+    # region Methods
 
     def get_api(self) -> FanslyApi:
         if self._api is None:
@@ -107,7 +107,7 @@ class FanslyConfig(object):
                     token=token,
                     user_agent=user_agent,
                     check_key=self.check_key,
-                    #session_id=self.session_id,
+                    # session_id=self.session_id,
                     device_id=self.cached_device_id,
                     device_id_timestamp=self.cached_device_id_timestamp,
                     on_device_updated=self._save_config,
@@ -115,14 +115,13 @@ class FanslyConfig(object):
 
                 # Explicit save - on init of FanslyApi() self._api was None
                 self._save_config()
-            
+
             else:
                 raise RuntimeError(
                     'Token or user agent error creating Fansly API object.'
                 )
 
         return self._api
-
 
     def user_names_str(self) -> Optional[str]:
         """Returns a nicely formatted and alphabetically sorted list of
@@ -138,17 +137,14 @@ class FanslyConfig(object):
 
         return ', '.join(sorted(self.user_names))
 
-
     def download_mode_str(self) -> str:
         """Gets the string representation of `download_mode`."""
         return str(self.download_mode).capitalize()
-
 
     def metadata_handling_str(self) -> str:
         """Gets the string representation of `metadata_handling`."""
         return str(self.metadata_handling).capitalize()
 
-    
     def _sync_settings(self) -> None:
         """Syncs the settings of the config object
         to the config parser/config file.
@@ -160,7 +156,7 @@ class FanslyConfig(object):
         self._parser.set('MyAccount', 'authorization_token', self.token)
         self._parser.set('MyAccount', 'user_agent', self.user_agent)
         self._parser.set('MyAccount', 'check_key', self.check_key)
-        #self._parser.set('MyAccount', 'session_id', self.session_id)
+        # self._parser.set('MyAccount', 'session_id', self.session_id)
 
         if self.download_directory is None:
             self._parser.set('Options', 'download_directory', 'Local_directory')
@@ -169,10 +165,11 @@ class FanslyConfig(object):
 
         self._parser.set('Options', 'download_mode', self.download_mode_str())
         self._parser.set('Options', 'metadata_handling', self.metadata_handling_str())
-        
+
         # Booleans
         self._parser.set('Options', 'show_downloads', str(self.show_downloads))
         self._parser.set('Options', 'show_skipped_downloads', str(self.show_skipped_downloads))
+        self._parser.set('Options', 'minimize_output', str(self.minimize_content))
         self._parser.set('Options', 'download_media_previews', str(self.download_media_previews))
         self._parser.set('Options', 'open_folder_when_finished', str(self.open_folder_when_finished))
         self._parser.set('Options', 'separate_messages', str(self.separate_messages))
@@ -198,14 +195,12 @@ class FanslyConfig(object):
         self._parser.set('Logic', 'check_key_pattern', str(self.check_key_pattern))
         self._parser.set('Logic', 'main_js_pattern', str(self.main_js_pattern))
 
-
     def _load_raw_config(self) -> list[str]:
         if self.config_path is None:
             return []
 
         else:
             return self._parser.read(self.config_path)
-
 
     def _save_config(self) -> bool:
         if self.config_path is None:
@@ -218,7 +213,6 @@ class FanslyConfig(object):
                 self._parser.write(f)
                 return True
 
-
     def token_is_valid(self) -> bool:
         if self.token is None:
             return False
@@ -230,7 +224,6 @@ class FanslyConfig(object):
             ]
         )
 
-    
     def useragent_is_valid(self) -> bool:
         if self.user_agent is None:
             return False
@@ -241,7 +234,6 @@ class FanslyConfig(object):
                 'ReplaceMe' in self.user_agent,
             ]
         )
-    
 
     def get_unscrambled_token(self) -> Optional[str]:
         """Gets the unscrambled Fansly authorization token.
@@ -253,16 +245,16 @@ class FanslyConfig(object):
         """
 
         if self.token is not None:
-            F, c ='fNs', self.token
-            
+            F, c = 'fNs', self.token
+
             if c[-3:] == F:
                 c = c.rstrip(F)
 
                 A, B, C = [''] * len(c), 7, 0
-                
+
                 for D in range(B):
-                    for E in range(D, len(A), B) : A[E] = c[C]; C += 1
-                
+                    for E in range(D, len(A), B): A[E] = c[C]; C += 1
+
                 return ''.join(A)
 
             else:
@@ -270,4 +262,4 @@ class FanslyConfig(object):
 
         return self.token
 
-    #endregion
+    # endregion

@@ -111,26 +111,27 @@ def main(config: FanslyConfig) -> int:
             or config.download_mode == DownloadMode.NOTSET:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
 
-    print()
-    print_info(f'Token: {config.token}')
-    print_info(f'Check Key: {config.check_key}')
-    print_info(
-        f'Device ID: {config.get_api().device_id} '
-        f'({datetime.fromtimestamp(config.get_api().device_id_timestamp / 1000)})'
-    )
-    print_info(f'Session ID: {config.get_api().session_id}')
-
     global_download_state = GlobalState()
 
-    # M3U8 fixing interim
     print()
-    print_info(
-        "Due to important memory usage and video format bugfixes, "
-        "existing media items "
-        f"\n{' '*16} need to be re-hashed (`_hash_`/`_hash1_` to `_hash2_`)."
-        f"\n{' '*16} Affected files will automatically be renamed in the background."
-    )
-    print()
+    if not config.minimize_content:
+        print_info(f'Token: {config.token}')
+        print_info(f'Check Key: {config.check_key}')
+        print_info(
+            f'Device ID: {config.get_api().device_id} '
+            f'({datetime.fromtimestamp(config.get_api().device_id_timestamp / 1000)})'
+        )
+        print_info(f'Session ID: {config.get_api().session_id}')
+
+        # M3U8 fixing interim
+        print()
+        print_info(
+            "Due to important memory usage and video format bugfixes, "
+            "existing media items "
+            f"\n{' '*16} need to be re-hashed (`_hash_`/`_hash1_` to `_hash2_`)."
+            f"\n{' '*16} Affected files will automatically be renamed in the background."
+        )
+        print()
 
     for creator_name in sorted(config.user_names):
         with Timer(creator_name):
