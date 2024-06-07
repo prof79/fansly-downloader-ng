@@ -1,6 +1,5 @@
 """Common Download Functions"""
 
-
 import traceback
 
 from typing import Any
@@ -91,11 +90,11 @@ def print_download_info(config: FanslyConfig) -> None:
 
 
 def process_download_accessible_media(
-            config: FanslyConfig,
-            state: DownloadState,
-            media_infos: list[dict],
-            post_id: str | None=None,
-        ) -> bool:
+        config: FanslyConfig,
+        state: DownloadState,
+        media_infos: list[dict],
+        post_id: str | None = None,
+) -> bool:
     """Filters all media found in posts, messages, ... and downloads them.
 
     :param FanslyConfig config: The downloader configuration.
@@ -127,8 +126,8 @@ def process_download_accessible_media(
     accessible_media = [
         item for item in media_items
         if item.download_url \
-            and (item.is_preview == config.download_media_previews \
-                    or not item.is_preview)
+           and (item.is_preview == config.download_media_previews \
+                or not item.is_preview)
     ]
 
     # Special messages handling
@@ -141,8 +140,10 @@ def process_download_accessible_media(
         # Don't forget to save/reset afterwards.
         config.DUPLICATE_THRESHOLD = int(0.2 * state.total_message_items)
 
-    # at this point we have already parsed the whole post object and determined what is scrapable with the code above
-    print_info(f"@{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
+    if not config.minimize_output:
+        # at this point we have already parsed the whole post object and determined what is scrapable with the code above
+        print_info(
+            f"@{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
 
     set_create_directory_for_download(config, state)
 
@@ -151,7 +152,8 @@ def process_download_accessible_media(
         download_media(config, state, accessible_media)
 
     except DuplicateCountError:
-        print_warning(f"Already downloaded all possible {state.download_type_str()} content! [Duplicate threshold exceeded {config.DUPLICATE_THRESHOLD}]")
+        print_warning(
+            f"Already downloaded all possible {state.download_type_str()} content! [Duplicate threshold exceeded {config.DUPLICATE_THRESHOLD}]")
         # "Timeline" needs a way to break the loop.
         if state.download_type == DownloadType.TIMELINE:
             return False

@@ -243,7 +243,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
         )
 
     if config.token_is_valid():
-        print_info(f"Token validation successful!")
+        print_info(f"Token validation successful!\n")
 
 
 def validate_adjust_user_agent(config: FanslyConfig) -> None:
@@ -304,7 +304,7 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
         print_info(f"Success! Applied a browser user-agent to config.ini file.\n")
 
     else:
-        print_info(f"User agent validation successful!")
+        print_info(f"User agent validation successful!\n")
 
 
 def validate_adjust_check_key(config: FanslyConfig) -> None:
@@ -312,7 +312,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 
     :param FanslyConfig config: The configuration to validate and correct.
     """
-    if not config.minimize_content:
+    if not config.minimize_output:
         print_warning(
             f'!!! FANSLY MAY BAN YOU FOR USING THIS SOFTWARE, BE WARNED !!!'
         )
@@ -345,8 +345,8 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
             )
             print()
 
-    if config.minimize_content:
-        print_info(f"The following check key will be used: `{config.check_key}`")
+    if config.minimize_output:
+        print_info(f"The following check key will be used: `{config.check_key}`\n")
     else:
         print_warning(
             f"Make sure, checking the main.js sources of the Fansly homepage, "
@@ -354,7 +354,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
             f"\n{20 * ' '}to this text: `{config.check_key}`"
         )
 
-    if not config.minimize_content and config.interactive:
+    if not config.minimize_output and config.interactive:
 
         key_confirmation = input(
             f"\n{20 * ' '}► Is this key correct (y/n)? "
@@ -426,13 +426,13 @@ def validate_adjust_download_directory(config: FanslyConfig) -> None:
 
         config.download_directory = Path.cwd()
 
-        print_info(f"Acknowledging local download directory: '{config.download_directory}'")
+        print_info(f"Acknowledging local download directory:\n{17*' '}'{config.download_directory}'")
 
     # if user specified a correct custom downloads path
     elif config.download_directory is not None \
             and config.download_directory.is_dir():
 
-        print_info(f"Acknowledging custom basis download directory: '{config.download_directory}'")
+        print_info(f"Acknowledging custom basis download directory:\n{17*' '}'{config.download_directory}'")
 
     else:  # if their set directory, can't be found by the OS
         print_warning(

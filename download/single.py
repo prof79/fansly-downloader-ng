@@ -1,6 +1,5 @@
 """Single Post Downloading"""
 
-
 from .common import get_unique_media_ids, process_download_accessible_media
 from .core import DownloadState
 from .media import download_media_infos
@@ -18,7 +17,8 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
     # This is important for directory creation later on.
     state.download_type = DownloadType.SINGLE
 
-    print_info(f"You have launched in Single Post download mode.")
+    if not config.minimize_output:
+        print_info(f"You have launched in Single Post download mode.")
 
     if config.post_id is not None:
         print_info(f"Trying to download post {config.post_id} as specified on the command-line ...")
@@ -31,24 +31,25 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
         )
 
     else:
-        print_info(f"Please enter the ID of the post you would like to download."
-            f"\n{17*' '}After you click on a post, it will show in your browsers URL bar."
-        )
-        print()
-        
+        if not config.minimize_output:
+            print_info(f"Please enter the ID of the post you would like to download."
+                       f"\n{17 * ' '}After you click on a post, it will show in your browsers URL bar."
+                       )
+            print()
+
         while True:
-            post_id = input(f"\n{17*' '}► Post ID: ")
+            post_id = input(f"\n{17 * ' '}► Post ID: ")
 
             if is_valid_post_id(post_id):
                 break
 
             else:
                 print_error(f"The input string '{post_id}' can not be a valid post ID."
-                    f"\n{22*' '}The last few numbers in the url is the post ID"
-                    f"\n{22*' '}Example: 'https://fansly.com/post/1283998432982'"
-                    f"\n{22*' '}In the example, '1283998432982' would be the post ID.",
-                    17
-                )
+                            f"\n{22 * ' '}The last few numbers in the url is the post ID"
+                            f"\n{22 * ' '}Example: 'https://fansly.com/post/1283998432982'"
+                            f"\n{22 * ' '}In the example, '1283998432982' would be the post ID.",
+                            17
+                            )
 
     post_response = config.get_api() \
         .get_post(post_id)
@@ -59,7 +60,7 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
 
         # post object contains: posts, aggregatedPosts, accountMediaBundles, accountMedia, accounts, tips, tipGoals, stories, polls
         post_object = post_response.json()['response']
-        
+
         # if access to post content / post contains content
         if post_object['accountMediaBundles'] or post_object['accountMedia']:
 
@@ -81,10 +82,10 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
                 # Post ID could be from a different creator than specified
                 # in the config file.
                 state.creator_name = creator_username
-    
-                if creator_display_name and creator_username:
+
+                if creator_display_name and creator_username and not config.minimize_output:
                     print_info(f"Inspecting a post by {creator_display_name} (@{creator_username})")
-                else:
+                elif not config.minimize_output:
                     print_info(f"Inspecting a post by {creator_username.capitalize()}")
 
             # Deferred deduplication init because directory may have changed
@@ -96,14 +97,15 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
 
             process_download_accessible_media(config, state, media_infos, post_id)
 
-            if state.duplicate_count > 0 and config.show_downloads and not config.show_skipped_downloads:
+            if state.duplicate_count > 0 and config.show_downloads and not config.show_skipped_downloads and not config.minimize_output:
                 print_info(
                     f"Skipped {state.duplicate_count} already downloaded media item{'' if state.duplicate_count == 1 else 's'}."
                 )
-        
+
         else:
             print_warning(f"Could not find any accessible content in the single post.")
-    
+
     else:
-        print_error(f"Failed single post download. Response code: {post_response.status_code}\n{post_response.text}", 20)
+        print_error(f"Failed single post download. Response code: {post_response.status_code}\n{post_response.text}",
+                    20)
         input_enter_continue(config.interactive)

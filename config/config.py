@@ -1,6 +1,5 @@
 """Configuration File Manipulation"""
 
-
 import configparser
 import os
 
@@ -76,8 +75,8 @@ def username_has_valid_chars(name: str) -> bool:
         return False
 
     invalid_chars = set(name) \
-        - set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
-    
+                    - set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
+
     return not invalid_chars
 
 
@@ -130,7 +129,7 @@ def load_config(config: FanslyConfig) -> None:
 
     print_info('Reading config.ini file ...')
     print()
-    
+
     config.config_path = Path.cwd() / 'config.ini'
 
     if not config.config_path.exists():
@@ -149,7 +148,7 @@ def load_config(config: FanslyConfig) -> None:
         # config would overwrite the existing configuration!
         replace_me_str = 'ReplaceMe'
 
-        #region TargetedCreator
+        # region TargetedCreator
 
         creator_section = 'TargetedCreator'
 
@@ -158,41 +157,41 @@ def load_config(config: FanslyConfig) -> None:
 
         # Check for command-line override - already set?
         if config.user_names is None:
-            user_names = config._parser.get(creator_section, 'Username', fallback=replace_me_str) # string
+            user_names = config._parser.get(creator_section, 'Username', fallback=replace_me_str)  # string
 
             config.user_names = \
                 sanitize_creator_names(parse_items_from_line(user_names))
 
-        #endregion TargetedCreator
+        # endregion TargetedCreator
 
-        #region MyAccount
+        # region MyAccount
 
         account_section = 'MyAccount'
 
         if not config._parser.has_section(account_section):
             config._parser.add_section(account_section)
 
-        config.token = config._parser.get(account_section, 'Authorization_Token', fallback=replace_me_str) # string
-        config.user_agent = config._parser.get(account_section, 'User_Agent', fallback=replace_me_str) # string
+        config.token = config._parser.get(account_section, 'Authorization_Token', fallback=replace_me_str)  # string
+        config.user_agent = config._parser.get(account_section, 'User_Agent', fallback=replace_me_str)  # string
 
         default_check_key = 'qybZy9-fyszis-bybxyf'
 
-        config.check_key = config._parser.get(account_section, 'Check_Key', fallback=default_check_key) # string
+        config.check_key = config._parser.get(account_section, 'Check_Key', fallback=default_check_key)  # string
 
         if config.check_key in [
-                    'negwij-zyZnek-wavje1',
-                    'negwij-zyZnak-wavje1',
-                ]:
+            'negwij-zyZnek-wavje1',
+            'negwij-zyZnak-wavje1',
+        ]:
             config.check_key = default_check_key
 
-        #endregion MyAccount
+        # endregion MyAccount
 
-        #region Other
+        # region Other
 
         other_section = 'Other'
 
         # I obsoleted this ...
-        #config.current_version = config.parser.get('Other', 'version') # str
+        # config.current_version = config.parser.get('Other', 'version') # str
         if config._parser.has_option(other_section, 'version'):
             config._parser.remove_option(other_section, 'version')
 
@@ -201,9 +200,9 @@ def load_config(config: FanslyConfig) -> None:
                 and len(config._parser[other_section]) == 0:
             config._parser.remove_section(other_section)
 
-        #endregion Other
+        # endregion Other
 
-        #region Options
+        # region Options
 
         options_section = 'Options'
 
@@ -214,7 +213,7 @@ def load_config(config: FanslyConfig) -> None:
         config.download_directory = Path(
             config._parser.get(options_section, 'download_directory', fallback='Local_directory')
         )
-        
+
         # Normal (Timeline & Messages), Timeline, Messages, Single (Single by post id) or Collections -> str
         download_mode = config._parser.get(options_section, 'download_mode', fallback='Normal')
         config.download_mode = DownloadMode(download_mode.upper())
@@ -239,7 +238,7 @@ def load_config(config: FanslyConfig) -> None:
         config.timeline_retries = config._parser.getint(options_section, 'timeline_retries', fallback=1)
         config.timeline_delay_seconds = config._parser.getint(options_section, 'timeline_delay_seconds', fallback=60)
 
-        #region Renamed Options
+        # region Renamed Options
 
         # I renamed this to "use_duplicate_threshold" but retain older config.ini compatibility
         # True, False -> boolean
@@ -259,12 +258,12 @@ def load_config(config: FanslyConfig) -> None:
         else:
             config.use_folder_suffix = config._parser.getboolean(options_section, 'use_folder_suffix', fallback=True)
 
-        #endregion Renamed
-            
-        #endregion Options
+        # endregion Renamed
 
-        #region Cache
-        
+        # endregion Options
+
+        # region Cache
+
         cache_section = 'Cache'
 
         if not config._parser.has_section(cache_section):
@@ -275,9 +274,9 @@ def load_config(config: FanslyConfig) -> None:
         config.cached_device_id_timestamp = \
             config._parser.getint(cache_section, 'device_id_timestamp', fallback=None)
 
-        #endregion Cache
+        # endregion Cache
 
-        #region Logic
+        # region Logic
 
         key_default_pattern = r'''this\.checkKey_\s*=\s*["']([^"']+)["']'''
         main_js_default_pattern = r'''\ssrc\s*=\s*"(main\..*?\.js)"'''
@@ -292,41 +291,45 @@ def load_config(config: FanslyConfig) -> None:
         config.main_js_pattern = \
             config._parser.get(logic_section, 'main_js_pattern', fallback=main_js_default_pattern)
 
-        #endregion Logic
+        # endregion Logic
 
         # Safe to save! :-)
         save_config_or_raise(config)
 
     except configparser.NoOptionError as e:
         error_string = str(e)
-        raise ConfigError(f"Your config.ini file is invalid, please download a fresh version of it from GitHub.\n{error_string}")
+        raise ConfigError(
+            f"Your config.ini file is invalid, please download a fresh version of it from GitHub.\n{error_string}")
 
     except ValueError as e:
         error_string = str(e)
 
         if 'a boolean' in error_string:
             if config.interactive:
-                open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+                open_url(
+                    'https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
             raise ConfigError(
                 f"'{error_string.rsplit('boolean: ')[1]}' is malformed in the configuration file! This value can only be True or False"
-                f"\n{17*' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [1]"
+                f"\n{17 * ' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [1]"
             )
 
         else:
             if config.interactive:
-                open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+                open_url(
+                    'https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
             raise ConfigError(
                 f"You have entered a wrong value in the config.ini file -> '{error_string}'"
-                f"\n{17*' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [2]"
+                f"\n{17 * ' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [2]"
             )
 
     except (KeyError, NameError) as key:
         if config.interactive:
-            open_url('https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
+            open_url(
+                'https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini')
 
         raise ConfigError(
             f"'{key}' is missing or malformed in the configuration file!"
-            f"\n{17*' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [3]"
+            f"\n{17 * ' '}Read the Wiki > Explanation of provided programs & their functionality > config.ini [3]"
         )

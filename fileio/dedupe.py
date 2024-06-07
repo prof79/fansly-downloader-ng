@@ -25,29 +25,32 @@ def dedupe_init(config: FanslyConfig, state: DownloadState):
         
         add_hash_to_folder_items(config, state)
 
-        print_info(
-            f"Deduplication process is complete! Each new download will now be compared"
-            f"\n{17*' '}against a total of {len(state.recent_photo_hashes)} photo & {len(state.recent_video_hashes)} "
-            "video hashes and corresponding media IDs."
-        )
-
-        # print("Recent Photo Hashes:", state.recent_photo_hashes)
-        # print("Recent Photo Media IDs:", state.recent_photo_media_ids)
-        # print("Recent Video Hashes:", state.recent_video_hashes)
-        # print("Recent Video Media IDs:", state.recent_video_media_ids)
-
-        if randint(1, 100) <= 19:
-            print_warning(
-                f"Reminder: If you remove id_NUMBERS or hash_STRING from filenames of previously downloaded files"
-                f"\n{20*' '}they will no longer be compatible with Fansly Downloader's deduplication algorithm!"
+        if not config.minimize_output:
+            print_info(
+                f"Deduplication process is complete! Each new download will now be compared"
+                f"\n{17*' '}against a total of {len(state.recent_photo_hashes)} photo & {len(state.recent_video_hashes)} "
+                "video hashes and corresponding media IDs."
             )
 
-        # because adding information as metadata; requires specific
-        # configuration for each file type through PIL and that's too complex
-        # due to file types. maybe in the future I might decide to just save
-        # every image as .png and every video as .mp4 and add/read it as
-        # metadata or if someone contributes a function actually perfectly
-        # adding metadata to all common file types, that would be nice.
+            # print("Recent Photo Hashes:", state.recent_photo_hashes)
+            # print("Recent Photo Media IDs:", state.recent_photo_media_ids)
+            # print("Recent Video Hashes:", state.recent_video_hashes)
+            # print("Recent Video Media IDs:", state.recent_video_media_ids)
+
+            if randint(1, 100) <= 19:
+                print_warning(
+                    f"Reminder: If you remove id_NUMBERS or hash_STRING from filenames of previously downloaded files"
+                    f"\n{20*' '}they will no longer be compatible with Fansly Downloader's deduplication algorithm!"
+                )
+
+            # because adding information as metadata; requires specific
+            # configuration for each file type through PIL and that's too complex
+            # due to file types. maybe in the future I might decide to just save
+            # every image as .png and every video as .mp4 and add/read it as
+            # metadata or if someone contributes a function actually perfectly
+            # adding metadata to all common file types, that would be nice.
+        else:
+            print()
 
 
 def dedupe_media_file(config: FanslyConfig, state: DownloadState, mimetype: str, filename: Path) -> bool:
