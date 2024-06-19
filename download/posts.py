@@ -9,7 +9,7 @@ from .types import DownloadType
 from config import FanslyConfig
 from fileio.dedupe import dedupe_init
 from textio import input_enter_continue, print_error, print_info, print_warning
-from utils.common import is_valid_post_id, get_post_id_from_request
+from utils.common import is_valid_content_id, get_content_id_from_request
 
 
 def download_posts(config: FanslyConfig, state: DownloadState):
@@ -42,12 +42,12 @@ def download_posts(config: FanslyConfig, state: DownloadState):
         while len(post_id) > 0:
             while True:
                 requested_post = input(f"\n{17 * ' '}► Post Link or ID: ")
-                post_id = get_post_id_from_request(requested_post)
+                post_id = get_content_id_from_request(requested_post)
 
                 if len(post_id) == 0:
                     print_info("All desired post links or IDs are recorded. Proceeding to download.")
                     break
-                elif is_valid_post_id(post_id):
+                elif is_valid_content_id(post_id):
                     post_ids.append(post_id)
                     print_info(f"Post {post_id} is recorded. Enter the next one or hit enter to proceed.")
                     break

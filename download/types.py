@@ -10,3 +10,4 @@ class DownloadType(StrEnum):
     MESSAGES = auto()
     POSTS = auto()
     TIMELINE = auto()
+    ALBUM = auto()

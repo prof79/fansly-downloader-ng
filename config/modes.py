@@ -11,3 +11,4 @@ class DownloadMode(StrEnum):
     NORMAL = auto()
     POSTS = auto()
     TIMELINE = auto()
+    ALBUM = auto()
