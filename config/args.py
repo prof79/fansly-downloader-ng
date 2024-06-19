@@ -381,7 +381,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         
         if not is_valid_post_id(post_id):
             raise ConfigError(
-                f"Argument error - '{post_id}' is not a valid post link or ID. "
+                f"Argument error - '{post_id}' is not a valid post ID. "
                 "For an ID at least 10 characters/only digits are required."
             )
 

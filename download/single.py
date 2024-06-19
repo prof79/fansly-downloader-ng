@@ -44,7 +44,7 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
                 break
 
             else:
-                print_error(f"The input string '{post_id}' can not be a valid post link or ID."
+                print_error(f"The input string '{requested_post}' can not be a valid post link or ID."
                     f"\n{22*' '}The last few numbers in the URL are the post ID"
                     f"\n{22*' '}Example: 'https://fansly.com/post/1283998432982'"
                     f"\n{22*' '}In the example, '1283998432982' is the post ID.",
@@ -103,8 +103,8 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
                 )
         
         else:
-            print_warning(f"Could not find any accessible content in the single post.")
+            print_warning(f"Could not find any accessible content in post {post_id}.")
     
     else:
-        print_error(f"Failed single post download. Response code: {post_response.status_code}\n{post_response.text}", 20)
+        print_error(f"Failed to download post {post_id}. Response code: {post_response.status_code}\n{post_response.text}", 20)
         input_enter_continue(config.interactive)
