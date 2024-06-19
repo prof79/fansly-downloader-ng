@@ -215,7 +215,7 @@ def load_config(config: FanslyConfig) -> None:
             config._parser.get(options_section, 'download_directory', fallback='Local_directory')
         )
         
-        # Normal (Timeline & Messages), Timeline, Messages, Single (Single by post id) or Collections -> str
+        # Normal (Timeline & Messages), Timeline, Messages, Posts (Posts by post ids) or Collections -> str
         download_mode = config._parser.get(options_section, 'download_mode', fallback='Normal')
         config.download_mode = DownloadMode(download_mode.upper())
 

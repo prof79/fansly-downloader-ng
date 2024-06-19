@@ -103,7 +103,7 @@ def process_download_accessible_media(
         currently being downloaded.
     :param list[dict] media_infos: A list of media informations from posts,
         timelines, messages, collections and so on.
-    :param str|None post_id: The post ID required for "Single" download mode.
+    :param str|None post_id: The post ID required for "Posts" download mode.
 
     :return: "False" as a break indicator for "Timeline" downloads,
         "True" otherwise.
