@@ -27,7 +27,7 @@ def download_single_post(config: FanslyConfig, state: DownloadState):
     elif not config.interactive:
         raise RuntimeError(
             'Single Post downloading is not supported in non-interactive mode '
-            'unless a post ID is specified via command-line.'
+            'unless a post link or ID is specified via command-line.'
         )
 
     else:
