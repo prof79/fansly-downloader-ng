@@ -94,6 +94,21 @@ def get_content_id_from_request(requested_content: str) -> str:
     return content_id
 
 
+def get_post_ids_from_list_of_requests(requested_posts: list[str]) -> list[str]:
+    """Strips post_ids from a list of post links if necessary.
+
+    :param requested_posts: The list of requests made by the user.
+    :type requested_posts: list[str]
+
+    :return: A list of extracted post_ids.
+    :rtype: list[str]
+    """
+    post_ids = []
+    for requested_post in requested_posts:
+        post_ids.append(get_content_id_from_request(requested_post))
+    return post_ids
+
+
 def open_location(filepath: Path, open_folder_when_finished: bool, interactive: bool) -> bool:
     """Opens the download directory in the platform's respective
     file manager application once the download process has finished.

@@ -11,6 +11,7 @@ from requests.exceptions import RequestException
 from textio.textio import input_enter_close, input_enter_continue
 
 from .config import username_has_valid_chars, username_has_valid_length
+from config.modes import DownloadMode
 from .fanslyconfig import FanslyConfig
 
 from errors import ConfigError
@@ -22,7 +23,7 @@ from utils.web import guess_check_key, guess_user_agent, open_get_started_url
 
 def validate_creator_names(config: FanslyConfig) -> bool:
     """Validates the input value for `config_username` in `config.ini`.
-    
+
     :param FanslyConfig config: The configuration object to validate.
 
     :return: True if all user names passed the test/could be remedied,
@@ -46,13 +47,13 @@ def validate_creator_names(config: FanslyConfig) -> bool:
             print_warning(f"Invalid creator name '{user}' will be removed from processing.")
             config.user_names.remove(user)
             list_changed = True
-        
+
         # Has the user name been adjusted? (Interactive input)
         elif user != validated_name:
             config.user_names.remove(user)
             config.user_names.add(validated_name)
             list_changed = True
-    
+
     print()
 
     # Save any potential changes
@@ -69,7 +70,7 @@ def validate_creator_names(config: FanslyConfig) -> bool:
 
 def validate_adjust_creator_name(name: str, interactive: bool=False) -> str | None:
     """Validates the name of a Fansly creator.
-    
+
     :param name: The creator name to validate and potentially correct.
     :type name: str
     :param interactive: Prompts the user for a replacement name if an
@@ -114,7 +115,7 @@ def validate_adjust_creator_name(name: str, interactive: bool=False) -> str | No
 
             name = input(f"\n{19*' '}► Enter a valid username: ")
             name = name.strip().removeprefix('@')
-        
+
         else:
             return None
 
@@ -142,7 +143,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
     # semi-automatically set up value for config_token (authorization_token) based on the users input
     if plyvel_installed and not config.token_is_valid():
-        
+
         # fansly-downloader plyvel dependant package imports
         from config.browser import (
             find_leveldb_folders,
@@ -163,10 +164,10 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
         browser_paths = get_browser_config_paths()
         fansly_account = None
-        
+
         for browser_path in browser_paths:
             browser_fansly_token = None
-        
+
             # if not firefox, process leveldb folders
             if 'firefox' not in browser_path.lower():
                 leveldb_folders = find_leveldb_folders(browser_path)
@@ -177,14 +178,14 @@ def validate_adjust_token(config: FanslyConfig) -> None:
                     if browser_fansly_token:
                         fansly_account = config.get_api().get_client_user_name(browser_fansly_token)
                         break  # exit the inner loop if a valid processed_token is found
-        
+
             # if firefox, process sqlite db instead
             else:
                 browser_fansly_token = get_token_from_firefox_profile(browser_path)
 
                 if browser_fansly_token:
                     fansly_account = config.get_api().get_client_user_name(browser_fansly_token)
-        
+
             if all([fansly_account, browser_fansly_token]):
                 # we might also utilise this for guessing the useragent
                 browser_name = parse_browser_from_string(browser_path)
@@ -228,7 +229,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
                 f"\n{18*' '}Did you recently browse Fansly with an authenticated session?"
                 f"\n{18*' '}Please read & apply the 'Get-Started' tutorial."
             )
-        
+
     # if users decisions have led to auth token still being invalid
     if not config.token_is_valid():
         if config.interactive:
@@ -245,7 +246,7 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
     """Validates the input value for `user_agent` in `config.ini`.
 
     :param FanslyConfig config: The configuration to validate and correct.
-    """    
+    """
 
     # if no matches / error just set random UA
     ua_if_failed = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
@@ -362,7 +363,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
                     done = True
                     config.check_key = new_key
                     save_config_or_raise(config)
-    
+
     else:
         input_enter_continue(config.interactive)
 
@@ -379,7 +380,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 #             f"\n{20*' '}Look for `fansly-session-id` in requests or `id` from `session_active_session`"
 #             f"\n{20*' '}in local storage for https://fansly.com (18 digits)."
 #         )
-    
+
 #     if config.interactive:
 
 #         done = False
@@ -392,12 +393,12 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 #                 done = True
 #                 config.session_id = session_id
 #                 save_config_or_raise(config)
-            
+
 #             else:
 #                 print_warning(
 #                     f'Invalid session ID, should be 18 digits. Please try again.'
 #                 )
-    
+
 #     else:
 #         input_enter_close(config.interactive)
 
@@ -405,7 +406,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 def validate_adjust_download_directory(config: FanslyConfig) -> None:
     """Validates the `download_directory` value from `config.ini`
     and corrects it if possible.
-    
+
     :param FanslyConfig config: The configuration to validate and correct.
     """
     # if user didn't specify custom downloads path
@@ -438,10 +439,41 @@ def validate_adjust_download_directory(config: FanslyConfig) -> None:
         save_config_or_raise(config)
 
 
+def validate_adjust_download_mode(config: FanslyConfig) -> None:
+    """Validates the `download_mode` value from `config.ini`
+    and adjusts it if desired.
+
+    :param FanslyConfig config: The configuration to validate and correct.
+    """
+    current_download_mode = config.download_mode.capitalize()
+    print_info(f"The current download mode is set to '{current_download_mode}'.")
+
+    if config.interactive:
+        done = False
+        while not done:
+            key_confirmation = input(
+                f"\n{20 * ' '}► Would you like to change it (y/n)? "
+            ).strip().lower()
+
+            if key_confirmation.startswith('y'):
+                available_modes = [mode.capitalize() for mode in DownloadMode if mode != DownloadMode.NOTSET]
+                print_info(f"Available download modes are: {', '.join(available_modes)}.")
+                new_download_mode = input(f"\n{20 * ' '}► Enter the desired download mode: "
+                                ).strip()
+                try:
+                    config.download_mode = DownloadMode(new_download_mode.upper())
+                    print_info(f"The new download mode '{new_download_mode.capitalize()}' has been set!")
+                    done = True
+                except ValueError:
+                    print_warning(f"The entered download mode '{new_download_mode}' seems to be invalid.")
+            else:
+                done = True
+
+
 def validate_adjust_config(config: FanslyConfig) -> None:
     """Validates all input values from `config.ini`
     and corrects them if possible.
-    
+
     :param FanslyConfig config: The configuration to validate and correct.
     """
     if not validate_creator_names(config):
@@ -456,3 +488,5 @@ def validate_adjust_config(config: FanslyConfig) -> None:
     #validate_adjust_session_id(config)
 
     validate_adjust_download_directory(config)
+
+    validate_adjust_download_mode(config)

@@ -8,6 +8,6 @@ class DownloadType(StrEnum):
     NOTSET = auto()
     COLLECTIONS = auto()
     MESSAGES = auto()
-    SINGLE = auto()
+    POSTS = auto()
     TIMELINE = auto()
     ALBUM = auto()
