@@ -15,7 +15,8 @@ def download_album(config: FanslyConfig, state: DownloadState):
     # This is important for directory creation later on.
     state.download_type = DownloadType.ALBUM
 
-    print_info(f"You have launched in Album download mode.")
+    if not config.minimize_output:
+        print_info(f"You have launched in Album download mode.")
 
     if config.album_id is not None:
         print_info(f"Trying to download album {config.album_id} as specified on the command-line ...")
@@ -27,10 +28,11 @@ def download_album(config: FanslyConfig, state: DownloadState):
         )
 
     else:
-        print_info(f"Please enter the link or ID of the album you would like to download."
-                   f"\n{17 * ' '}After you click on an album, it will show in your browsers URL bar."
-                   )
-        print()
+        if not config.minimize_output:
+            print_info(f"Please enter the link or ID of the album you would like to download."
+                       f"\n{17 * ' '}After you click on an album, it will show in your browsers URL bar."
+                       )
+            print()
 
         while True:
             requested_album = input(f"\n{17 * ' '}► Album Link or ID: ")
@@ -84,7 +86,7 @@ def download_album(config: FanslyConfig, state: DownloadState):
                 )
 
         else:
-            print_warning(f"Could not find any accessible content in the album.")
+            print_warning(f"Could not find any accessible content in album {album_id}.")
 
     else:
         print_error(
