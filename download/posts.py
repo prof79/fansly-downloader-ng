@@ -18,7 +18,8 @@ def download_posts(config: FanslyConfig, state: DownloadState):
     # This is important for directory creation later on.
     state.download_type = DownloadType.POSTS
 
-    print_info(f"You have launched in Posts download mode.")
+    if not config.minimize_output:
+        print_info(f"You have launched in Posts download mode.")
 
     if config.post_ids is not None:
         print_info(f"Trying to download posts {config.post_ids} as specified on the command-line ...")
@@ -31,10 +32,11 @@ def download_posts(config: FanslyConfig, state: DownloadState):
         )
 
     else:
-        print_info(f"Please enter the links or the IDs of the posts you would like to download one after another (confirm with <Enter>)."
-            f"\n{17*' '}After you click on a post, the ID will show in your browser's URL bar."
-        )
-        print()
+        if not config.minimize_output:
+            print_info(f"Please enter the links or the IDs of the posts you would like to download one after another (confirm with <Enter>)."
+                f"\n{17*' '}After you click on a post, the ID will show in your browser's URL bar."
+            )
+            print()
 
         post_ids = []
         post_id = "dummy"
@@ -93,9 +95,9 @@ def download_posts(config: FanslyConfig, state: DownloadState):
                     # in the config file.
                     state.creator_name = creator_username
 
-                    if creator_display_name and creator_username:
+                    if creator_display_name and creator_username and not config.minimize_output:
                         print_info(f"Inspecting post {post_id} by {creator_display_name} (@{creator_username})")
-                    else:
+                    elif not config.minimize_output:
                         print_info(f"Inspecting post {post_id} by {creator_username.capitalize()}")
 
                 # Deferred deduplication init because directory may have changed
