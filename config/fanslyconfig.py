@@ -69,6 +69,7 @@ class FanslyConfig(object):
     separate_timeline: bool = True
     show_downloads: bool = True
     show_skipped_downloads: bool = True
+    minimize_output: bool = False
     use_duplicate_threshold: bool = False
     use_folder_suffix: bool = True
     # Show input prompts or sleep - for automation/scheduling purposes
@@ -169,6 +170,7 @@ class FanslyConfig(object):
         # Booleans
         self._parser.set('Options', 'show_downloads', str(self.show_downloads))
         self._parser.set('Options', 'show_skipped_downloads', str(self.show_skipped_downloads))
+        self._parser.set('Options', 'minimize_output', str(self.minimize_output))
         self._parser.set('Options', 'download_media_previews', str(self.download_media_previews))
         self._parser.set('Options', 'open_folder_when_finished', str(self.open_folder_when_finished))
         self._parser.set('Options', 'separate_messages', str(self.separate_messages))

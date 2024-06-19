@@ -13,7 +13,8 @@ from textio import print_info
 
 
 def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None:
-    print_info('Getting account information ...')
+    if not config.minimize_output:
+        print_info('Getting account information ...')
 
     if config.download_mode == DownloadMode.NOTSET:
         message = 'Internal error getting account info - config download mode not set.'

@@ -11,7 +11,8 @@ from textio import input_enter_continue, print_error, print_info
 def download_collections(config: FanslyConfig, state: DownloadState):
     """Downloads Fansly purchased item collections."""
 
-    print_info(f"Starting Collections sequence. Buckle up and enjoy the ride!")
+    if not config.minimize_output:
+        print_info(f"Starting Collections sequence. Buckle up and enjoy the ride!")
 
     # This is important for directory creation later on.
     state.download_type = DownloadType.COLLECTIONS

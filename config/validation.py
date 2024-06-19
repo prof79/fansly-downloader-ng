@@ -1,6 +1,5 @@
 """Configuration Validation"""
 
-
 import re
 import requests
 
@@ -68,7 +67,7 @@ def validate_creator_names(config: FanslyConfig) -> bool:
         return True
 
 
-def validate_adjust_creator_name(name: str, interactive: bool=False) -> str | None:
+def validate_adjust_creator_name(name: str, interactive: bool = False) -> str | None:
     """Validates the name of a Fansly creator.
 
     :param name: The creator name to validate and potentially correct.
@@ -100,7 +99,8 @@ def validate_adjust_creator_name(name: str, interactive: bool=False) -> str | No
             usern_error = True
 
         if not usern_error and not username_has_valid_chars(name):
-            print_warning(f"{usern_base_text} should only contain\n{20*' '}alphanumeric characters, hyphens, or underscores!\n")
+            print_warning(
+                f"{usern_base_text} should only contain\n{20 * ' '}alphanumeric characters, hyphens, or underscores!\n")
             usern_error = True
 
         if not usern_error:
@@ -110,10 +110,10 @@ def validate_adjust_creator_name(name: str, interactive: bool=False) -> str | No
         if interactive:
             print_config(
                 f"Enter the username handle (eg. @MyCreatorsName or MyCreatorsName)"
-                f"\n{19*' '}of the Fansly creator you want to download content from."
+                f"\n{19 * ' '}of the Fansly creator you want to download content from."
             )
 
-            name = input(f"\n{19*' '}► Enter a valid username: ")
+            name = input(f"\n{19 * ' '}► Enter a valid username: ")
             name = name.strip().removeprefix('@')
 
         else:
@@ -130,16 +130,16 @@ def validate_adjust_token(config: FanslyConfig) -> None:
     plyvel_installed, browser_name = False, None
 
     if not config.token_is_valid():
-            try:
-                import plyvel
-                plyvel_installed = True
+        try:
+            import plyvel
+            plyvel_installed = True
 
-            except ImportError:
-                print_warning(
-                    f"Fansly Downloader NG's automatic configuration for the authorization_token in the config.ini file will be skipped."
-                    f"\n{20*' '}Your system is missing required plyvel (python module) builds by Siyao Chen (@liviaerxin)."
-                    f"\n{20*' '}Installable with 'pip3 install plyvel-ci' or from github.com/liviaerxin/plyvel/releases/latest"
-                )
+        except ImportError:
+            print_warning(
+                f"Fansly Downloader NG's automatic configuration for the authorization_token in the config.ini file will be skipped."
+                f"\n{20 * ' '}Your system is missing required plyvel (python module) builds by Siyao Chen (@liviaerxin)."
+                f"\n{20 * ' '}Installable with 'pip3 install plyvel-ci' or from github.com/liviaerxin/plyvel/releases/latest"
+            )
 
     # semi-automatically set up value for config_token (authorization_token) based on the users input
     if plyvel_installed and not config.token_is_valid():
@@ -155,11 +155,11 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
         print_warning(
             f"Authorization token '{config.token}' is unmodified, missing or malformed"
-            f"\n{20*' '}in the configuration file."
+            f"\n{20 * ' '}in the configuration file."
         )
         print_config(
             f"Trying to automatically configure Fansly authorization token"
-            f"\n{19*' '}from any browser storage available on the local system ..."
+            f"\n{19 * ' '}from any browser storage available on the local system ..."
         )
 
         browser_paths = get_browser_config_paths()
@@ -192,20 +192,23 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
                 if config.interactive:
                     # Save token to configuration?
-                    print_config(f"Do you want to link the account '{fansly_account}' to Fansly Downloader? (found in: {browser_name})")
+                    print_config(
+                        f"Do you want to link the account '{fansly_account}' to Fansly Downloader? (found in: {browser_name})")
 
                     while True:
-                        user_input_acc_verify = input(f"{19*' '}► Type either 'Yes' or 'No': ").strip().lower()
+                        user_input_acc_verify = input(f"{19 * ' '}► Type either 'Yes' or 'No': ").strip().lower()
 
                         if user_input_acc_verify.startswith('y') or user_input_acc_verify.startswith('n'):
-                            break # break user input verification
+                            break  # break user input verification
 
                         else:
-                            print_error(f"Please enter either 'Yes' or 'No', to decide if you want to link to '{fansly_account}'.")
+                            print_error(
+                                f"Please enter either 'Yes' or 'No', to decide if you want to link to '{fansly_account}'.")
 
                 else:
                     # Forcefully link account in interactive mode.
-                    print_warning(f"Interactive mode is automtatically linking the account '{fansly_account}' to Fansly Downloader. (found in: {browser_name})")
+                    print_warning(
+                        f"Interactive mode is automtatically linking the account '{fansly_account}' to Fansly Downloader. (found in: {browser_name})")
                     user_input_acc_verify = 'y'
 
                 # based on user input; write account username & auth token to config.ini
@@ -217,7 +220,7 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
                     print_info(f"Success! Authorization token applied to config.ini file.\n")
 
-                    break # break whole loop
+                    break  # break whole loop
 
         # if no account auth was found in any of the users browsers
         if fansly_account is None:
@@ -226,8 +229,8 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
             raise ConfigError(
                 f"Your Fansly account was not found in any of your browser's local storage."
-                f"\n{18*' '}Did you recently browse Fansly with an authenticated session?"
-                f"\n{18*' '}Please read & apply the 'Get-Started' tutorial."
+                f"\n{18 * ' '}Did you recently browse Fansly with an authenticated session?"
+                f"\n{18 * ' '}Please read & apply the 'Get-Started' tutorial."
             )
 
     # if users decisions have led to auth token still being invalid
@@ -237,8 +240,11 @@ def validate_adjust_token(config: FanslyConfig) -> None:
 
         raise ConfigError(
             f"Reached the end and the authorization token in config.ini file is still invalid!"
-            f"\n{18*' '}Please read & apply the 'Get-Started' tutorial."
+            f"\n{18 * ' '}Please read & apply the 'Get-Started' tutorial."
         )
+
+    if config.token_is_valid():
+        print_info(f"Token validation successful!\n")
 
 
 def validate_adjust_user_agent(config: FanslyConfig) -> None:
@@ -259,21 +265,21 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
         if config.token_from_browser_name is not None:
             print_config(
                 f"Adjusting it with an educated guess based on the combination of your \n"
-                f"{19*' '}operating system & specific browser."
+                f"{19 * ' '}operating system & specific browser."
             )
 
         else:
             print_config(
                 f"Adjusting it with an educated guess, hardcoded for Chrome browser."
-                f"\n{19*' '}If you're not using Chrome you might want to replace it in the config.ini file later on."
-                f"\n{19*' '}More information regarding this topic is on the Fansly Downloader NG Wiki."
+                f"\n{19 * ' '}If you're not using Chrome you might want to replace it in the config.ini file later on."
+                f"\n{19 * ' '}More information regarding this topic is on the Fansly Downloader NG Wiki."
             )
 
         try:
             # thanks Jonathan Robson (@jnrbsn) - for continuously providing these up-to-date user-agents
             user_agent_response = requests.get(
                 'https://jnrbsn.github.io/user-agents/user-agents.json',
-                headers = {
+                headers={
                     'User-Agent': ua_if_failed,
                     'accept-language': 'en-US,en;q=0.9'
                 }
@@ -298,16 +304,20 @@ def validate_adjust_user_agent(config: FanslyConfig) -> None:
 
         print_info(f"Success! Applied a browser user-agent to config.ini file.\n")
 
+    else:
+        print_info(f"User agent validation successful!\n")
+
 
 def validate_adjust_check_key(config: FanslyConfig) -> None:
     """Validates the input value for `check_key` in `config.ini`.
 
     :param FanslyConfig config: The configuration to validate and correct.
     """
-    print_warning(
-        f'!!! FANSLY MAY BAN YOU FOR USING THIS SOFTWARE, BE WARNED !!!'
-    )
-    print()
+    if not config.minimize_output:
+        print_warning(
+            f'!!! FANSLY MAY BAN YOU FOR USING THIS SOFTWARE, BE WARNED !!!'
+        )
+        print()
 
     if config.user_agent \
             and config.main_js_pattern \
@@ -336,27 +346,30 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
             )
             print()
 
-    print_warning(
-        f"Make sure, checking the main.js sources of the Fansly homepage, "
-        f"\n{20*' '}that the expression assigend to `this.checkKey_` evaluates "
-        f"\n{20*' '}to this text: `{config.check_key}`"
-    )
+    if config.minimize_output:
+        print_info(f"The following check key will be used: `{config.check_key}`\n")
+    else:
+        print_warning(
+            f"Make sure, checking the main.js sources of the Fansly homepage, "
+            f"\n{20 * ' '}that the expression assigend to `this.checkKey_` evaluates "
+            f"\n{20 * ' '}to this text: `{config.check_key}`"
+        )
 
-    if config.interactive:
+    if not config.minimize_output and config.interactive:
 
         key_confirmation = input(
-            f"\n{20*' '}► Is this key correct (y/n)? "
+            f"\n{20 * ' '}► Is this key correct (y/n)? "
         ).strip().lower()
 
         if key_confirmation.startswith('n'):
             done = False
 
             while not done:
-                new_key = input(f"\n{20*' '}► New key: "
-                ).strip()
+                new_key = input(f"\n{20 * ' '}► New key: "
+                                ).strip()
 
                 new_key_confirmation = input(
-                    f"\n{20*' '}► Does this look reasonable `{new_key}` (y/n)? "
+                    f"\n{20 * ' '}► Does this look reasonable `{new_key}` (y/n)? "
                 ).strip().lower()
 
                 if new_key_confirmation.startswith('y'):
@@ -364,7 +377,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
                     config.check_key = new_key
                     save_config_or_raise(config)
 
-    else:
+    elif not config.interactive:
         input_enter_continue(config.interactive)
 
 
@@ -414,26 +427,26 @@ def validate_adjust_download_directory(config: FanslyConfig) -> None:
 
         config.download_directory = Path.cwd()
 
-        print_info(f"Acknowledging local download directory: '{config.download_directory}'")
+        print_info(f"Acknowledging local download directory:\n{17*' '}'{config.download_directory}'")
 
     # if user specified a correct custom downloads path
     elif config.download_directory is not None \
-        and config.download_directory.is_dir():
+            and config.download_directory.is_dir():
 
-        print_info(f"Acknowledging custom basis download directory: '{config.download_directory}'")
+        print_info(f"Acknowledging custom basis download directory:\n{17*' '}'{config.download_directory}'")
 
-    else: # if their set directory, can't be found by the OS
+    else:  # if their set directory, can't be found by the OS
         print_warning(
             f"The custom base download directory file path '{config.download_directory}' seems to be invalid!"
-            f"\n{20*' '}Please change it to a correct file path, for example: 'C:\\MyFanslyDownloads'"
-            f"\n{20*' '}An Explorer window to help you set the correct path will open soon!"
-            f"\n{20*' '}You may right-click inside the Explorer to create a new folder."
-            f"\n{20*' '}Select a folder and it will be used as the default download directory."
+            f"\n{20 * ' '}Please change it to a correct file path, for example: 'C:\\MyFanslyDownloads'"
+            f"\n{20 * ' '}An Explorer window to help you set the correct path will open soon!"
+            f"\n{20 * ' '}You may right-click inside the Explorer to create a new folder."
+            f"\n{20 * ' '}Select a folder and it will be used as the default download directory."
         )
 
-        sleep(10) # give user time to realise instructions were given
+        sleep(10)  # give user time to realise instructions were given
 
-        config.download_directory = ask_correct_dir() # ask user to select correct path using tkinters explorer dialog
+        config.download_directory = ask_correct_dir()  # ask user to select correct path using tkinters explorer dialog
 
         # save the config permanently into config.ini
         save_config_or_raise(config)
@@ -485,7 +498,7 @@ def validate_adjust_config(config: FanslyConfig) -> None:
 
     validate_adjust_check_key(config)
 
-    #validate_adjust_session_id(config)
+    # validate_adjust_session_id(config)
 
     validate_adjust_download_directory(config)
 

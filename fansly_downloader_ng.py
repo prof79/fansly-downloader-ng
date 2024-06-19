@@ -30,7 +30,7 @@ __credits__ = [
 import base64
 import traceback
 
-#from memory_profiler import profile
+# from memory_profiler import profile
 from datetime import datetime
 
 from config import FanslyConfig, load_config, validate_adjust_config
@@ -55,10 +55,10 @@ from utils.timer import Timer
 
 
 # tell PIL to be tolerant of files that are truncated
-#ImageFile.LOAD_TRUNCATED_IMAGES = True
+# ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # turn off for our purpose unnecessary PIL safety features
-#Image.MAX_IMAGE_PIXELS = None
+# Image.MAX_IMAGE_PIXELS = None
 
 
 def print_logo() -> None:
@@ -69,10 +69,10 @@ def print_logo() -> None:
             'CiAg4paI4paI4paI4paI4paI4paI4paI4pWXIOKWiOKWiOKWiOKWiOKWiOKVlyDilojilojilojilZcgICDilojilojilZfilojilojilojilojilojilojilojilZfilojilojilZcgIOKWiOKWiOKVlyAgIOKWiOKWiOKVlyAgICDilojilojilojilZcgICDilojilojilZfilojilojilojilojilojilojilojilZcgICAgIOKWiOKWiOKWiOKWiOKWiOKVlyDilojilojilojilojilojilojilZcg4paI4paI4paI4paI4paI4paI4pWXIAogIOKWiOKWiOKVlOKVkOKVkOKVkOKVkOKVneKWiOKWiOKVlOKVkOKVkOKWiOKWiOKVl+KWiOKWiOKWiOKWiOKVlyAg4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWQ4pWd4paI4paI4pWRICDilZrilojilojilZcg4paI4paI4pWU4pWdICAgIOKWiOKWiOKWiOKWiOKVlyAg4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWQ4pWdICAgIOKWiOKWiOKVlOKVkOKVkOKWiOKWiOKVl+KWiOKWiOKVlOKVkOKVkOKWiOKWiOKVl+KWiOKWiOKVlOKVkOKVkOKWiOKWiOKVlwogIOKWiOKWiOKWiOKWiOKWiOKVlyAg4paI4paI4paI4paI4paI4paI4paI4pWR4paI4paI4pWU4paI4paI4pWXIOKWiOKWiOKVkeKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVl+KWiOKWiOKVkSAgIOKVmuKWiOKWiOKWiOKWiOKVlOKVnSAgICAg4paI4paI4pWU4paI4paI4pWXIOKWiOKWiOKVkeKWiOKWiOKVkSDilojilojilojilZcgICAg4paI4paI4paI4paI4paI4paI4paI4pWR4paI4paI4paI4paI4paI4paI4pWU4pWd4paI4paI4paI4paI4paI4paI4pWU4pWdCiAg4paI4paI4pWU4pWQ4pWQ4pWdICDilojilojilZTilZDilZDilojilojilZHilojilojilZHilZrilojilojilZfilojilojilZHilZrilZDilZDilZDilZDilojilojilZHilojilojilZEgICAg4pWa4paI4paI4pWU4pWdICAgICAg4paI4paI4pWR4pWa4paI4paI4pWX4paI4paI4pWR4paI4paI4pWRICDilojilojilZEgICAg4paI4paI4pWU4pWQ4pWQ4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWdIOKWiOKWiOKVlOKVkOKVkOKVkOKVnSAKICDilojilojilZEgICAgIOKWiOKWiOKVkSAg4paI4paI4pWR4paI4paI4pWRIOKVmuKWiOKWiOKWiOKWiOKVkeKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVkeKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVl+KWiOKWiOKVkSAgICAgICDilojilojilZEg4pWa4paI4paI4paI4paI4pWR4paI4paI4paI4paI4paI4paI4paI4pWRICAgIOKWiOKWiOKVkSAg4paI4paI4pWR4paI4paI4pWRICAgICDilojilojilZEgICAgIAogIOKVmuKVkOKVnSAgICAg4pWa4pWQ4pWdICDilZrilZDilZ3ilZrilZDilZ0gIOKVmuKVkOKVkOKVkOKVneKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVneKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVneKVmuKVkOKVnSAgICAgICDilZrilZDilZ0gIOKVmuKVkOKVkOKVkOKVneKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVnSAgICDilZrilZDilZ0gIOKVmuKVkOKVneKVmuKVkOKVnSAgICAg4pWa4pWQ4pWdICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgZGV2ZWxvcGVkIG9uIGdpdGh1Yi5jb20vcHJvZjc5L2ZhbnNseS1kb3dubG9hZGVyLW5nCg=='
         ).decode('utf-8')
     )
-    print(f"{(100 - len(__version__) - 1)//2*' '}v{__version__}\n")
+    print(f"{(100 - len(__version__) - 1) // 2 * ' '}v{__version__}\n")
 
 
-#@profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
+# @profile(precision=2, stream=open('memory_use.log', 'w', encoding='utf-8'))
 def main(config: FanslyConfig) -> int:
     """The main logic of the downloader program.
     
@@ -111,26 +111,27 @@ def main(config: FanslyConfig) -> int:
             or config.download_mode == DownloadMode.NOTSET:
         raise RuntimeError('Internal error - user name and download mode should not be empty after validation.')
 
-    print()
-    print_info(f'Token: {config.token}')
-    print_info(f'Check Key: {config.check_key}')
-    print_info(
-        f'Device ID: {config.get_api().device_id} '
-        f'({datetime.fromtimestamp(config.get_api().device_id_timestamp / 1000)})'
-    )
-    print_info(f'Session ID: {config.get_api().session_id}')
-
     global_download_state = GlobalState()
 
-    # M3U8 fixing interim
     print()
-    print_info(
-        "Due to important memory usage and video format bugfixes, "
-        "existing media items "
-        f"\n{' '*16} need to be re-hashed (`_hash_`/`_hash1_` to `_hash2_`)."
-        f"\n{' '*16} Affected files will automatically be renamed in the background."
-    )
-    print()
+    if not config.minimize_output:
+        print_info(f'Token: {config.token}')
+        print_info(f'Check Key: {config.check_key}')
+        print_info(
+            f'Device ID: {config.get_api().device_id} '
+            f'({datetime.fromtimestamp(config.get_api().device_id_timestamp / 1000)})'
+        )
+        print_info(f'Session ID: {config.get_api().session_id}')
+
+        # M3U8 fixing interim
+        print()
+        print_info(
+            "Due to important memory usage and video format bugfixes, "
+            "existing media items "
+            f"\n{' ' * 16} need to be re-hashed (`_hash_`/`_hash1_` to `_hash2_`)."
+            f"\n{' ' * 16} Affected files will automatically be renamed in the background."
+        )
+        print()
 
     for creator_name in sorted(config.user_names):
         with Timer(creator_name):
@@ -141,7 +142,8 @@ def main(config: FanslyConfig) -> int:
                 if not any([config.download_mode == DownloadMode.POSTS, config.download_mode == DownloadMode.ALBUM]):
                     dedupe_init(config, state)
 
-                print_download_info(config)
+                if not config.minimize_output:
+                    print_download_info(config)
 
                 get_creator_account_info(config, state)
 
@@ -166,10 +168,12 @@ def main(config: FanslyConfig) -> int:
                     download_collections(config, state)
 
                 else:
-                    if any([config.download_mode == DownloadMode.MESSAGES, config.download_mode == DownloadMode.NORMAL]):
+                    if any([config.download_mode == DownloadMode.MESSAGES,
+                            config.download_mode == DownloadMode.NORMAL]):
                         download_messages(config, state)
 
-                    if any([config.download_mode == DownloadMode.TIMELINE, config.download_mode == DownloadMode.NORMAL]):
+                    if any([config.download_mode == DownloadMode.TIMELINE,
+                            config.download_mode == DownloadMode.NORMAL]):
                         download_timeline(config, state)
 
                 update_global_statistics(global_download_state, download_state=state)

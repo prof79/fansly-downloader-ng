@@ -1,6 +1,5 @@
 """Message Downloading"""
 
-
 import random
 
 from time import sleep
@@ -18,9 +17,10 @@ def download_messages(config: FanslyConfig, state: DownloadState):
     # This is important for directory creation later on.
     state.download_type = DownloadType.MESSAGES
 
-    print_info(f"Initiating Messages procedure. Standby for results.")
-    print()
-    
+    if not config.minimize_output:
+        print_info(f"Initiating Messages procedure. Standby for results.")
+        print()
+
     groups_response = config.get_api() \
         .get_group()
 
@@ -56,7 +56,7 @@ def download_messages(config: FanslyConfig, state: DownloadState):
                     .get_message(params)
 
                 if messages_response.status_code == 200:
-                
+
                     # Object contains: messages, accountMedia, accountMediaBundles, tips, tipGoals, stories
                     messages = messages_response.json()['response']
 
@@ -67,7 +67,7 @@ def download_messages(config: FanslyConfig, state: DownloadState):
 
                     # Print info on skipped downloads if `show_skipped_downloads` is enabled
                     skipped_downloads = state.duplicate_count - starting_duplicates
-                    if skipped_downloads > 1 and config.show_downloads and not config.show_skipped_downloads:
+                    if skipped_downloads > 1 and config.show_downloads and not config.show_skipped_downloads and not config.minimize_output:
                         print_info(
                             f"Skipped {skipped_downloads} already downloaded media item{'' if skipped_downloads == 1 else 's'}."
                         )
@@ -82,12 +82,12 @@ def download_messages(config: FanslyConfig, state: DownloadState):
                         msg_cursor = messages['messages'][-1]['id']
 
                     except IndexError:
-                        break # break if end is reached
+                        break  # break if end is reached
 
                 else:
                     print_error(
                         f"Failed messages download. messages_req failed with response code: "
-                        f"{messages_response.status_code}\n{messages_response.text}", 
+                        f"{messages_response.status_code}\n{messages_response.text}",
                         30
                     )
 

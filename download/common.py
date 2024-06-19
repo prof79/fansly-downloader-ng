@@ -141,9 +141,10 @@ def process_download_accessible_media(
         # Don't forget to save/reset afterwards.
         config.DUPLICATE_THRESHOLD = int(0.2 * state.total_message_items)
 
-    # at this point we have already parsed the whole post object and determined what is scrapable with the code above
-    print_info(
-        f"@{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
+    if not config.minimize_output:
+        # at this point we have already parsed the whole post object and determined what is scrapable with the code above
+        print_info(
+            f"@{state.creator_name} - amount of media in {state.download_type_str()}: {len(media_infos)} (scrapable: {len(accessible_media)})")
 
     set_create_directory_for_download(config, state)
 

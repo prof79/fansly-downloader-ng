@@ -158,6 +158,14 @@ def parse_args() -> argparse.Namespace:
              "intervention.",
     )
     parser.add_argument(
+        '-mo', '--minimize-output',
+        required=False,
+        default=False,
+        action='store_true',
+        dest='minimize_output',
+        help="Minimize output by showing as little information as necessary."
+    )
+    parser.add_argument(
         '-npox', '--no-prompt-on-exit',
         required=False,
         default=False,
@@ -462,6 +470,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
     positive_bools = [
         'separate_previews',
         'use_duplicate_threshold',
+        'minimize_output'
     ]
 
     # Sets config to arguments when arguments are True

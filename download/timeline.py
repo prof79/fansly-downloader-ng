@@ -1,6 +1,5 @@
 """Timeline Downloads"""
 
-
 import random
 import traceback
 
@@ -18,9 +17,9 @@ from textio import input_enter_continue, print_debug, print_error, print_info, p
 
 
 def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
-
-    print_info(f"Executing Timeline functionality. Anticipate remarkable outcomes!")
-    print()
+    if not config.minimize_output:
+        print_info(f"Executing Timeline functionality. Anticipate remarkable outcomes!")
+        print()
 
     # This is important for directory creation later on.
     state.download_type = DownloadType.TIMELINE
@@ -33,14 +32,15 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
     while True and attempts <= config.timeline_retries:
         starting_duplicates = state.duplicate_count
 
-        if timeline_cursor == 0:
-            print_info(f"Inspecting most recent Timeline cursor ... [CID: {state.creator_id}]")
+        if not config.minimize_output:
+            if timeline_cursor == 0:
+                print_info(f"Inspecting most recent Timeline cursor ... [CID: {state.creator_id}]")
 
-        else:
-            print_info(f"Inspecting Timeline cursor: {timeline_cursor} [CID: {state.creator_id}]")
-    
+            else:
+                print_info(f"Inspecting Timeline cursor: {timeline_cursor} [CID: {state.creator_id}]")
+
         timeline_response = Response()
-    
+
         try:
             if state.creator_id is None or timeline_cursor is None:
                 raise RuntimeError('Creator name or timeline cursor should not be None')
@@ -53,7 +53,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
             if timeline_response.status_code == 200:
 
                 timeline = timeline_response.json()['response']
-        
+
                 if config.debug:
                     print_debug(f'Timeline object: {timeline}')
 
@@ -81,7 +81,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
 
                 # Print info on skipped downloads if `show_skipped_downloads` is enabled
                 skipped_downloads = state.duplicate_count - starting_duplicates
-                if skipped_downloads > 1 and config.show_downloads and not config.show_skipped_downloads:
+                if skipped_downloads > 1 and config.show_downloads and not config.show_skipped_downloads and not config.minimize_output:
                     print_info(
                         f"Skipped {skipped_downloads} already downloaded media item{'' if skipped_downloads == 1 else 's'}."
                     )
@@ -101,7 +101,7 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
 
                 except Exception:
                     message = \
-                        'Please copy & paste this on GitHub > Issues & provide a short explanation (34):'\
+                        'Please copy & paste this on GitHub > Issues & provide a short explanation (34):' \
                         f'\n{traceback.format_exc()}\n'
 
                     raise ApiError(message)
@@ -110,8 +110,8 @@ def download_timeline(config: FanslyConfig, state: DownloadState) -> None:
             print_error("Couldn't find any scrapable media at all!\
                 \n This most likely happend because you're not following the creator, your authorisation token is wrong\
                 \n or the creator is not providing unlocked content.",
-                35
-            )
+                        35
+                        )
             input_enter_continue(config.interactive)
 
         except Exception:

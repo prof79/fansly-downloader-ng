@@ -87,7 +87,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
         # deduplication - part 1: decide if this media is even worth further processing; by media id
         if any([media_item.media_id in state.recent_photo_media_ids,
                 media_item.media_id in state.recent_video_media_ids]):
-            if config.show_downloads and config.show_skipped_downloads:
+            if config.show_downloads and config.show_skipped_downloads and not config.minimize_output:
                 print_info(
                     f"Deduplication [{media_item.media_id}]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
             state.duplicate_count += 1
