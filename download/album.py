@@ -40,7 +40,7 @@ def download_album(config: FanslyConfig, state: DownloadState):
                 break
 
             else:
-                print_error(f"The input string '{album_id}' can not be a valid album link or ID."
+                print_error(f"The input string '{requested_album}' can not be a valid album link or ID."
                             f"\n{22 * ' '}The last few numbers in the URL are the album ID"
                             f"\n{22 * ' '}Example: 'https://fansly.com/collection/<creator>/478316699355983877'"
                             f"\n{22 * ' '}In the example, '478316699355983877' is the album ID.",
