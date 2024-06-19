@@ -9,7 +9,7 @@ from .types import DownloadType
 from config import FanslyConfig
 from fileio.dedupe import dedupe_init
 from textio import input_enter_continue, print_error, print_info, print_warning
-from utils.common import is_valid_post_id
+from utils.common import is_valid_post_id, get_post_id_from_request
 
 
 def download_posts(config: FanslyConfig, state: DownloadState):
@@ -31,8 +31,8 @@ def download_posts(config: FanslyConfig, state: DownloadState):
         )
 
     else:
-        print_info(f"Please enter the IDs of the posts you would like to download one after another (confirm with <Enter>)."
-            f"\n{17*' '}After you click on a post, it will show in your browsers URL bar."
+        print_info(f"Please enter the links or the IDs of the posts you would like to download one after another (confirm with <Enter>)."
+            f"\n{17*' '}After you click on a post, the ID will show in your browser's URL bar."
         )
         print()
 
@@ -41,20 +41,21 @@ def download_posts(config: FanslyConfig, state: DownloadState):
 
         while len(post_id) > 0:
             while True:
-                post_id = input(f"\n{17*' '}► Post ID: ")
+                requested_post = input(f"\n{17 * ' '}► Post Link or ID: ")
+                post_id = get_post_id_from_request(requested_post)
 
                 if len(post_id) == 0:
-                    print_info("All desired post IDs are recorded. Proceeding to download.")
+                    print_info("All desired post links or IDs are recorded. Proceeding to download.")
                     break
                 elif is_valid_post_id(post_id):
                     post_ids.append(post_id)
                     print_info(f"Post {post_id} is recorded. Enter the next one or hit enter to proceed.")
                     break
                 else:
-                    print_error(f"The input string '{post_id}' can not be a valid post ID."
+                    print_error(f"The input string '{requested_post}' can not be a valid post link or ID."
                         f"\n{22*' '}The last few numbers in the url is the post ID"
                         f"\n{22*' '}Example: 'https://fansly.com/post/1283998432982'"
-                        f"\n{22*' '}In the example, '1283998432982' would be the post ID.",
+                        f"\n{22*' '}In the example, '1283998432982' is the post ID.",
                         17
                     )
 
@@ -93,9 +94,9 @@ def download_posts(config: FanslyConfig, state: DownloadState):
                     state.creator_name = creator_username
 
                     if creator_display_name and creator_username:
-                        print_info(f"Inspecting a post by {creator_display_name} (@{creator_username})")
+                        print_info(f"Inspecting post {post_id} by {creator_display_name} (@{creator_username})")
                     else:
-                        print_info(f"Inspecting a post by {creator_username.capitalize()}")
+                        print_info(f"Inspecting post {post_id} by {creator_username.capitalize()}")
 
                 # Deferred deduplication init because directory may have changed
                 # depending on post creator (!= configured creator)
