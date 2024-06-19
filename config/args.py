@@ -13,7 +13,7 @@ from .modes import DownloadMode
 
 from errors import ConfigError
 from textio import print_debug, print_warning
-from utils.common import is_valid_post_id, save_config_or_raise
+from utils.common import is_valid_post_id, save_config_or_raise, get_post_id_from_request
 
 
 def parse_args() -> argparse.Namespace:
@@ -124,10 +124,10 @@ def parse_args() -> argparse.Namespace:
         '--single',
         required=False,
         default=None,
-        metavar='POST_ID',
+        metavar='REQUESTED_POST',
         dest='download_mode_single',
         help='Use "Single" download mode. This will download a single post '
-            "by ID from an arbitrary creator. "
+            "by link or ID from an arbitrary creator. "
             "A post ID must be at least 10 characters and consist of digits only."
             "Example - https://fansly.com/post/1283998432982 -> ID is: 1283998432982",
     )
@@ -376,13 +376,13 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         config_overridden = True
 
     if args.download_mode_single is not None:
-        post_id = args.download_mode_single
+        post_id = get_post_id_from_request(args.download_mode_single)
         config.download_mode = DownloadMode.SINGLE
         
         if not is_valid_post_id(post_id):
             raise ConfigError(
-                f"Argument error - '{post_id}' is not a valid post ID. "
-                "At least 10 characters/only digits required."
+                f"Argument error - '{post_id}' is not a valid post link or ID. "
+                "For an ID at least 10 characters/only digits are required."
             )
 
         config.post_id = post_id
