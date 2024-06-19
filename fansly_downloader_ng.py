@@ -138,7 +138,7 @@ def main(config: FanslyConfig) -> int:
                 state = DownloadState(creator_name=creator_name)
 
                 # Special treatment for deviating folder names later
-                if not config.download_mode == DownloadMode.SINGLE:
+                if not any([config.download_mode == DownloadMode.SINGLE, config.download_mode == DownloadMode.ALBUM]):
                     dedupe_init(config, state)
 
                 print_download_info(config)
@@ -151,12 +151,16 @@ def main(config: FanslyConfig) -> int:
                 # Messages: Scrapes only the creator's messages content.
                 # Single: Fetch a single post by the post's ID. Click on a post to see its ID in the url bar e.g. ../post/1283493240234
                 # Collection: Download all content listed within the "Purchased Media Collection"
+                # Album: Download all content saved in a creator's album.
 
                 print_info(f'Download mode is: {config.download_mode_str()}')
                 print()
 
                 if config.download_mode == DownloadMode.SINGLE:
                     download_single_post(config, state)
+
+                elif config.download_mode == DownloadMode.ALBUM:
+                    download_album(config, state)
 
                 elif config.download_mode == DownloadMode.COLLECTION:
                     download_collections(config, state)
