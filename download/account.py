@@ -25,7 +25,7 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
         raise RuntimeError(message)
 
     # Collections are independent of creators and
-    # single posts may diverge from configured creators
+    # posts may diverge from configured creators
     if any([config.download_mode == DownloadMode.MESSAGES,
             config.download_mode == DownloadMode.NORMAL,
             config.download_mode == DownloadMode.TIMELINE]):
@@ -36,7 +36,7 @@ def get_creator_account_info(config: FanslyConfig, state: DownloadState) -> None
 
         try:
             raw_response = config.get_api() \
-                .get_creator_account_info(state.creator_name)
+                .get_creator_account_info_by_name(state.creator_name)
 
             account = raw_response.json()['response'][0]
 

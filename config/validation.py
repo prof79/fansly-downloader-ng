@@ -10,6 +10,7 @@ from requests.exceptions import RequestException
 from textio.textio import input_enter_close, input_enter_continue
 
 from .config import username_has_valid_chars, username_has_valid_length
+from config.modes import DownloadMode
 from .fanslyconfig import FanslyConfig
 
 from errors import ConfigError
@@ -21,7 +22,7 @@ from utils.web import guess_check_key, guess_user_agent, open_get_started_url
 
 def validate_creator_names(config: FanslyConfig) -> bool:
     """Validates the input value for `config_username` in `config.ini`.
-    
+
     :param FanslyConfig config: The configuration object to validate.
 
     :return: True if all user names passed the test/could be remedied,
@@ -68,7 +69,7 @@ def validate_creator_names(config: FanslyConfig) -> bool:
 
 def validate_adjust_creator_name(name: str, interactive: bool = False) -> str | None:
     """Validates the name of a Fansly creator.
-    
+
     :param name: The creator name to validate and potentially correct.
     :type name: str
     :param interactive: Prompts the user for a replacement name if an
@@ -418,7 +419,7 @@ def validate_adjust_check_key(config: FanslyConfig) -> None:
 def validate_adjust_download_directory(config: FanslyConfig) -> None:
     """Validates the `download_directory` value from `config.ini`
     and corrects it if possible.
-    
+
     :param FanslyConfig config: The configuration to validate and correct.
     """
     # if user didn't specify custom downloads path
@@ -451,10 +452,41 @@ def validate_adjust_download_directory(config: FanslyConfig) -> None:
         save_config_or_raise(config)
 
 
+def validate_adjust_download_mode(config: FanslyConfig) -> None:
+    """Validates the `download_mode` value from `config.ini`
+    and adjusts it if desired.
+
+    :param FanslyConfig config: The configuration to validate and correct.
+    """
+    current_download_mode = config.download_mode.capitalize()
+    print_info(f"The current download mode is set to '{current_download_mode}'.")
+
+    if config.interactive:
+        done = False
+        while not done:
+            key_confirmation = input(
+                f"\n{20 * ' '}► Would you like to change it (y/n)? "
+            ).strip().lower()
+
+            if key_confirmation.startswith('y'):
+                available_modes = [mode.capitalize() for mode in DownloadMode if mode != DownloadMode.NOTSET]
+                print_info(f"Available download modes are: {', '.join(available_modes)}.")
+                new_download_mode = input(f"\n{20 * ' '}► Enter the desired download mode: "
+                                ).strip()
+                try:
+                    config.download_mode = DownloadMode(new_download_mode.upper())
+                    print_info(f"The new download mode '{new_download_mode.capitalize()}' has been set!")
+                    done = True
+                except ValueError:
+                    print_warning(f"The entered download mode '{new_download_mode}' seems to be invalid.")
+            else:
+                done = True
+
+
 def validate_adjust_config(config: FanslyConfig) -> None:
     """Validates all input values from `config.ini`
     and corrects them if possible.
-    
+
     :param FanslyConfig config: The configuration to validate and correct.
     """
     if not validate_creator_names(config):
@@ -469,3 +501,5 @@ def validate_adjust_config(config: FanslyConfig) -> None:
     # validate_adjust_session_id(config)
 
     validate_adjust_download_directory(config)
+
+    validate_adjust_download_mode(config)

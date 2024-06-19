@@ -3,7 +3,7 @@
 from configparser import ConfigParser
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from config.modes import DownloadMode
 from config.metadatahandling import MetadataHandling
@@ -34,7 +34,8 @@ class FanslyConfig(object):
     token_from_browser_name: Optional[str] = None
     debug: bool = False
     # If specified on the command-line
-    post_id: Optional[str] = None
+    post_ids: Optional[List[str]] = None
+    album_id: Optional[str] = None
     # Set on start after self-update
     updated_to: Optional[str] = None
 
@@ -56,7 +57,7 @@ class FanslyConfig(object):
     # session_id: str = 'null'
 
     # Options
-    # "Normal" | "Timeline" | "Messages" | "Single" | "Collection"
+    # "Normal" | "Timeline" | "Messages" | "Posts" | "Collection" | "Album"
     download_mode: DownloadMode = DownloadMode.NORMAL
     download_directory: (None | Path) = None
     download_media_previews: bool = True

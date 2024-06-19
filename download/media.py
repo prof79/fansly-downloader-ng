@@ -1,6 +1,5 @@
 """Fansly Download Functionality"""
 
-
 import random
 
 from rich.progress import Progress, BarColumn, TextColumn
@@ -21,10 +20,9 @@ from utils.common import batch_list
 
 
 def download_media_infos(
-            config: FanslyConfig,
-            media_ids: list[str]
-        ) -> list[dict]:
-
+        config: FanslyConfig,
+        media_ids: list[str]
+) -> list[dict]:
     media_infos: list[dict] = []
 
     for ids in batch_list(media_ids, config.BATCH_SIZE):
@@ -87,9 +85,11 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
             raise MediaError('Download URL for media item not defined. Aborting.')
 
         # deduplication - part 1: decide if this media is even worth further processing; by media id
-        if any([media_item.media_id in state.recent_photo_media_ids, media_item.media_id in state.recent_video_media_ids]):
+        if any([media_item.media_id in state.recent_photo_media_ids,
+                media_item.media_id in state.recent_video_media_ids]):
             if config.show_downloads and config.show_skipped_downloads and not config.minimize_output:
-                print_info(f"Deduplication [Media ID]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
+                print_info(
+                    f"Deduplication [{media_item.media_id}]: {media_item.mimetype.split('/')[-2]} '{filename}' → skipped")
             state.duplicate_count += 1
             continue
 
@@ -124,9 +124,10 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
             else:
                 # if the mimetype is neither image nor video, skip the download
-                print_warning(f"Unknown mimetype; skipping download for mimetype: '{media_item.mimetype}' | media_id: {media_item.media_id}")
+                print_warning(
+                    f"Unknown mimetype; skipping download for mimetype: '{media_item.mimetype}' | media_id: {media_item.media_id}")
                 continue
-            
+
             # decides to separate previews or not
             if media_item.is_preview and config.separate_previews:
                 file_save_path = file_save_dir / 'Previews' / filename
@@ -137,7 +138,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
             if not file_save_dir.exists():
                 file_save_dir.mkdir(parents=True)
-        
+
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:
             print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
@@ -155,10 +156,10 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
             else:
                 # handle the download of a normal media file
                 with config.get_api().get_with_ngsw(
-                            url=media_item.download_url,
-                            stream=True,
-                            add_fansly_headers=False,
-                        ) as response:
+                        url=media_item.download_url,
+                        stream=True,
+                        add_fansly_headers=False,
+                ) as response:
 
                     if response.status_code == 200:
                         text_column = TextColumn(f"", table_column=Column(ratio=1))

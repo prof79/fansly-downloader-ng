@@ -1,6 +1,5 @@
 """Work Directory Manipulation"""
 
-
 import os
 import sys
 import time
@@ -58,7 +57,7 @@ def set_create_directory_for_download(config: FanslyConfig, state: DownloadState
             suffix = '_fansly'
 
         user_base_path = config.download_directory / f'{state.creator_name}{suffix}'
-        
+
         user_base_path.mkdir(exist_ok=True)
 
         # Default directory if download types don't match in check below
@@ -67,13 +66,16 @@ def set_create_directory_for_download(config: FanslyConfig, state: DownloadState
         if state.download_type == DownloadType.COLLECTIONS:
             download_directory = config.download_directory / 'Collections'
 
+        elif state.download_type == DownloadType.ALBUM:
+            download_directory = user_base_path / 'Album'
+
         elif state.download_type == DownloadType.MESSAGES and config.separate_messages:
             download_directory = user_base_path / 'Messages'
 
         elif state.download_type == DownloadType.TIMELINE and config.separate_timeline:
             download_directory = user_base_path / 'Timeline'
 
-        elif state.download_type == DownloadType.SINGLE and config.separate_timeline:
+        elif state.download_type == DownloadType.POSTS and config.separate_timeline:
             download_directory = user_base_path / 'Timeline'
 
         # Save state
@@ -105,7 +107,7 @@ def delete_temporary_pyinstaller_files():
             item = os.path.join(temp_dir, folder)
 
             if folder.startswith('_MEI') \
-                and os.path.isdir(item) \
+                    and os.path.isdir(item) \
                     and (current_time - os.path.getctime(item)) > 3600:
 
                 for root, dirs, files in os.walk(item, topdown=False):

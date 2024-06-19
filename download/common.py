@@ -4,6 +4,7 @@ import traceback
 
 from typing import Any
 
+from utils.common import batch_list
 from .downloadstate import DownloadState
 from .media import download_media
 from .types import DownloadType
@@ -102,7 +103,7 @@ def process_download_accessible_media(
         currently being downloaded.
     :param list[dict] media_infos: A list of media informations from posts,
         timelines, messages, collections and so on.
-    :param str|None post_id: The post ID required for "Single" download mode.
+    :param str|None post_id: The post ID required for "Posts" download mode.
 
     :return: "False" as a break indicator for "Timeline" downloads,
         "True" otherwise.
@@ -167,3 +168,40 @@ def process_download_accessible_media(
         config.DUPLICATE_THRESHOLD = original_duplicate_threshold
 
     return True
+
+
+def process_batch_download(
+        input_list: list[Any],
+        config: FanslyConfig,
+        state: DownloadState
+):
+    """Takes a list of media_ids to download using batches.
+
+    :param list[Any] input_list: The list with media_ids.
+    :param FanslyConfig config: The downloader configuration.
+    :param DownloadState state: The state and statistics of what is
+        currently being downloaded.
+    """
+
+    # Splitting the list into batches and making separate API calls for each
+    for batch in batch_list(input_list, config.BATCH_SIZE):
+
+        batched_ids = ','.join(batch)
+
+        media_info_response = config.get_api() \
+            .get_account_media(batched_ids)
+
+        if media_info_response.status_code == 200:
+            media_info = media_info_response.json()['response']
+
+            process_download_accessible_media(config, state, media_info)
+
+        else:
+            print_error(
+                f"Media batch download failed. Response code: "
+                f"{media_info_response.status_code}"
+                f"\n{media_info_response.text}"
+                f"\n\nAffected media IDs: {batched_ids}",
+                23
+            )
+            input_enter_continue(config.interactive)

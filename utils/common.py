@@ -1,6 +1,5 @@
 """Common Utility Functions"""
 
-
 import os
 import platform
 import subprocess
@@ -55,28 +54,59 @@ def save_config_or_raise(config: FanslyConfig) -> bool:
         return True
 
 
-def is_valid_post_id(post_id: str) -> bool:
-    """Validates a Fansly post ID.
+def is_valid_content_id(content_id: str) -> bool:
+    """Validates a Fansly post / album ID.
 
-    Valid post IDs must:
+    Valid post / album IDs must:
     
     - only contain digits
     - be longer or equal to 10 characters
     - not contain spaces
     
-    :param post_id: The post ID string to validate.
-    :type post_id: str
+    :param content_id: The post / album ID string to validate.
+    :type content_id: str
 
     :return: True or False.
     :rtype: bool
     """
     return all(
         [
-            post_id.isdigit(),
-            len(post_id) >= 10,
-            not any(char.isspace() for char in post_id),
+            content_id.isdigit(),
+            len(content_id) >= 10,
+            not any(char.isspace() for char in content_id),
         ]
     )
+
+
+def get_content_id_from_request(requested_content: str) -> str:
+    """Strips post / album ID from a post / album link if necessary.
+    Otherwise, the ID is returned directly
+
+    :param requested_content: The request made by the user.
+    :type requested_content: str
+
+    :return: The extracted post / album ID.
+    :rtype: str
+    """
+    content_id = requested_content
+    if requested_content.startswith("https://fansly.com/"):
+        content_id = requested_content.split('/')[-1]
+    return content_id
+
+
+def get_post_ids_from_list_of_requests(requested_posts: list[str]) -> list[str]:
+    """Strips post_ids from a list of post links if necessary.
+
+    :param requested_posts: The list of requests made by the user.
+    :type requested_posts: list[str]
+
+    :return: A list of extracted post_ids.
+    :rtype: list[str]
+    """
+    post_ids = []
+    for requested_post in requested_posts:
+        post_ids.append(get_content_id_from_request(requested_post))
+    return post_ids
 
 
 def open_location(filepath: Path, open_folder_when_finished: bool, interactive: bool) -> bool:
@@ -98,10 +128,10 @@ def open_location(filepath: Path, open_folder_when_finished: bool, interactive: 
 
     if not open_folder_when_finished or not interactive:
         return False
-    
+
     if not os.path.isfile(filepath) and not os.path.isdir(filepath):
         return False
-    
+
     # tested below and they work to open folder locations
     if plat == 'Windows':
         # verified works
@@ -110,7 +140,7 @@ def open_location(filepath: Path, open_folder_when_finished: bool, interactive: 
     elif plat == 'Linux':
         # verified works
         subprocess.run(['xdg-open', filepath], shell=False)
-        
+
     elif plat == 'Darwin':
         # verified works
         subprocess.run(['open', filepath], shell=False)
