@@ -139,9 +139,12 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
             if not file_save_dir.exists():
                 file_save_dir.mkdir(parents=True)
 
+        if config.resolution != 'MAX' and not media_item.requested_height_found:
+            print_warning(f"Requested resolution {config.resolution}p not found. Resolution set to {media_item.height}")
+
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:
-            print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
+            print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.height}p")
 
         try:
 

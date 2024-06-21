@@ -218,6 +218,8 @@ def load_config(config: FanslyConfig) -> None:
         download_mode = config._parser.get(options_section, 'download_mode', fallback='Normal')
         config.download_mode = DownloadMode(download_mode.upper())
 
+        config.resolution = config._parser.get(options_section, 'resolution', fallback='MAX')
+
         # Advanced, Simple -> str
         metadata_handling = config._parser.get(options_section, 'metadata_handling', fallback='Advanced')
         config.metadata_handling = MetadataHandling(metadata_handling.upper())

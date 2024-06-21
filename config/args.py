@@ -145,6 +145,14 @@ def parse_args() -> argparse.Namespace:
     # endregion Download Modes
 
     # region Other Options
+    parser.add_argument(
+        '-r', '--resolution',
+        required=False,
+        default=None,
+        metavar='REQUESTED_RESOLUTION',
+        dest='resolution',
+        help='Define a lower resolution to download. Default is the highest resolution available.'
+    )
 
     parser.add_argument(
         '-ni', '--non-interactive',
@@ -431,6 +439,10 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
             raise ConfigError(
                 f"Argument error - '{handling}' is not a valid metadata handling strategy."
             )
+
+    if args.resolution:
+        config.resolution = args.resolution
+        config_overridden = True
 
     # The code following avoids code duplication of checking an
     # argument and setting the override flag for each argument.

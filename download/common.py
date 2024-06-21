@@ -117,7 +117,7 @@ def process_download_accessible_media(
     for media_info in media_infos:
         try:
             # add details into a list
-            media_items += [parse_media_info(state, media_info, post_id)]
+            media_items += [parse_media_info(config, state, media_info, post_id)]
 
         except Exception:
             print_error(f"Unexpected error parsing {state.download_type_str()} content;\n{traceback.format_exc()}", 42)

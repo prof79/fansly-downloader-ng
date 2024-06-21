@@ -3,6 +3,7 @@
 
 import json
 
+from config import FanslyConfig
 from . import MediaItem
 
 from download.downloadstate import DownloadState
@@ -49,63 +50,67 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
     :param str content_type: "media" or "preview"
     :param dict media_info: ???
 
-    :return: None.
+    :return: bool requested_resolution_found: defines whether requested resolution was found / exists
     """
-    
+
     if content.get('locations'):
         location_url: str = content['locations'][0]['location']
 
         current_variant_resolution = (content['width'] or 0) * (content['height'] or 0)
 
-        if current_variant_resolution > item.highest_variants_resolution \
-                and item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
+        if item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
+            if item.requested_height and item.requested_height == content['height']:
+                item.requested_height_found = True
 
-            item.highest_variants_resolution = current_variant_resolution
-            item.highest_variants_resolution_height = content['height'] or 0
-            item.highest_variants_resolution_url = location_url
+            if item.requested_height_found or current_variant_resolution > item.requested_variant_resolution:
+                item.requested_variant_resolution = current_variant_resolution
+                item.requested_variant_resolution_height = content['height'] or 0
+                item.requested_variant_resolution_url = location_url
 
-            item.media_id = int(content['id'])
-            item.mimetype = simplify_mimetype(content['mimetype'])
+                item.media_id = int(content['id'])
+                item.mimetype = simplify_mimetype(content['mimetype'])
 
-            # if key-pair-id is not in there we'll know it's the new .m3u8 format, so we construct a generalised url, which we can pass relevant auth strings with
-            # note: this url won't actually work, its purpose is to just pass the strings through the download_url variable
-            if item.highest_variants_resolution_url is not None and \
-                    not 'Key-Pair-Id' in item.highest_variants_resolution_url:
+                # if key-pair-id is not in there we'll know it's the new .m3u8 format, so we construct a generalised url, which we can pass relevant auth strings with
+                # note: this url won't actually work, its purpose is to just pass the strings through the download_url variable
+                if item.requested_variant_resolution_url is not None and \
+                        not 'Key-Pair-Id' in item.requested_variant_resolution_url:
+                    try:
+                        # use very specific metadata, bound to the specific media to get auth info
+                        item.metadata = content['locations'][0]['metadata']
+
+                        # item.requested_variant_resolution_url = \
+                        #     f"{item.requested_variant_resolution_url.split('.m3u8')[0]}_{parse_variant_metadata(content['metadata'])}.m3u8?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
+
+                        item.requested_variant_resolution_url = \
+                            f"{item.requested_variant_resolution_url}?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
+
+                    except KeyError:
+                        # we pass here and catch below
+                        pass
+
+                """
+                it seems like the date parsed here is actually the correct date,
+                which is directly attached to the content. but posts that could be uploaded
+                8 hours ago, can contain images from 3 months ago. so the date we are parsing here,
+                might be the date, that the fansly CDN has first seen that specific content and the
+                content creator, just attaches that old content to a public post after e.g. 3 months.
+
+                or createdAt & updatedAt are also just bugged out idk..
+                note: images would be overwriting each other by filename, if hashing didnt provide uniqueness
+                else we would be forced to add randint(-1800, 1800) to epoch timestamps
+                """
                 try:
-                    # use very specific metadata, bound to the specific media to get auth info
-                    item.metadata = content['locations'][0]['metadata']
+                    item.created_at = int(content['updatedAt'])
 
-                    # item.highest_variants_resolution_url = \
-                    #     f"{item.highest_variants_resolution_url.split('.m3u8')[0]}_{parse_variant_metadata(content['metadata'])}.m3u8?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
+                except Exception:
+                    item.created_at = int(media_info[content_type]['createdAt'])
 
-                    item.highest_variants_resolution_url = \
-                        f"{item.highest_variants_resolution_url}?ngsw-bypass=true&Policy={item.metadata['Policy']}&Key-Pair-Id={item.metadata['Key-Pair-Id']}&Signature={item.metadata['Signature']}"
-
-                except KeyError:
-                    # we pass here and catch below
-                    pass
-
-            """
-            it seems like the date parsed here is actually the correct date,
-            which is directly attached to the content. but posts that could be uploaded
-            8 hours ago, can contain images from 3 months ago. so the date we are parsing here,
-            might be the date, that the fansly CDN has first seen that specific content and the
-            content creator, just attaches that old content to a public post after e.g. 3 months.
-
-            or createdAt & updatedAt are also just bugged out idk..
-            note: images would be overwriting each other by filename, if hashing didnt provide uniqueness
-            else we would be forced to add randint(-1800, 1800) to epoch timestamps
-            """
-            try:
-                item.created_at = int(content['updatedAt'])
-
-            except Exception:
-                item.created_at = int(media_info[content_type]['createdAt'])
-
-    item.download_url = item.highest_variants_resolution_url
+    item.download_url = item.requested_variant_resolution_url
+    item.height = item.requested_variant_resolution_height
 
 
 def parse_media_info(
+            config: FanslyConfig,
             state: DownloadState,
             media_info: dict,
             post_id: str | None=None,
@@ -113,9 +118,11 @@ def parse_media_info(
     """Parse media JSON reply from Fansly API."""
 
     # initialize variables
-    #highest_variants_resolution_url, download_url, file_extension, metadata, default_normal_locations, default_normal_mimetype, mimetype =  None, None, None, None, None, None, None
-    #created_at, media_id, highest_variants_resolution, highest_variants_resolution_height, default_normal_height = 0, 0, 0, 0, 0
+    #requested_variant_resolution_url, download_url, file_extension, metadata, default_normal_locations, default_normal_mimetype, mimetype =  None, None, None, None, None, None, None
+    #created_at, media_id, requested_variant_resolution, requested_variant_resolution_height, default_normal_height = 0, 0, 0, 0, 0
     item = MediaItem()
+    if config.resolution != 'MAX':
+        item.requested_height = int(config.resolution)
 
     # check if media is a preview
     item.is_preview = media_info['previewId'] is not None
@@ -131,7 +138,7 @@ def parse_media_info(
     if not item.is_preview:
         default_details = media_info['media']
 
-        item.default_normal_locations = media_info['media']['locations']
+        item.default_normal_locations = default_details['locations']
         item.default_normal_id = int(default_details['id'])
         item.default_normal_created_at = int(default_details['createdAt'])
         item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
@@ -157,14 +164,22 @@ def parse_media_info(
         variants = media_info['media']['variants']
 
         for content in variants:
-            parse_variants(item, content=content, content_type='media', media_info=media_info)
+            if not item.requested_height_found:
+                parse_variants(item, content=content, content_type='media', media_info=media_info)
+            else:
+                break
+
 
     # previews: if media location is not found, we work with the preview media info instead
     if not item.download_url and 'preview' in media_info:
         variants = media_info['preview']['variants']
+        item.requested_height_found = False
 
         for content in variants:
-            parse_variants(item, content=content, content_type='preview', media_info=media_info)
+            if not item.requested_height_found:
+                parse_variants(item, content=content, content_type='preview', media_info=media_info)
+            else:
+                break
 
     """
     so the way this works is; we have these 4 base variables defined all over this function.
@@ -177,17 +192,18 @@ def parse_media_info(
                 [
                     item.default_normal_height,
                     item.default_normal_locations,
-                    item.highest_variants_resolution_height,
-                    item.highest_variants_resolution_url,
+                    item.requested_variant_resolution_height,
+                    item.requested_variant_resolution_url,
                 ]
             ) and all(
                 [
-                    item.default_normal_height > item.highest_variants_resolution_height,
+                    item.default_normal_height > item.requested_variant_resolution_height,
                     item.default_normal_mimetype == item.mimetype,
                 ]
-            ) or not item.download_url:
+            ) and not item.requested_height_found or not item.download_url:
         # overwrite default variable values, which we will finally return; with the ones from the default media
         item.media_id = item.default_normal_id
+        item.height = item.default_normal_height
         item.created_at = item.default_normal_created_at
         item.mimetype = item.default_normal_mimetype
         item.download_url = item.default_normal_locations
