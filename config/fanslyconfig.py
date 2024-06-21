@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional, List
 
 from config.modes import DownloadMode
+from config.resolutions import VideoResolution
 from config.metadatahandling import MetadataHandling
 
 from api import FanslyApi
@@ -59,6 +60,8 @@ class FanslyConfig(object):
     # Options
     # "Normal" | "Timeline" | "Messages" | "Posts" | "Collection" | "Album"
     download_mode: DownloadMode = DownloadMode.NORMAL
+    # 360 | 480 | 720 | 1080 | 1440 | 2160
+    resolution: VideoResolution = VideoResolution.NOTSET
     download_directory: (None | Path) = None
     download_media_previews: bool = True
     # "Advanced" | "Simple"
@@ -165,6 +168,7 @@ class FanslyConfig(object):
             self._parser.set('Options', 'download_directory', str(self.download_directory))
 
         self._parser.set('Options', 'download_mode', self.download_mode_str())
+        self._parser.set('Options', 'resolution', str(self.resolution))
         self._parser.set('Options', 'metadata_handling', self.metadata_handling_str())
 
         # Booleans

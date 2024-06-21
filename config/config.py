@@ -11,6 +11,7 @@ from pathlib import Path
 from config.fanslyconfig import FanslyConfig
 from config.metadatahandling import MetadataHandling
 from config.modes import DownloadMode
+from config.resolutions import VideoResolution
 
 from errors import ConfigError
 from textio import print_info, print_config, print_warning
@@ -217,6 +218,9 @@ def load_config(config: FanslyConfig) -> None:
         # Normal (Timeline & Messages), Timeline, Messages, Posts (Posts by post ids), Album (Album by album link or ID) or Collections -> str
         download_mode = config._parser.get(options_section, 'download_mode', fallback='Normal')
         config.download_mode = DownloadMode(download_mode.upper())
+
+        resolution = config._parser.getint(options_section, 'resolution', fallback=0)
+        config.resolution = VideoResolution(resolution)
 
         # Advanced, Simple -> str
         metadata_handling = config._parser.get(options_section, 'metadata_handling', fallback='Advanced')

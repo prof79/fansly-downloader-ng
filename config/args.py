@@ -9,6 +9,7 @@ from .config import parse_items_from_line, sanitize_creator_names
 from .fanslyconfig import FanslyConfig
 from .metadatahandling import MetadataHandling
 from .modes import DownloadMode
+from .resolutions import VideoResolution
 
 from errors import ConfigError
 from textio import print_debug, print_warning
@@ -145,6 +146,16 @@ def parse_args() -> argparse.Namespace:
     # endregion Download Modes
 
     # region Other Options
+
+    parser.add_argument(
+        '-r', '--resolution',
+        required=False,
+        default=None,
+        type=int,
+        dest='resolution',
+        help='Define a resolution to download [360, 480, 720, 1080, 1440, 2160]. '
+             'Default is the highest resolution available.'
+    )
 
     parser.add_argument(
         '-ni', '--non-interactive',
@@ -440,6 +451,16 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
             raise ConfigError(
                 f"Argument error - '{handling}' is not a valid metadata handling strategy."
             )
+
+    if args.resolution:
+        try:
+            config.resolution = VideoResolution(args.resolution)
+            config_overridden = True
+        except ValueError:
+            raise ConfigError(
+                f"Argument error - '{args.resolution}' is not a valid resolution."
+            )
+
 
     # The code following avoids code duplication of checking an
     # argument and setting the override flag for each argument.
