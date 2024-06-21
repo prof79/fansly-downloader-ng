@@ -141,7 +141,7 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
                 file_save_dir.mkdir(parents=True)
 
         if config.resolution != VideoResolution.NOTSET and not media_item.requested_height_found and media_item.mimetype == 'video/mp4':
-            print_warning(f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.height.value}p ({media_item.height.description})")
+            print_warning(f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.height.value}p ({media_item.height.description})\n")
 
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:

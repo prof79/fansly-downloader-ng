@@ -189,7 +189,7 @@ def parse_media_info(
                 [
                     item.default_normal_height,
                     item.default_normal_locations,
-                    item.requested_variant_resolution_height.value,
+                    item.requested_variant_resolution_height,
                     item.requested_variant_resolution_url,
                 ]
             ) and all(
