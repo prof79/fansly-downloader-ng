@@ -17,6 +17,7 @@ class MediaItem(object):
     default_normal_created_at: int = 0
     default_normal_locations: str | None = None
     default_normal_mimetype: str | None = None
+    default_normal_resolution: int = 0
     default_normal_height: int = 0
 
     media_id: int = 0

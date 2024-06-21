@@ -58,12 +58,12 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
         current_variant_resolution = (content['width'] or 0) * (content['height'] or 0)
 
         if item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
-            if item.requested_height and item.requested_height.value == content['height']:
+            if item.requested_height and (item.requested_height.value == content['height'] or item.requested_height.value == content['width']):
                 item.requested_height_found = True
 
             if item.requested_height_found or current_variant_resolution > item.requested_variant_resolution:
                 item.requested_variant_resolution = current_variant_resolution
-                item.requested_variant_resolution_height = content['height'] or 0
+                item.requested_variant_resolution_height = min((content['height'] or 0), (content['width'] or 0))
                 item.requested_variant_resolution_url = location_url
 
                 item.media_id = int(content['id'])
@@ -135,21 +135,16 @@ def parse_media_info(
     if not item.is_preview:
         default_details = media_info['media']
 
-        item.default_normal_locations = default_details['locations']
-        item.default_normal_id = int(default_details['id'])
-        item.default_normal_created_at = int(default_details['createdAt'])
-        item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = default_details['height'] or 0
-
     # if its a preview, we take the default preview media instead
     else:
         default_details = media_info['preview']
 
-        item.default_normal_locations = media_info['preview']['locations']
-        item.default_normal_id = int(media_info['preview']['id'])
-        item.default_normal_created_at = int(default_details['createdAt'])
-        item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = default_details['height'] or 0
+    item.default_normal_locations = default_details['locations']
+    item.default_normal_id = int(default_details['id'])
+    item.default_normal_created_at = int(default_details['createdAt'])
+    item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
+    item.default_normal_height = min((default_details['height'] or 0), (default_details['width'] or 0))
+    item.default_normal_resolution = (default_details['width'] or 0) * (default_details['height'] or 0)
 
     if default_details['locations']:
         item.default_normal_locations = default_details['locations'][0]['location']
@@ -186,14 +181,14 @@ def parse_media_info(
     if \
             all(
                 [
-                    item.default_normal_height,
+                    item.default_normal_resolution,
                     item.default_normal_locations,
-                    item.requested_variant_resolution_height,
+                    item.requested_variant_resolution,
                     item.requested_variant_resolution_url,
                 ]
             ) and all(
                 [
-                    item.default_normal_height > item.requested_variant_resolution_height,
+                    item.default_normal_resolution > item.requested_variant_resolution,
                     item.default_normal_mimetype == item.mimetype,
                 ]
             ) and not item.requested_height_found or not item.download_url:
