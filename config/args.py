@@ -1,6 +1,5 @@
 """Argument Parsing and Configuration Mapping"""
 
-
 import argparse
 
 from functools import partial
@@ -10,6 +9,7 @@ from .config import parse_items_from_line, sanitize_creator_names
 from .fanslyconfig import FanslyConfig
 from .metadatahandling import MetadataHandling
 from .modes import DownloadMode
+from .resolutions import VideoResolution
 
 from errors import ConfigError
 from textio import print_debug, print_warning
@@ -19,12 +19,12 @@ from utils.common import is_valid_post_id, save_config_or_raise
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Fansly Downloader NG scrapes media content from one or more Fansly creators. "
-            "Settings will be taken from config.ini or internal defaults and "
-            "can be overriden with the following parameters.\n"
-            "Using the command-line will not overwrite config.ini.",
+                    "Settings will be taken from config.ini or internal defaults and "
+                    "can be overriden with the following parameters.\n"
+                    "Using the command-line will not overwrite config.ini.",
     )
 
-    #region Essential Options
+    # region Essential Options
 
     parser.add_argument(
         '-u', '--user',
@@ -33,8 +33,8 @@ def parse_args() -> argparse.Namespace:
         metavar='USER',
         dest='users',
         help="A list of one or more Fansly creators you want to download "
-            "content from.\n"
-            "This overrides TargetedCreator > username in config.ini.",
+             "content from.\n"
+             "This overrides TargetedCreator > username in config.ini.",
         nargs='+',
     )
     parser.add_argument(
@@ -43,10 +43,10 @@ def parse_args() -> argparse.Namespace:
         default=None,
         dest='download_directory',
         help="The base directory to store all creators' content in. "
-            "A subdirectory for each creator will be created automatically. "
-            "If you do not specify --no-folder-suffix, "
-            "each creator's folder will be suffixed with ""_fansly"". "
-            "Please remember to quote paths including spaces.",
+             "A subdirectory for each creator will be created automatically. "
+             "If you do not specify --no-folder-suffix, "
+             "each creator's folder will be suffixed with ""_fansly"". "
+             "Please remember to quote paths including spaces.",
     )
     parser.add_argument(
         '-t', '--token',
@@ -62,9 +62,9 @@ def parse_args() -> argparse.Namespace:
         default=None,
         dest='user_agent',
         help="The browser user agent string to use when communicating with "
-            "Fansly servers. This should ideally be set to the user agent "
-            "of the browser you use to view Fansly pages and where the "
-            "authorization token was obtained from.",
+             "Fansly servers. This should ideally be set to the user agent "
+             "of the browser you use to view Fansly pages and where the "
+             "authorization token was obtained from.",
     )
     parser.add_argument(
         '-ck', '--check-key',
@@ -72,7 +72,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         dest='check_key',
         help="Fansly's _checkKey in the main.js on https://fansly.com. "
-            "Essential for digital signature and preventing bans.",
+             "Essential for digital signature and preventing bans.",
     )
     # parser.add_argument(
     #     '-sid', '--session-id',
@@ -82,9 +82,9 @@ def parse_args() -> argparse.Namespace:
     #     help="Fansly's session ID.",
     # )
 
-    #endregion Essentials
+    # endregion Essentials
 
-    #region Download modes
+    # region Download modes
 
     download_modes = parser.add_mutually_exclusive_group(required=False)
 
@@ -127,14 +127,24 @@ def parse_args() -> argparse.Namespace:
         metavar='POST_ID',
         dest='download_mode_single',
         help='Use "Single" download mode. This will download a single post '
-            "by ID from an arbitrary creator. "
-            "A post ID must be at least 10 characters and consist of digits only."
-            "Example - https://fansly.com/post/1283998432982 -> ID is: 1283998432982",
+             "by ID from an arbitrary creator. "
+             "A post ID must be at least 10 characters and consist of digits only."
+             "Example - https://fansly.com/post/1283998432982 -> ID is: 1283998432982",
     )
 
-    #endregion Download Modes
+    # endregion Download Modes
 
-    #region Other Options
+    # region Other Options
+
+    parser.add_argument(
+        '-r', '--resolution',
+        required=False,
+        default=None,
+        type=int,
+        dest='resolution',
+        help='Define a resolution to download [360, 480, 720, 1080, 1440, 2160]. '
+             'Default is the highest resolution available.'
+    )
 
     parser.add_argument(
         '-ni', '--non-interactive',
@@ -143,9 +153,9 @@ def parse_args() -> argparse.Namespace:
         action='store_true',
         dest='non_interactive',
         help="Do not ask for input during warnings and errors that need "
-            "your attention but can be automatically continued. "
-            "Setting this will download all media of all users without any "
-            "intervention.",
+             "your attention but can be automatically continued. "
+             "Setting this will download all media of all users without any "
+             "intervention.",
     )
     parser.add_argument(
         '-npox', '--no-prompt-on-exit',
@@ -154,7 +164,7 @@ def parse_args() -> argparse.Namespace:
         action='store_true',
         dest='no_prompt_on_exit',
         help="Do not ask to press <ENTER> at the very end of the program. "
-            "Set this for a fully automated/headless experience.",
+             "Set this for a fully automated/headless experience.",
     )
     parser.add_argument(
         '-nfs', '--no-folder-suffix',
@@ -227,7 +237,7 @@ def parse_args() -> argparse.Namespace:
         action='store_true',
         dest='use_duplicate_threshold',
         help="Use an internal de-deduplication threshold to not download "
-            "already downloaded media again.",
+             "already downloaded media again.",
     )
     parser.add_argument(
         '-mh', '--metadata-handling',
@@ -236,7 +246,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         dest='metadata_handling',
         help="How to handle media EXIF metadata. "
-            "Supported strategies: Advanced (Default), Simple",
+             "Supported strategies: Advanced (Default), Simple",
     )
     parser.add_argument(
         '-tr', '--timeline-retries',
@@ -245,9 +255,9 @@ def parse_args() -> argparse.Namespace:
         type=int,
         dest='timeline_retries',
         help="Number of retries on empty timelines. Defaults to 1. "
-            "Part of anti-rate-limiting measures - try bumping up to eg. 2 "
-            "if nothing gets downloaded. Also see the explanation of "
-            "--timeline-delay-seconds.",
+             "Part of anti-rate-limiting measures - try bumping up to eg. 2 "
+             "if nothing gets downloaded. Also see the explanation of "
+             "--timeline-delay-seconds.",
     )
     parser.add_argument(
         '-td', '--timeline-delay-seconds',
@@ -256,22 +266,22 @@ def parse_args() -> argparse.Namespace:
         type=int,
         dest='timeline_delay_seconds',
         help="Number of seconds to wait before retrying empty timelines. "
-            "Defaults to 60. "
-            "Part of anti-rate-limiting measures - 1 retry/60 seconds works "
-            "all the time but also unnecessarily delays at the proper end of "
-            "a creator's timeline - since reaching the end and being "
-            "rate-limited is indistinguishable as of now. "
-            "You may try to lower this or set to 0 in order to speed things "
-            "up - but if nothing gets downloaded the Fansly server firewalls "
-            "rate-limited you. "
-            "You can calculate yourself how long a download session "
-            "(without download time and extra retries) will last at minimum: "
-            "NUMBER_OF_CREATORS * TIMELINE_RETRIES * TIMELINE_DELAY_SECONDS",
+             "Defaults to 60. "
+             "Part of anti-rate-limiting measures - 1 retry/60 seconds works "
+             "all the time but also unnecessarily delays at the proper end of "
+             "a creator's timeline - since reaching the end and being "
+             "rate-limited is indistinguishable as of now. "
+             "You may try to lower this or set to 0 in order to speed things "
+             "up - but if nothing gets downloaded the Fansly server firewalls "
+             "rate-limited you. "
+             "You can calculate yourself how long a download session "
+             "(without download time and extra retries) will last at minimum: "
+             "NUMBER_OF_CREATORS * TIMELINE_RETRIES * TIMELINE_DELAY_SECONDS",
     )
 
-    #endregion Other Options
+    # endregion Other Options
 
-    #region Developer/troubleshooting arguments
+    # region Developer/troubleshooting arguments
 
     parser.add_argument(
         '--debug',
@@ -287,17 +297,17 @@ def parse_args() -> argparse.Namespace:
         help="This is for internal use of the self-updating functionality only.",
     )
 
-    #endregion Dev/Tshoot
+    # endregion Dev/Tshoot
 
     return parser.parse_args()
 
 
 def check_attributes(
-            args: argparse.Namespace,
-            config: FanslyConfig,
-            arg_attribute: str,
-            config_attribute: str
-        ) -> None:
+        args: argparse.Namespace,
+        config: FanslyConfig,
+        arg_attribute: str,
+        config_attribute: str
+) -> None:
     """A helper method to validate the presence of attributes (properties)
     in `argparse.Namespace` and `FanslyConfig` objects for mapping
     arguments. This is to locate code changes and typos.
@@ -316,7 +326,7 @@ def check_attributes(
     """
     if hasattr(args, arg_attribute) and hasattr(config, config_attribute):
         return
-    
+
     raise RuntimeError(
         'Internal argument configuration error - please contact the developer.'
         f'(args.{arg_attribute} == {hasattr(args, arg_attribute)}, '
@@ -337,9 +347,9 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         raise RuntimeError('Internal error mapping arguments - configuration path not set. Load the config first.')
 
     config_overridden = False
-    
+
     config.debug = args.debug
-    
+
     if config.debug:
         print_debug(f'Args: {args}')
         print()
@@ -378,7 +388,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
     if args.download_mode_single is not None:
         post_id = args.download_mode_single
         config.download_mode = DownloadMode.SINGLE
-        
+
         if not is_valid_post_id(post_id):
             raise ConfigError(
                 f"Argument error - '{post_id}' is not a valid post ID. "
@@ -394,11 +404,20 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         try:
             config.metadata_handling = MetadataHandling(handling)
             config_overridden = True
-        
+
         except ValueError:
-               raise ConfigError(
+            raise ConfigError(
                 f"Argument error - '{handling}' is not a valid metadata handling strategy."
-            )         
+            )
+
+    if args.resolution:
+        try:
+            config.resolution = VideoResolution(args.resolution)
+            config_overridden = True
+        except ValueError:
+            raise ConfigError(
+                f"Argument error - '{args.resolution}' is not a valid resolution."
+            )
 
     # The code following avoids code duplication of checking an
     # argument and setting the override flag for each argument.
@@ -415,7 +434,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
         'token',
         'user_agent',
         'check_key',
-        #'session_id',
+        # 'session_id',
         'updated_to',
     ]
 
@@ -511,8 +530,8 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
     if config_overridden:
         print_warning(
             "You have specified some command-line arguments that override config.ini settings.\n"
-            f"{20*' '}A separate, temporary config file will be generated for this session\n"
-            f"{20*' '}to prevent accidental changes to your original configuration.\n"
+            f"{20 * ' '}A separate, temporary config file will be generated for this session\n"
+            f"{20 * ' '}to prevent accidental changes to your original configuration.\n"
         )
         config.config_path = config.config_path.parent / 'config_args.ini'
         save_config_or_raise(config)
