@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from utils.datetime import get_adjusted_datetime
+from config.resolutions import VideoResolution
 
 
 @dataclass
@@ -16,20 +17,20 @@ class MediaItem(object):
     default_normal_created_at: int = 0
     default_normal_locations: str | None = None
     default_normal_mimetype: str | None = None
-    default_normal_height: int = 0
+    default_normal_height: VideoResolution = VideoResolution.NOTSET
 
     media_id: int = 0
-    height: int = 0
+    height: VideoResolution = VideoResolution.NOTSET
     metadata: dict[str, Any] | None = None
     mimetype: str | None = None
     created_at: int = 0
     download_url: str | None = None
     file_extension: str | None = None
 
-    requested_height: int = 0
+    requested_height: VideoResolution = VideoResolution.NOTSET
     requested_height_found: bool = False
     requested_variant_resolution: int = 0
-    requested_variant_resolution_height: int = 0
+    requested_variant_resolution_height: VideoResolution = VideoResolution.NOTSET
     requested_variant_resolution_url: str | None = None
 
     is_preview: bool = False

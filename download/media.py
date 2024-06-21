@@ -9,6 +9,7 @@ from time import sleep
 from .downloadstate import DownloadState
 from .m3u8 import download_m3u8
 from .types import DownloadType
+from config.resolutions import VideoResolution
 
 from config import FanslyConfig
 from errors import ApiError, DownloadError, DuplicateCountError, M3U8Error, MediaError
@@ -139,12 +140,12 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
             if not file_save_dir.exists():
                 file_save_dir.mkdir(parents=True)
 
-        if config.resolution != 'MAX' and not media_item.requested_height_found:
-            print_warning(f"Requested resolution {config.resolution}p not found. Resolution set to {media_item.height}")
+        if config.resolution != VideoResolution.NOTSET and not media_item.requested_height_found:
+            print_warning(f"Requested resolution {config.resolution.value}p not found. Resolution set to {media_item.height.value}p ({media_item.height.description})")
 
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:
-            print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.height}p")
+            print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.height.value}p ({media_item.height.description})")
 
         try:
 

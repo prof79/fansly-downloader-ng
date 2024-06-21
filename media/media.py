@@ -7,6 +7,7 @@ from config import FanslyConfig
 from . import MediaItem
 
 from download.downloadstate import DownloadState
+from config.resolutions import VideoResolution
 from textio import print_error
 
 
@@ -59,12 +60,12 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
         current_variant_resolution = (content['width'] or 0) * (content['height'] or 0)
 
         if item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
-            if item.requested_height and item.requested_height == content['height']:
+            if item.requested_height and item.requested_height.value == content['height']:
                 item.requested_height_found = True
 
             if item.requested_height_found or current_variant_resolution > item.requested_variant_resolution:
                 item.requested_variant_resolution = current_variant_resolution
-                item.requested_variant_resolution_height = content['height'] or 0
+                item.requested_variant_resolution_height = VideoResolution(content['height']) or VideoResolution.NOTSET
                 item.requested_variant_resolution_url = location_url
 
                 item.media_id = int(content['id'])
@@ -121,8 +122,7 @@ def parse_media_info(
     #requested_variant_resolution_url, download_url, file_extension, metadata, default_normal_locations, default_normal_mimetype, mimetype =  None, None, None, None, None, None, None
     #created_at, media_id, requested_variant_resolution, requested_variant_resolution_height, default_normal_height = 0, 0, 0, 0, 0
     item = MediaItem()
-    if config.resolution != 'MAX':
-        item.requested_height = int(config.resolution)
+    item.requested_height = config.resolution
 
     # check if media is a preview
     item.is_preview = media_info['previewId'] is not None
@@ -142,7 +142,7 @@ def parse_media_info(
         item.default_normal_id = int(default_details['id'])
         item.default_normal_created_at = int(default_details['createdAt'])
         item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = default_details['height'] or 0
+        item.default_normal_height = VideoResolution(default_details['height']) or VideoResolution.NOTSET
 
     # if its a preview, we take the default preview media instead
     else:
@@ -152,7 +152,7 @@ def parse_media_info(
         item.default_normal_id = int(media_info['preview']['id'])
         item.default_normal_created_at = int(default_details['createdAt'])
         item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = default_details['height'] or 0
+        item.default_normal_height = VideoResolution(default_details['height']) or VideoResolution.NOTSET
 
     if default_details['locations']:
         item.default_normal_locations = default_details['locations'][0]['location']
@@ -192,12 +192,12 @@ def parse_media_info(
                 [
                     item.default_normal_height,
                     item.default_normal_locations,
-                    item.requested_variant_resolution_height,
+                    item.requested_variant_resolution_height.value,
                     item.requested_variant_resolution_url,
                 ]
             ) and all(
                 [
-                    item.default_normal_height > item.requested_variant_resolution_height,
+                    item.default_normal_height.value > item.requested_variant_resolution_height.value,
                     item.default_normal_mimetype == item.mimetype,
                 ]
             ) and not item.requested_height_found or not item.download_url:

@@ -9,6 +9,7 @@ from .config import parse_items_from_line, sanitize_creator_names
 from .fanslyconfig import FanslyConfig
 from .metadatahandling import MetadataHandling
 from .modes import DownloadMode
+from .resolutions import VideoResolution
 
 from errors import ConfigError
 from textio import print_debug, print_warning
@@ -149,9 +150,10 @@ def parse_args() -> argparse.Namespace:
         '-r', '--resolution',
         required=False,
         default=None,
-        metavar='REQUESTED_RESOLUTION',
+        type=int,
         dest='resolution',
-        help='Define a lower resolution to download. Default is the highest resolution available.'
+        help='Define a resolution to download [360, 480, 720, 1080, 1440, 2160]. '
+             'Default is the highest resolution available.'
     )
 
     parser.add_argument(
@@ -441,8 +443,14 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
             )
 
     if args.resolution:
-        config.resolution = args.resolution
-        config_overridden = True
+        try:
+            config.resolution = VideoResolution(args.resolution)
+            config_overridden = True
+        except ValueError:
+            raise ConfigError(
+                f"Argument error - '{args.resolution}' is not a valid resolution."
+            )
+
 
     # The code following avoids code duplication of checking an
     # argument and setting the override flag for each argument.
