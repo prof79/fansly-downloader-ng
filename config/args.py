@@ -146,6 +146,7 @@ def parse_args() -> argparse.Namespace:
     # endregion Download Modes
 
     # region Other Options
+
     parser.add_argument(
         '-r', '--resolution',
         required=False,

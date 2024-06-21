@@ -4,10 +4,10 @@
 import json
 
 from config import FanslyConfig
+from config.resolutions import VideoResolution
 from . import MediaItem
 
 from download.downloadstate import DownloadState
-from config.resolutions import VideoResolution
 from textio import print_error
 
 
@@ -43,15 +43,13 @@ def parse_variant_metadata(variant_metadata_json: str):
 
 
 # TODO: Enums in Python for content_type?
-def parse_variants(item: MediaItem, content: dict, content_type: str, media_info: dict): # content_type: media / preview
+def parse_variants(item: MediaItem, content: dict, content_type: str, media_info: dict) -> None: # content_type: media / preview
     """Parse metadata and resolution variants of a Fansly media item.
     
     :param MediaItem item: The media to parse and correct.
     :param dict content: ???
     :param str content_type: "media" or "preview"
     :param dict media_info: ???
-
-    :return: bool requested_resolution_found: defines whether requested resolution was found / exists
     """
 
     if content.get('locations'):
@@ -65,7 +63,7 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
 
             if item.requested_height_found or current_variant_resolution > item.requested_variant_resolution:
                 item.requested_variant_resolution = current_variant_resolution
-                item.requested_variant_resolution_height = VideoResolution(content['height']) or VideoResolution.NOTSET
+                item.requested_variant_resolution_height = content['height'] or 0
                 item.requested_variant_resolution_url = location_url
 
                 item.media_id = int(content['id'])
@@ -95,7 +93,6 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
                 8 hours ago, can contain images from 3 months ago. so the date we are parsing here,
                 might be the date, that the fansly CDN has first seen that specific content and the
                 content creator, just attaches that old content to a public post after e.g. 3 months.
-
                 or createdAt & updatedAt are also just bugged out idk..
                 note: images would be overwriting each other by filename, if hashing didnt provide uniqueness
                 else we would be forced to add randint(-1800, 1800) to epoch timestamps
@@ -142,7 +139,7 @@ def parse_media_info(
         item.default_normal_id = int(default_details['id'])
         item.default_normal_created_at = int(default_details['createdAt'])
         item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = VideoResolution(default_details['height']) or VideoResolution.NOTSET
+        item.default_normal_height = default_details['height'] or 0
 
     # if its a preview, we take the default preview media instead
     else:
@@ -152,7 +149,7 @@ def parse_media_info(
         item.default_normal_id = int(media_info['preview']['id'])
         item.default_normal_created_at = int(default_details['createdAt'])
         item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-        item.default_normal_height = VideoResolution(default_details['height']) or VideoResolution.NOTSET
+        item.default_normal_height = default_details['height'] or 0
 
     if default_details['locations']:
         item.default_normal_locations = default_details['locations'][0]['location']
@@ -197,7 +194,7 @@ def parse_media_info(
                 ]
             ) and all(
                 [
-                    item.default_normal_height.value > item.requested_variant_resolution_height.value,
+                    item.default_normal_height > item.requested_variant_resolution_height,
                     item.default_normal_mimetype == item.mimetype,
                 ]
             ) and not item.requested_height_found or not item.download_url:
@@ -221,5 +218,8 @@ def parse_media_info(
             print_error(f"Failed downloading a video! Please open a GitHub issue ticket called 'Metadata missing' and copy paste this:\n\
                 \n\tMetadata Missing\n\tpost_id: {post_id} & media_id: {item.media_id} & creator username: {state.creator_name}\n", 14)
             input('Press Enter to attempt continue downloading ...')
+
+    if item.mimetype == 'video/mp4':
+        item.height = VideoResolution(item.height)
     
     return item
