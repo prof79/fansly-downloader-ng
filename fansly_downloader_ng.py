@@ -101,11 +101,11 @@ def main(config: FanslyConfig) -> int:
     # may overwrite config.ini settings later on during validation
     # when the config may be saved again.
     # Thus a separate config_args.ini will be used for the session.
-    map_args_to_config(args, config)
+    download_mode_set = map_args_to_config(args, config)
 
     self_update(config)
 
-    validate_adjust_config(config)
+    validate_adjust_config(config, download_mode_set)
 
     if config.user_names is None \
             or config.download_mode == DownloadMode.NOTSET:
