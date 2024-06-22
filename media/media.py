@@ -8,7 +8,7 @@ from config.resolutions import VideoResolution
 from . import MediaItem
 
 from download.downloadstate import DownloadState
-from textio import print_error
+from textio import print_error, print_warning
 
 
 def simplify_mimetype(mimetype: str):
@@ -58,12 +58,13 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
         current_variant_resolution = (content['width'] or 0) * (content['height'] or 0)
 
         if item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
-            if item.requested_height and (item.requested_height.value == content['height'] or item.requested_height.value == content['width']):
-                item.requested_height_found = True
+            if item.requested_resolution and (item.requested_resolution.value == content['height'] or item.requested_resolution.value == content['width']):
+                item.requested_resolution_found = True
+                item.default_normal_requested = False
 
-            if item.requested_height_found or current_variant_resolution > item.requested_variant_resolution:
-                item.requested_variant_resolution = current_variant_resolution
-                item.requested_variant_resolution_height = min((content['height'] or 0), (content['width'] or 0))
+            if item.requested_resolution_found or current_variant_resolution > item.requested_variant_pixel_count:
+                item.requested_variant_pixel_count = current_variant_resolution
+                item.requested_variant_resolution = (content['height'] or 0) if item.resolution_defined_by_height else (content['width'] or 0)
                 item.requested_variant_resolution_url = location_url
 
                 item.media_id = int(content['id'])
@@ -104,7 +105,7 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
                     item.created_at = int(media_info[content_type]['createdAt'])
 
     item.download_url = item.requested_variant_resolution_url
-    item.height = item.requested_variant_resolution_height
+    item.resolution = item.requested_variant_resolution
 
 
 def parse_media_info(
@@ -119,11 +120,11 @@ def parse_media_info(
     #requested_variant_resolution_url, download_url, file_extension, metadata, default_normal_locations, default_normal_mimetype, mimetype =  None, None, None, None, None, None, None
     #created_at, media_id, requested_variant_resolution, requested_variant_resolution_height, default_normal_height = 0, 0, 0, 0, 0
     item = MediaItem()
-    item.requested_height = config.resolution
+    item.requested_resolution = config.resolution
 
     # check if media is a preview
     item.is_preview = media_info['previewId'] is not None
-    
+
     # fix rare bug, of free / paid content being counted as preview
     if item.is_preview:
         if media_info['access']:
@@ -143,8 +144,22 @@ def parse_media_info(
     item.default_normal_id = int(default_details['id'])
     item.default_normal_created_at = int(default_details['createdAt'])
     item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
-    item.default_normal_height = min((default_details['height'] or 0), (default_details['width'] or 0))
-    item.default_normal_resolution = (default_details['width'] or 0) * (default_details['height'] or 0)
+    item.default_normal_pixel_count = (default_details['width'] or 0) * (default_details['height'] or 0)
+    item.default_normal_resolution = default_details['height'] or 0
+
+    if item.default_normal_mimetype == 'video/mp4':
+        try:
+            item.default_normal_resolution = VideoResolution((default_details['height'] or 0))
+            if all([default_details['locations'], item.requested_resolution, item.requested_resolution.value == default_details['height']]):
+                item.requested_resolution_found = True
+        except ValueError:
+            try:
+                item.default_normal_resolution = VideoResolution((default_details['width'] or 0))
+                item.resolution_defined_by_height = False
+                if all([default_details['locations'], item.requested_resolution, item.requested_resolution.value == default_details['width']]):
+                    item.requested_resolution_found = True
+            except ValueError:
+                print_warning(f"Default video has an untypical resolution.\n")
 
     if default_details['locations']:
         item.default_normal_locations = default_details['locations'][0]['location']
@@ -156,20 +171,18 @@ def parse_media_info(
         variants = media_info['media']['variants']
 
         for content in variants:
-            if not item.requested_height_found:
-                parse_variants(item, content=content, content_type='media', media_info=media_info)
-            else:
+            parse_variants(item, content=content, content_type='media', media_info=media_info)
+            if item.requested_resolution_found:
                 break
 
     # previews: if media location is not found, we work with the preview media info instead
     if not item.download_url and 'preview' in media_info:
         variants = media_info['preview']['variants']
-        item.requested_height_found = False
+        item.requested_resolution_found = False
 
         for content in variants:
-            if not item.requested_height_found:
-                parse_variants(item, content=content, content_type='preview', media_info=media_info)
-            else:
+            parse_variants(item, content=content, content_type='preview', media_info=media_info)
+            if item.requested_resolution_found:
                 break
 
     """
@@ -181,20 +194,21 @@ def parse_media_info(
     if \
             all(
                 [
-                    item.default_normal_resolution,
+                    item.default_normal_pixel_count,
                     item.default_normal_locations,
-                    item.requested_variant_resolution,
+                    item.requested_variant_pixel_count,
                     item.requested_variant_resolution_url,
+                    item.default_normal_requested
                 ]
             ) and all(
                 [
-                    item.default_normal_resolution > item.requested_variant_resolution,
+                    item.default_normal_pixel_count > item.requested_variant_pixel_count,
                     item.default_normal_mimetype == item.mimetype,
                 ]
-            ) and not item.requested_height_found or not item.download_url:
+            ) or not item.download_url:
         # overwrite default variable values, which we will finally return; with the ones from the default media
         item.media_id = item.default_normal_id
-        item.height = item.default_normal_height
+        item.resolution = item.default_normal_resolution
         item.created_at = item.default_normal_created_at
         item.mimetype = item.default_normal_mimetype
         item.download_url = item.default_normal_locations
@@ -214,6 +228,9 @@ def parse_media_info(
             input('Press Enter to attempt continue downloading ...')
 
     if item.mimetype == 'video/mp4':
-        item.height = VideoResolution(item.height)
-    
+        try:
+            item.resolution = VideoResolution(item.resolution)
+        except ValueError:
+            print_warning(f"Variant video has an untypical resolution.\n")
+
     return item
