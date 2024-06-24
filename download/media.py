@@ -12,6 +12,7 @@ from .m3u8 import download_m3u8
 from .types import DownloadType
 
 from config import FanslyConfig
+from config.resolutions import VideoResolution
 from errors import ApiError, DownloadError, DuplicateCountError, M3U8Error, MediaError
 from fileio.dedupe import dedupe_media_file
 from media import MediaItem
@@ -137,10 +138,26 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
 
             if not file_save_dir.exists():
                 file_save_dir.mkdir(parents=True)
+
+        if config.resolution != VideoResolution.NOTSET and not media_item.requested_resolution_found and media_item.mimetype == 'video/mp4':
+            try:  # typical resolution was found and instance of VideoResolution was created
+                print_warning(
+                    f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.resolution.value}p ({media_item.resolution.description})\n")
+            except AttributeError:  # untypical resolution
+                print_warning(
+                    f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.resolution}p\n")
         
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:
-            print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
+            if media_item.mimetype == 'video/mp4':
+                try:  # typical resolution was found and instance of VideoResolution was created
+                    print_info(
+                        f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.resolution.value}p ({media_item.resolution.description})")
+                except AttributeError:  # untypical resolution
+                    print_info(
+                        f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.resolution}p")
+            else:
+                print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
 
         try:
 
