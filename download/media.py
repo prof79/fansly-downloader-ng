@@ -139,13 +139,23 @@ def download_media(config: FanslyConfig, state: DownloadState, accessible_media:
             if not file_save_dir.exists():
                 file_save_dir.mkdir(parents=True)
 
-        if config.resolution != VideoResolution.NOTSET and not media_item.requested_height_found and media_item.mimetype == 'video/mp4':
-            print_warning(f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.height.value}p ({media_item.height.description})\n")
+        if config.resolution != VideoResolution.NOTSET and not media_item.requested_resolution_found and media_item.mimetype == 'video/mp4':
+            try:
+                print_warning(
+                    f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.resolution.value}p ({media_item.resolution.description})\n")
+            except AttributeError:
+                print_warning(
+                    f"Requested resolution {config.resolution.value}p ({config.resolution.description}) not found. Resolution set to {media_item.resolution}p\n")
         
         # if show_downloads is True / downloads should be shown
         if config.show_downloads:
             if media_item.mimetype == 'video/mp4':
-                print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.height.value}p ({media_item.height.description})")
+                try:
+                    print_info(
+                        f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.resolution.value}p ({media_item.resolution.description})")
+                except AttributeError:
+                    print_info(
+                        f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}' in {media_item.resolution}p")
             else:
                 print_info(f"Downloading {media_item.mimetype.split('/')[-2]} '{filename}'")
 
