@@ -444,7 +444,7 @@ def validate_adjust_download_mode(config: FanslyConfig, download_mode_set: bool)
     and adjusts it if desired.
 
     :param FanslyConfig config: The configuration to validate and correct.
-    :param bool download_mode_set: Indicated whether a download mode as been set using args
+    :param bool download_mode_set: Indicates whether a download mode as been set using args
     """
     current_download_mode = config.download_mode.capitalize()
     print_info(f"The current download mode is set to '{current_download_mode}'.")
@@ -476,7 +476,7 @@ def validate_adjust_config(config: FanslyConfig, download_mode_set: bool) -> Non
     and corrects them if possible.
 
     :param FanslyConfig config: The configuration to validate and correct.
-    :param bool download_mode_set: Indicated whether a download mode as been set using args
+    :param bool download_mode_set: Indicates whether a download mode as been set using args
     """
     if not validate_creator_names(config):
         raise ConfigError('Configuration error - no valid creator name specified.')
@@ -491,4 +491,4 @@ def validate_adjust_config(config: FanslyConfig, download_mode_set: bool) -> Non
 
     validate_adjust_download_directory(config)
 
-    validate_adjust_download_mode(config, download_mode_set)
+    validate_adjust_download_mode(config, download_mode_set)  # don't prompt if download mode has specifically been set with args
