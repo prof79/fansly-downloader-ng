@@ -60,8 +60,9 @@ def parse_variants(item: MediaItem, content: dict, content_type: str, media_info
         if item.default_normal_mimetype == simplify_mimetype(content['mimetype']):
             if item.requested_resolution and (item.requested_resolution.value == content['height'] or item.requested_resolution.value == content['width']):
                 item.requested_resolution_found = True
-                item.default_normal_requested = False
+                item.default_normal_requested = False  # a variant with the requested resolution is found, therefore we don't want the default video
 
+            # if requested resolution is never found, the best quality video is taken from variants
             if item.requested_resolution_found or current_variant_resolution > item.requested_variant_pixel_count:
                 item.requested_variant_pixel_count = current_variant_resolution
                 item.requested_variant_resolution = (content['height'] or 0) if item.resolution_defined_by_height else (content['width'] or 0)
@@ -117,8 +118,6 @@ def parse_media_info(
     """Parse media JSON reply from Fansly API."""
 
     # initialize variables
-    #requested_variant_resolution_url, download_url, file_extension, metadata, default_normal_locations, default_normal_mimetype, mimetype =  None, None, None, None, None, None, None
-    #created_at, media_id, requested_variant_resolution, requested_variant_resolution_height, default_normal_height = 0, 0, 0, 0, 0
     item = MediaItem()
     item.requested_resolution = config.resolution
 
@@ -145,20 +144,21 @@ def parse_media_info(
     item.default_normal_created_at = int(default_details['createdAt'])
     item.default_normal_mimetype = simplify_mimetype(default_details['mimetype'])
     item.default_normal_pixel_count = (default_details['width'] or 0) * (default_details['height'] or 0)
-    item.default_normal_resolution = default_details['height'] or 0
+    item.default_normal_resolution = default_details['height'] or 0  # assume resolution is defined by height
 
     if item.default_normal_mimetype == 'video/mp4':
-        try:
+        try:  # try to create an instance of VideoResolution with the height of the video
             item.default_normal_resolution = VideoResolution((default_details['height'] or 0))
+            # if the default video is in the requested resolution set boolean to true
             if all([default_details['locations'], item.requested_resolution, item.requested_resolution.value == default_details['height']]):
                 item.requested_resolution_found = True
-        except ValueError:
+        except ValueError:  # failed, resolution must be defined by width
             try:
                 item.default_normal_resolution = VideoResolution((default_details['width'] or 0))
                 item.resolution_defined_by_height = False
                 if all([default_details['locations'], item.requested_resolution, item.requested_resolution.value == default_details['width']]):
                     item.requested_resolution_found = True
-            except ValueError:
+            except ValueError:  # both height and width are not in [360, 480, 720, 1080, 1440, 2160]
                 print_warning(f"Default video has an untypical resolution.\n")
 
     if default_details['locations']:
@@ -172,7 +172,7 @@ def parse_media_info(
 
         for content in variants:
             parse_variants(item, content=content, content_type='media', media_info=media_info)
-            if item.requested_resolution_found:
+            if item.requested_resolution_found:  # stop checking variants if one with the requested resolution was found
                 break
 
     # previews: if media location is not found, we work with the preview media info instead
@@ -188,8 +188,8 @@ def parse_media_info(
     """
     so the way this works is; we have these 4 base variables defined all over this function.
     parse_variants() will initially overwrite them with values from each contents variants above.
-    then right below, we will compare the values and decide which media has the higher resolution. (default populated content vs content from variants)
-    or if variants didn't provide a higher resolution at all, we just fall back to the default content
+    then right below, we will compare the values and decide which media has the higher pixel count. (default populated content vs content from variants)
+    or if variants didn't provide a higher resolution at all or the default resolution was requested (True by default), we just fall back to the default content
     """
     if \
             all(
@@ -228,7 +228,7 @@ def parse_media_info(
             input('Press Enter to attempt continue downloading ...')
 
     if item.mimetype == 'video/mp4':
-        try:
+        try:  # try to create instance with the found resolution
             item.resolution = VideoResolution(item.resolution)
         except ValueError:
             print_warning(f"Variant video has an untypical resolution.\n")
