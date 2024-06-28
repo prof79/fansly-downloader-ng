@@ -117,17 +117,18 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.7 2024-03-22
+### v0.9.8 2024-06-28
 
-Fix for update checks (hopefully) and disabled SSL verification for WebSockets due to a specific issue.
-Things are complicated for you now, check key must be deciphered by evaluating a `JavaScript` expression.
+Download menu in interactive mode ([#58](https://github.com/prof79/fansly-downloader-ng/issues/58)) kudos @1gintonic
 
 For more details and history see: **[Release Notes](ReleaseNotes.md)**
 
 ## 🏗️ Setup
+
 On Windows you can just download and run the [executable version](https://github.com/prof79/fansly-downloader-ng/releases/latest) - skip the entire setup section and go directly to [Quick Start](https://github.com/prof79/fansly-downloader-ng#-quick-start).
 
-#### Python Environment
+### Python Environment
+
 If your operating system is not compatible with executable versions of **Fansly Downloader NG** (only Windows supported for ``.exe``) or you want to use the Python sources directly please [download and extract](https://github.com/prof79/fansly-downloader-ng/archive/refs/heads/master.zip) *or* clone the repository and ensure that [Python 3.11+](https://www.python.org/downloads/) is installed on your system.
 
 **Note:** Using a [Python virtual environment](https://docs.python.org/3/library/venv.html) is recommended but out-of-scope of this guide.
@@ -155,6 +156,7 @@ After all requirements are met run `fansly_downloader_ng.py`.
 Raw Python code versions of **Fansly Downloader NG** do not receive automatic updates. If an update is available you will be notified but need to manually download and set-up the [current repository](https://github.com/prof79/fansly-downloader-ng/archive/refs/heads/master.zip) again.
 
 ## 🚀 Quick Start
+
 Follow these steps to quickly get started with either the [Python](https://github.com/prof79/fansly-downloader-ng#python-version-requirements) or the [Executable](https://github.com/prof79/fansly-downloader-ng/releases/latest):
 
 1. Download the latest version of **Fansly Downloader NG** by choosing one of the options below:
@@ -173,6 +175,7 @@ See the [manual set-up tutorial](https://github.com/prof79/fansly-downloader-ng/
 Once you have completed the initial configuration of **Fansly Downloader NG**, for every future use case, you will only need to adapt the creator(s) in `Targeted Creator > Username` section in the `config.ini` using a text editor of your choice. Additional settings can also be found in the `config.ini` file, which are documented in [the Wiki](https://github.com/prof79/fansly-downloader-ng/wiki/Explanation-of-provided-programs-&-their-functionality#4-configini) page.
 
 ## 🤔 FAQ
+
 Do you have any unanswered questions or want to know more about **Fansly Downloader NG**? Head over to the [Wiki](https://github.com/prof79/fansly-downloader-ng/wiki) or check if your topic was mentioned in [Discussions](https://github.com/prof79/fansly-downloader-ng/discussions) or [Issues](https://github.com/prof79/fansly-downloader-ng/issues)
 
 * **Q**: "Is **Fansly Downloader NG** exclusive to Windows?"
@@ -202,13 +205,17 @@ If you're knowledgeable with the Python programming language you can decompile a
 Please note that "Issue" tickets are reserved for reporting genuine or suspected bugs in the codebase of the downloader which require attention from the developer. They are not for general computer user problems.
 
 ## 🤝 Contributing to Fansly Downloader NG
+
 Any kind of positive contribution is welcome! Please help the project improve by [opening a pull request](https://github.com/prof79/fansly-downloader-ng/pulls) with your suggested changes!
 
 ### Special Thanks
+
 A heartfelt thank you goes out to [@liviaerxin](https://github.com/liviaerxin) for their invaluable contribution in providing the cross-platform package [plyvel](https://github.com/wbolster/plyvel). Due to [these builds](https://github.com/liviaerxin/plyvel/releases/latest) Fansly downloader NG's initial interactive cross-platform setup has become a reality.
 
 ## 🛡️ License
+
 This project (including executables) is licensed under the GPL-3.0 License - see the [`LICENSE`](LICENSE) file for details.
 
 ## Disclaimer
+
 "Fansly" or [fansly.com](https://fansly.com/) is operated by Select Media LLC as stated on their "Contact" page. This repository and the provided content in it isn't in any way affiliated with, sponsored by, or endorsed by Select Media LLC or "Fansly". The developer(referred to: "prof79" in the following) of this code is not responsible for the end users actions, no unlawful activities of any kind are being encouraged. Statements and processes described in this repository only represent best practice guidance aimed at fostering an effective software usage. The repository was written purely for educational purposes, in an entirely theoretical environment. Thus, any information is presented on the condition that the developer of this code shall not be held liable in no event to you or anyone else for any direct, special, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including without limitation, loss of profit, loss of use, savings or revenue, or the claims of third parties, whether the developer has advised of the possibility of such loss, however caused and on any theory of liability, arising out of or in connection with the possession, use or performance of this software. The material embodied in this repository is supplied to you "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of fitness. This code does not bypass any paywalls & no end user information is collected during usage. Finally it is important to note that this GitHub repository is the sole branch maintained and owned by the developer and any third-party websites or entities, that might refer to or be referred from it are in no way affiliated with Fansly Downloader, either directly or indirectly. This disclaimer is preliminary and is subject to revision.

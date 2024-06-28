@@ -2,6 +2,9 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.8 2024-06-28
+Download menu in interactive mode ([#58](https://github.com/prof79/fansly-downloader-ng/issues/58)) kudos @1gintonic
+
 ### v0.9.7 2024-03-22
 
 Fix for update checks (hopefully) and disabled SSL verification for WebSockets due to a specific issue.
