@@ -2,7 +2,12 @@
 
 ## 🗒️ Release Notes
 
+### v0.9.9 2024-06-28
+
+Accept URLs/be less picky when specifying single posts kudos ([#64](https://github.com/prof79/fansly-downloader-ng/issues/64)) @1gintonic
+
 ### v0.9.8 2024-06-28
+
 Download menu in interactive mode ([#58](https://github.com/prof79/fansly-downloader-ng/issues/58)) kudos @1gintonic
 
 ### v0.9.7 2024-03-22
