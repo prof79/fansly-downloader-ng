@@ -79,6 +79,22 @@ def is_valid_post_id(post_id: str) -> bool:
     )
 
 
+def get_post_id_from_request(requested_post: str) -> str:
+    """Strips post_id from a post link if necessary.
+    Otherwise, the post_id is returned directly
+
+    :param requested_post: The request made by the user.
+    :type requested_post: str
+
+    :return: The extracted post_id.
+    :rtype: str
+    """
+    post_id = requested_post
+    if requested_post.startswith("https://fansly.com/"):
+        post_id = requested_post.split('/')[-1]
+    return post_id
+
+
 def open_location(filepath: Path, open_folder_when_finished: bool, interactive: bool) -> bool:
     """Opens the download directory in the platform's respective
     file manager application once the download process has finished.
