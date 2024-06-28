@@ -2,8 +2,8 @@
 
 """Fansly Downloader NG"""
 
-__version__ = '0.9.9'
-__date__ = '2024-06-28T15:08:00+02'
+__version__ = '0.9.10'
+__date__ = '2024-06-28T15:23:00+02'
 __maintainer__ = 'prof79'
 __copyright__ = f'Copyright (C) 2023-2024 by {__maintainer__}'
 __authors__ = [
@@ -139,7 +139,7 @@ def main(config: FanslyConfig) -> int:
                 state = DownloadState(creator_name=creator_name)
 
                 # Special treatment for deviating folder names later
-                if not config.download_mode == DownloadMode.SINGLE:
+                if not config.download_mode == DownloadMode.POSTS:
                     dedupe_init(config, state)
 
                 print_download_info(config)
@@ -150,14 +150,14 @@ def main(config: FanslyConfig) -> int:
                 # Normal: Downloads Timeline + Messages one after another.
                 # Timeline: Scrapes only the creator's timeline content.
                 # Messages: Scrapes only the creator's messages content.
-                # Single: Fetch a single post by the post's ID. Click on a post to see its ID in the url bar e.g. ../post/1283493240234
+                # Posts: Fetch all desired post by their ID. Click on a post to see its ID in the url bar e.g. ../post/1283493240234
                 # Collection: Download all content listed within the "Purchased Media Collection"
 
                 print_info(f'Download mode is: {config.download_mode_str()}')
                 print()
 
-                if config.download_mode == DownloadMode.SINGLE:
-                    download_single_post(config, state)
+                if config.download_mode == DownloadMode.POSTS:
+                    download_posts(config, state)
 
                 elif config.download_mode == DownloadMode.COLLECTION:
                     download_collections(config, state)

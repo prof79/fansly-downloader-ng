@@ -117,9 +117,9 @@ This is a rewrite/refactoring of [Avnsx](https://github.com/Avnsx)'s original [F
 
 ⚠️ Due to a [hashing bug](../../issues/13) duplicate videos might be downloaded if a creator re-posts a lot. Downloaded videos will have to be renamed in a future version when video hashing is perfected.
 
-### v0.9.9 2024-06-28
+### v0.9.10 2024-06-28
 
-Accept URLs/be less picky when specifying single posts kudos ([#64](https://github.com/prof79/fansly-downloader-ng/issues/64)) @1gintonic
+Posts batch downloading ([#63](https://github.com/prof79/fansly-downloader-ng/issues/63)) kudos @1gintonic
 
 ### v0.9.8 2024-06-28
 

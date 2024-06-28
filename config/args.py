@@ -121,13 +121,14 @@ def parse_args() -> argparse.Namespace:
         help='Use "Collection" download mode. This will ony download a collection.',
     )
     download_modes.add_argument(
-        '--single',
+        '--posts',
         required=False,
         default=None,
         metavar='REQUESTED_POST',
-        dest='download_mode_single',
-        help='Use "Single" download mode. This will download a single post '
-            "by link or ID from an arbitrary creator. "
+        dest='download_mode_posts',
+        nargs='*',
+        help='Use "Posts" download mode. This will download one or more posts desired '
+            "by ID from arbitrary creators. Append all IDs separated by a whitespace."
             "A post ID must be at least 10 characters and consist of digits only."
             "Example - https://fansly.com/post/1283998432982 -> ID is: 1283998432982",
     )
@@ -385,17 +386,18 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
         config_overridden = True
         download_mode_set = True
 
-    if args.download_mode_single is not None:
-        post_id = get_post_id_from_request(args.download_mode_single)
-        config.download_mode = DownloadMode.SINGLE
-        
-        if not is_valid_post_id(post_id):
-            raise ConfigError(
-                f"Argument error - '{post_id}' is not a valid post ID. "
-                "For an ID at least 10 characters/only digits are required."
-            )
+    if args.download_mode_posts is not None:
+        post_ids = args.download_mode_posts
+        config.download_mode = DownloadMode.POSTS
 
-        config.post_id = post_id
+        for post_id in post_ids:
+            if not is_valid_post_id(post_id):
+                raise ConfigError(
+                    f"Argument error - '{post_id}' is not a valid post ID. "
+                    "At least 10 characters/only digits required."
+                )
+
+        config.post_ids = post_ids
         config_overridden = True
         download_mode_set = True
 
