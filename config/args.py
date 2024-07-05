@@ -324,7 +324,7 @@ def check_attributes(
     )
 
 
-def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
+def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> None:
     """Maps command-line arguments to the configuration object of
     the current session.
     
@@ -332,15 +332,11 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
         retrieved via argparse.
     :param FanslyConfig config: The program configuration to map the
         arguments to.
-
-    :return bool download_mode_set: Used to determine whether the
-        download mode has been specified with the command line.
     """
     if config.config_path is None:
         raise RuntimeError('Internal error mapping arguments - configuration path not set. Load the config first.')
 
     config_overridden = False
-    download_mode_set = False
     
     config.debug = args.debug
     
@@ -368,22 +364,22 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
     if args.download_mode_normal:
         config.download_mode = DownloadMode.NORMAL
         config_overridden = True
-        download_mode_set = True
+        config.download_mode_set = True
 
     if args.download_mode_messages:
         config.download_mode = DownloadMode.MESSAGES
         config_overridden = True
-        download_mode_set = True
+        config.download_mode_set = True
 
     if args.download_mode_timeline:
         config.download_mode = DownloadMode.TIMELINE
         config_overridden = True
-        download_mode_set = True
+        config.download_mode_set = True
 
     if args.download_mode_collection:
         config.download_mode = DownloadMode.COLLECTION
         config_overridden = True
-        download_mode_set = True
+        config.download_mode_set = True
 
     if args.download_mode_single is not None:
         post_id = args.download_mode_single
@@ -397,7 +393,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
 
         config.post_id = post_id
         config_overridden = True
-        download_mode_set = True
+        config.download_mode_set = True
 
     if args.metadata_handling is not None:
         handling = args.metadata_handling.strip().lower()
@@ -527,5 +523,3 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
         )
         config.config_path = config.config_path.parent / 'config_args.ini'
         save_config_or_raise(config)
-
-    return download_mode_set

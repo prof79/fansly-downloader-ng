@@ -42,6 +42,7 @@ class FanslyConfig(object):
     # Objects
     _parser = ConfigParser(interpolation=None)
     _api: Optional[FanslyApi] = None
+    download_mode_set: bool = False
 
     #endregion File-Independent
 
