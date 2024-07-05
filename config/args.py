@@ -13,7 +13,7 @@ from .modes import DownloadMode
 
 from errors import ConfigError
 from textio import print_debug, print_warning
-from utils.common import is_valid_post_id, save_config_or_raise, get_post_id_from_request
+from utils.common import is_valid_post_id, save_config_or_raise, get_post_ids_from_list_of_requests
 
 
 def parse_args() -> argparse.Namespace:
@@ -386,7 +386,7 @@ def map_args_to_config(args: argparse.Namespace, config: FanslyConfig) -> bool:
         download_mode_set = True
 
     if args.download_mode_posts is not None:
-        post_ids = get_post_id_from_request(args.download_mode_single)
+        post_ids = get_post_ids_from_list_of_requests(args.download_mode_posts)
         config.download_mode = DownloadMode.POSTS
 
         for post_id in post_ids:
