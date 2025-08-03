@@ -268,7 +268,7 @@ class FanslyApi(object):
 
     def get_group(self) -> Response:
         return self.get_with_ngsw(
-            url='https://apiv3.fansly.com/api/v1/group',
+            url='https://apiv3.fansly.com/api/v1/messaging/groups',
         )
 
 
