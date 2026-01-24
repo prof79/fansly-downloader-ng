@@ -25,7 +25,7 @@ def download_messages(config: FanslyConfig, state: DownloadState):
         .get_group()
 
     if groups_response.status_code == 200:
-        groups_response = groups_response.json()['response']['groups']
+        groups_response = groups_response.json()['response']['aggregationData']['groups']
 
         # go through messages and check if we even have a chat history with the creator
         group_id = None
